@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block body %}
+<nav class="navbar navbar-light bg-light">
+  <div class="container-fluid justify-content-center">
+     <a href="{% url 'home' %}" class="navbar-brand">Foodle</a>
+     <a href="/login/" class="btn btn-primary ms-auto">Login</a>
+  </div>
+</nav>
+
+<div class="container mt-5">
+    <!-- Hero Section -->
+    <div class="p-5 mb-4 bg-light rounded-3">
+      <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Welcome to Foodle</h1>
+        <p class="col-md-8 fs-4">Your ultimate companion for cooking, tracking, and sharing delicious meals.</p>
+        <a href="/login/" class="btn btn-primary btn-lg" type="button">Get Started</a>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row align-items-md-stretch">
+      <div class="col-md-6 mb-4">
+        <div class="h-100 p-5 text-white bg-dark rounded-3">
+          <h2>Features</h2>
+          <ul class="list-unstyled mt-3">
+              <li class="mb-2">
+                  <strong>Recipe Creator:</strong> Input recipes and save to a personal cookbook.
+              </li>
+              <li class="mb-2">
+                  <strong>Smart Calorie Tracking:</strong> Auto-calculate calories and macros with the food input system.
+              </li>
+              <li class="mb-2">
+                  <strong>Daily Log:</strong> Track daily intake.
+              </li>
+              <li class="mb-2">
+                  <strong>Meal Planning:</strong> Organize recipes into a weekly schedule.
+              </li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Socials Section -->
+      <div class="col-md-6 mb-4">
+        <div class="h-100 p-5 bg-light border rounded-3">
+          <h2>Socials</h2>
+          <p>Connect with other foodies! See other people's recipes, save them to your collection, and rate them. You can also share your thoughts by commenting on recipes.</p>
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
