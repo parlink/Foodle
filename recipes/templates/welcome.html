@@ -3,7 +3,7 @@
 <nav class="navbar navbar-light bg-light">
   <div class="container-fluid justify-content-center">
      <a href="{% url 'home' %}" class="navbar-brand">Foodle</a>
-     <a href="/login/" class="btn btn-primary ms-auto">Login</a>
+     <a href="{% url 'log_in' %}" class="btn btn-primary ms-auto">Login</a>
   </div>
 </nav>
 
@@ -13,7 +13,7 @@
       <div class="container-fluid py-5">
         <h1 class="display-5 fw-bold">Welcome to Foodle</h1>
         <p class="col-md-8 fs-4">Your ultimate companion for cooking, tracking, and sharing delicious meals.</p>
-        <a href="/login/" class="btn btn-primary btn-lg" type="button">Get Started</a>
+        <a href="{% url 'sign_up' %}" class="btn btn-primary btn-lg" type="button">Get Started</a>
       </div>
     </div>
 

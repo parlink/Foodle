@@ -1,13 +1,9 @@
-from django.conf import settings
-from django.contrib import messages
-from django.contrib.auth import login
-from django.shortcuts import redirect, render
-from django.views import View
-from recipes.forms import LogInForm
+from django.contrib.auth import views as auth_views
+from django.urls import reverse_lazy
 from recipes.views.decorators import LoginProhibitedMixin
+from recipes.forms import UserLoginForm
 
-
-class LogInView(LoginProhibitedMixin, View):
+class LogInView(LoginProhibitedMixin, auth_views.LoginView):
     """
     Handle user login requests.
 
@@ -15,40 +11,16 @@ class LogInView(LoginProhibitedMixin, View):
     and processes login submissions. Authenticated users are redirected
     away automatically via `LoginProhibitedMixin`.
     """
+    form_class = UserLoginForm
+    template_name = 'recipes/auth/login.html'
+    redirect_authenticated_user = True
+    
+    def get_success_url(self):
+        return reverse_lazy('dashboard')
 
-    http_method_names = ['get', 'post']
-    redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
-
-    def get(self, request):
+    def get_redirect_when_logged_in_url(self):
         """
-        Handle GET requests by displaying the login form.
+        Return the URL to redirect to if the user is already logged in.
+        Required by LoginProhibitedMixin.
         """
-
-        self.next = request.GET.get('next') or ''
-        return self.render()
-
-    def post(self, request):
-        """
-        Handle POST requests to authenticate and log in the user.
-
-        This method attempts to authenticate the user based on submitted
-        credentials. If successful, the user is logged in and redirected.
-        Otherwise, an error message is displayed and the form is re-rendered.
-        """
-
-        form = LogInForm(request.POST)
-        self.next = request.POST.get('next') or settings.REDIRECT_URL_WHEN_LOGGED_IN
-        user = form.get_user()
-        if user is not None:
-            login(request, user)
-            return redirect(self.next)
-        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-        return self.render()
-
-    def render(self):
-        """
-        Render log in template with blank log in form.
-        """
-
-        form = LogInForm()
-        return render(self.request, 'log_in.html', {'form': form, 'next': self.next})
+        return self.get_success_url()
