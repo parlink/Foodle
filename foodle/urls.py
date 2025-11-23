@@ -29,6 +29,10 @@ urlpatterns = [
     path('password/', views.PasswordView.as_view(), name='password'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
+<<<<<<< HEAD:foodle/urls.py
     path('feed/', views.feed, name='feed')
+=======
+    path('recipes/', views.recipes, name='recipes'),
+>>>>>>> 1e10d53 (Add browse recipe page):recipify/urls.py
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
