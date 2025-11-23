@@ -6,3 +6,4 @@ from .password_view import *
 from .profile_view import *
 from .sign_up_view import *
 from .welcome_view import *
+from .social_feed import feed
