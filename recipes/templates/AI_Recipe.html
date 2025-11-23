@@ -5,11 +5,31 @@
 <form method="post" action="/ai_recipe/">
     {%csrf_token %}
     <input type="text" class="form-control" name="user_input" >
-    <button type="submit" class="btn btn-primary mt-3">Submit</button>
+    <button type="submit" class="btn btn-primary mt-3" name="submit">Submit</button>
+    <button type="submit" class="btn btn-primary mt-3" name="clear_history">Clear History</button>
 
 </form>
 
 
-<p>{{response}}</p>
+<p>
+    {%for recipe in recipes%}
+    <ul>
+        
+      
+        
+        {%for step in recipe%}
 
+        <li>
+            {{step}}
+        </li>
+        
+        {% endfor %}
+    
+    </ul>    
+    
+    {% endfor %}
+
+
+</p>
+ 
 
