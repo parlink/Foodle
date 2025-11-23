@@ -12,7 +12,7 @@ is swallowed and generation continues.
 from faker import Faker
 from random import randint, random
 from django.core.management.base import BaseCommand, CommandError
-from recipes.models import User
+from recipes.models import User, Recipe
 
 
 user_fixtures = [
@@ -37,7 +37,8 @@ class Command(BaseCommand):
         faker (Faker): Locale-specific Faker instance used for random data.
     """
 
-    USER_COUNT = 200
+    USER_COUNT = 100
+    RECIPE_COUNT = 50 
     DEFAULT_PASSWORD = 'Password123'
     help = 'Seeds the database with sample data'
 
@@ -54,7 +55,9 @@ class Command(BaseCommand):
         post-processing or debugging (not required for operation).
         """
         self.create_users()
+        self.create_recipes()
         self.users = User.objects.all()
+        self.stdout.write(self.style.SUCCESS("Seeding complete!"))
 
     def create_users(self):
         """
@@ -124,6 +127,79 @@ class Command(BaseCommand):
             first_name=data['first_name'],
             last_name=data['last_name'],
         )
+
+    def create_recipes(self):
+        """
+        Create random recipes until the number of recipes = RECIPE_COUNT
+        """
+        recipe_count = Recipe.objects.count()
+        while recipe_count < self.RECIPE_COUNT:
+            self.generate_recipe()
+            recipe_count = Recipe.objects.count()
+        print("Recipe seeding complete")
+
+    def generate_recipe(self):
+        """Generate random recipes"""
+        recipe_number = Recipe.objects.count() + 1
+        name = f"Recipe_{recipe_number}"
+        average_rating = randint(1,5)
+        difficulty = self.faker.random_element(['Easy', 'Moderate', 'Hard'])
+        total_time = f"{randint(1,5)} hours"
+        servings = randint(2, 8)
+        ingredients = self.generate_ingredients()
+        method = self.generate_method()
+
+        self.try_create_recipe({
+            'name': name,
+            'average_rating': average_rating,
+            'difficulty': difficulty,
+            'total_time': total_time,
+            'servings': servings,
+            'ingredients': ingredients,
+            'method': method,
+        })
+
+    def try_create_recipe(self, data):
+        """Attempt to make a recipe & ignore errors"""
+        try:
+            self.create_recipe(data)
+        except:
+            pass
+
+    def create_recipe(self, data):
+        """Create recipe in database"""
+        Recipe.objects.create(
+            name = data['name'],
+            average_rating = data['average_rating'],
+            difficulty = data['difficulty'],
+            total_time = data['total_time'],
+            servings = data['servings'],
+            ingredients = data['ingredients'],
+            method = data['method'],
+        )
+
+    def generate_ingredients(self):
+        """Generate placeholder ingredients: e.g. Ingredient 1, Ingredient 2 ...
+        Also generate optional spices in the form: Spice_1, Spice_2 ... --> could be 0 """
+        ingredient_count = randint(3, 12)
+        ingredients = [f"Ingredient_{i}" for i in range(1, ingredient_count + 1)]
+        
+        spice_count = randint(0, 5)
+        spices = [f"Spice_{i}" for i in range(1, spice_count + 1)]
+
+        lines = []
+        lines.append("Ingredients: " + ", ".join(ingredients))
+
+        if spices:
+            lines.append("Spices: " + ", ".join(spices))
+
+        return ', '.join(lines)
+
+    def generate_method(self):
+        """Generate random steps"""
+        steps = randint(5, 10)
+        return "\n".join([f"{i + 1}) Step_{i + 1}" for i in range(steps)])
+
 
 def create_username(first_name, last_name):
     """
