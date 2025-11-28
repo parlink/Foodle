@@ -1,0 +1,222 @@
+{% extends 'base_content.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Custom styles for tracker page */
+    .bg-green-accent {
+        background-color: #28a745 !important;
+    }
+    .text-green-accent {
+        color: #28a745 !important;
+    }
+    .btn-green-accent {
+        background-color: #28a745;
+        color: white;
+        border: none;
+    }
+    .btn-green-accent:hover {
+        background-color: #218838;
+        color: white;
+    }
+    .card {
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+    .progress-bar-custom {
+        background-color: #28a745;
+    }
+    .meal-card {
+        border-left: 4px solid #28a745;
+    }
+    .section-divider {
+        border-bottom: 2px solid #e9ecef;
+        margin: 20px 0;
+        padding-bottom: 10px;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="row">
+        <!-- Left Sidebar (35%) -->
+        <div class="col-md-4">
+
+            <!-- Daily Summary -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Daily Summary</h5>
+                    
+                    <!-- Calories -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Calories</span>
+                            <span class="text-muted">{{ macros_consumed.calories }} / {{ daily_goals.calories }}</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-custom" role="progressbar" 
+                                 data-width="{{ calories_pct }}" 
+                                 aria-valuenow="{{ macros_consumed.calories }}" aria-valuemin="0" aria-valuemax="{{ daily_goals.calories }}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Protein -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Protein</span>
+                            <span class="text-muted">{{ macros_consumed.protein }}g / {{ daily_goals.protein }}g</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-custom" role="progressbar" 
+                                 data-width="{{ protein_pct }}" 
+                                 aria-valuenow="{{ macros_consumed.protein }}" aria-valuemin="0" aria-valuemax="{{ daily_goals.protein }}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Carbs (Dummy goal assumed for calc if not passed, or just display value) -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Carbs</span>
+                            <span class="text-muted">{{ macros_consumed.carbs }}g</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%;" aria-valuenow="{{ macros_consumed.carbs }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <!-- Fat -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Fat</span>
+                            <span class="text-muted">{{ macros_consumed.fat }}g</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 40%;" aria-valuenow="{{ macros_consumed.fat }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fasting Timer -->
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Fasting Status</h5>
+                    
+                    <div class="mb-3">
+                        <select class="form-select form-select-sm" aria-label="Fasting goal">
+                            <option value="14">14 hours</option>
+                            <option value="16">16 hours</option>
+                            <option value="18" selected>18 hours</option>
+                            <option value="20">20 hours</option>
+                        </select>
+                    </div>
+
+                    <div class="display-6 my-3 text-green-accent" style="font-size: 1.5rem;">
+                        {{ fasting_status.time_elapsed }} / {{ fasting_status.goal_time }}
+                    </div>
+                    
+                    {% if fasting_status.is_active %}
+                        <p class="text-muted">Fasting active</p>
+                        <button class="btn btn-outline-danger btn-sm">Stop Fast</button>
+                    {% else %}
+                        <p class="text-muted">Not fasting</p>
+                        <button class="btn btn-green-accent btn-sm">Start Fast</button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Water Tracker -->
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Water Intake</h5>
+                    <div class="my-3">
+                        <i class="bi bi-droplet-fill text-primary" style="font-size: 2rem;"></i>
+                        <div class="mt-2">
+                             <span class="fw-bold">{{ water_intake }} ml</span> <span class="text-muted">/ {{ daily_goals.water }} ml</span>
+                        </div>
+                        <div class="progress mt-2" style="height: 10px;">
+                            <div class="progress-bar bg-primary" role="progressbar" 
+                                 data-width="{{ water_pct }}" 
+                                 aria-valuenow="{{ water_intake }}" aria-valuemin="0" aria-valuemax="{{ daily_goals.water }}"></div>
+                        </div>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-secondary">- 250ml</button>
+                        <button type="button" class="btn btn-outline-primary">+ 250ml</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Feed -->
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h3">Track Meals</h2>
+                <button class="btn btn-green-accent rounded-pill px-4">
+                    <i class="bi bi-plus-lg me-1"></i> Add Meal
+                </button>
+            </div>
+
+            {% for type, items in meals.items %}
+                <div class="mb-5">
+                    <div class="section-divider">
+                        {{ type }}
+                    </div>
+
+                    {% if items %}
+                        {% for meal in items %}
+                            <div class="card meal-card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="card-title mb-1">{{ meal.title }}</h5>
+                                        </div>
+                                        <span class="badge bg-green-accent rounded-pill">{{ meal.calories }} cal</span>
+                                    </div>
+                                    
+                                    <div class="row mt-3 g-2 text-center text-muted small">
+                                        <div class="col-4 border-end">
+                                            <div class="fw-bold text-dark">{{ meal.protein }}g</div>
+                                            <div>Protein</div>
+                                        </div>
+                                        <div class="col-4 border-end">
+                                            <div class="fw-bold text-dark">{{ meal.carbs }}g</div>
+                                            <div>Carbs</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fw-bold text-dark">{{ meal.fat }}g</div>
+                                            <div>Fat</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-muted fst-italic py-3">No meals logged for {{ type }} yet.</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+
+<!-- to dynamically set the width of the progress bars -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var bars = document.querySelectorAll('.progress-bar[data-width]');
+        bars.forEach(function(bar) {
+            bar.style.width = bar.getAttribute('data-width') + '%';
+        });
+    });
+</script>
+
+
+{% endblock %}
+

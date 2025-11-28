@@ -11,7 +11,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 from django.contrib.messages import constants as messages
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -131,8 +135,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # User model for authentication and login purposes
 AUTH_USER_MODEL = 'recipes.User'
 
+AUTHENTICATION_BACKENDS = [
+    'recipes.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # Login URL for redirecting users from login protected views
 LOGIN_URL = 'log_in'
+
+# URL to redirect to after login (defaults to /accounts/profile/ otherwise)
+LOGIN_REDIRECT_URL = 'dashboard'
 
 # URL where @login_prohibited redirects to
 REDIRECT_URL_WHEN_LOGGED_IN = 'dashboard'
@@ -141,3 +153,12 @@ REDIRECT_URL_WHEN_LOGGED_IN = 'dashboard'
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
+
+# Email Configuration (Switching to SMTP for SendGrid/Twilio)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
