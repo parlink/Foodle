@@ -45,24 +45,24 @@ def chatbot(request):
 
           response = client.chat.completions.create(
                model = "gpt-4o",
-               messages = [{"role": "system", "content" : "You are a helpful chef, your job is to "
-               "give a recipe name and give the  user brief instructions on how to make it"
-               "make it line by line. If it is invalid then say it's invalid"
-               "each instruction that you write should be on a new line"
-               "Put each instruction on a separate line pls."
-               "you're being too harsh with the invalid instructions"
-               "don't say invalid to every thing that can't be made"
-               "if they missed out some instructions then perhaps add some of your own"
-               "but obv don't add too many or make it into some crazy dish"
-               "then at the end you could briefly say, I have added these ingredients ..."
-               "but only do that if they only put in like a couple items and you literally"
-               "can't make anything with those"
+               messages = [{"role": "system", "content" : """You are a helpful chef, your job is to 
+               give a recipe name and give the  user brief instructions on how to make it
+               make it line by line. If it is invalid then say it's invalid
+               each instruction that you write should be on a new line
+               Put each instruction on a separate line pls.
+               you're being too harsh with the invalid instructions
+               don't say invalid to every thing that can't be made
+               if they missed out some instructions then perhaps add some of your own
+               but obv don't add too many or make it into some crazy dish
+               then at the end you could briefly say, I have added these ingredients ...
+               but only do that if they only put in like a couple items and you literally
+               can't make anything with those
 
 
-               "so in summary they layout be, recipe name \n "
-               "step 1 \n"
-               "step 2 \n"
-               "until all of the steps are done"
+               so in summary they layout be, recipe name \n 
+               step 1 \n
+               step 2 \n
+               until all of the steps are done """
                },
 
 
