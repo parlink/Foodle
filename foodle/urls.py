@@ -26,15 +26,17 @@ urlpatterns = [
     path('', views.welcome, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('tracker/', views.tracker, name='tracker'),
-    path('log_in/', views.LogInView.as_view(), name='log_in'),
-    path('log_out/', views.log_out, name='log_out'),
+    path('add-meal/', views.add_meal, name='add_meal'),
+    path('delete-meal/<int:meal_id>/', views.delete_meal, name='delete_meal'),
+    path('login/', views.LogInView.as_view(), name='log_in'),
+    path('logout/', views.log_out, name='log_out'),
     path('password/', views.PasswordView.as_view(), name='password'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
-    path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
+    path('signup/', views.SignUpView.as_view(), name='sign_up'),
     path('feed/', views.feed, name='feed'),
     path('recipes/', views.recipes, name='recipes'),
 
-    #Password Reset URLs
+    # Password Reset URLs
     path(
         'password_reset/',
         auth_views.PasswordResetView.as_view(

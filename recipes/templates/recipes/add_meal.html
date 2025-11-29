@@ -1,0 +1,41 @@
+{% extends 'base_content.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<style>
+    .btn-green-accent {
+        background-color: #28a745;
+        color: white;
+        border: none;
+    }
+    .btn-green-accent:hover {
+        background-color: #218838;
+        color: white;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Add Meal</h3>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        {% include 'partials/bootstrap_form.html' with form=form %}
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'tracker' %}" class="btn btn-secondary">Cancel</a>
+                            
+                            <button type="submit" class="btn btn-green-accent">Add Meal</button>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
