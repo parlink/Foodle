@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from datetime import date
 
 
 class Meal(models.Model):
@@ -19,7 +20,7 @@ class Meal(models.Model):
     )
     name = models.CharField(max_length=200)
     meal_type = models.CharField(max_length=20, choices=MEAL_TYPE_CHOICES)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField(default=date.today)
     
     # Nutrition Fields
     calories = models.IntegerField()
