@@ -37,6 +37,8 @@ urlpatterns = [
     path('signup/', views.SignUpView.as_view(), name='sign_up'),
     path('feed/', views.feed, name='feed'),
     path('recipes/', views.recipes, name='recipes'),
+    path('post/<int:post_id>/like/', views.toggle_like, name='toggle_like'),
+    path('create-post/', views.create_post, name='create_post'),
 
     #Password Reset URLs
     path(

@@ -9,18 +9,37 @@
         .post-card { border: 1px solid #ddd; padding: 15px; border-radius: 10px; background: #fff; }
         .tags { margin-top: 10px; }
         .tag { background: #f1f1f1; padding: 3px 8px; border-radius: 5px; font-size: 12px; margin-right: 5px; }
+        
+        /* Styles for Likes */
+        .actions { margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; display: flex; align-items: center; gap: 10px;}
+        .like-btn { cursor: pointer; background: none; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; }
+        .like-btn:hover { background-color: #f0f0f0; }
+        .count { font-weight: bold; color: #555; }
+        
+        /* Styles for Create Button */
+        .create-btn-container { text-align: center; margin-bottom: 20px; }
+        .create-btn { background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; }
+        .create-btn:hover { background-color: #218838; }
     </style>
 </head>
 <body>
+
 <h1>Social Feed</h1>
+
+<div class="create-btn-container">
+    <a href="{% url 'create_post' %}" class="create-btn">
+        + Create New Post
+    </a>
+</div>
+
 <div class="feed">
     {% for post in posts %}
     <div class="post-card">
         <h3>{{ post.title }}</h3>
         <p>By {{ post.author.username }} • {{ post.created_at|date:"M d, Y H:i" }}</p>
 
-        {% if post.description %}
-            <p>{{ post.description }}</p>
+        {% if post.caption %}
+            <p>{{ post.caption }}</p>
         {% endif %}
 
         {% if post.tags.all %}
@@ -30,9 +49,20 @@
             {% endfor %}
         </div>
         {% endif %}
+
+        <div class="actions">
+            <form action="{% url 'toggle_like' post.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="like-btn">
+                    ❤️ Like
+                </button>
+            </form>
+            <span class="count">{{ post.total_likes }} Likes</span>
+        </div>
+
     </div>
     {% empty %}
-    <p>No posts yet.</p>
+    <p>No posts yet. Click the button above to create one!</p>
     {% endfor %}
 </div>
 </body>
