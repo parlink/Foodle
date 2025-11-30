@@ -2,35 +2,40 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.utils import timezone
-from datetime import date
+from datetime import date, timedelta
 from recipes.models import Meal, Profile, WaterIntake, FastingSession
+
+def get_accounting_date():
+    """
+    Returns the date for accounting purposes based on the 6 AM rule.
+    If current time is before 6 AM, returns yesterday's date.
+    Otherwise, returns today's date.
+    This exists so that if the user drinks water at night, it doesn't count for the day after.
+    """
+    now = timezone.localtime(timezone.now())
+    if now.hour < 6:
+        return now.date() - timedelta(days=1)
+    return now.date()
 
 @login_required
 def tracker(request):
-    today = date.today()
+    today = get_accounting_date()
     
     #Handle POST requests
     if request.method == 'POST':
         action = request.POST.get('action')
         
         #Handle water intake actions
-        if action == 'add_water':
+        if action == 'update_water':
+            amount = int(request.POST.get('amount', 0))
             water_intake_record, _ = WaterIntake.objects.get_or_create(
                 user=request.user,
                 date=today,
                 defaults={'amount_ml': 0}
             )
-            water_intake_record.amount_ml += 250
-            water_intake_record.save()
-            return redirect('tracker')
-        
-        elif action == 'remove_water':
-            water_intake_record, _ = WaterIntake.objects.get_or_create(
-                user=request.user,
-                date=today,
-                defaults={'amount_ml': 0}
-            )
-            water_intake_record.amount_ml = max(0, water_intake_record.amount_ml - 250)
+            # Update amount, ensuring it doesn't go below 0
+            new_amount = water_intake_record.amount_ml + amount
+            water_intake_record.amount_ml = max(0, new_amount)
             water_intake_record.save()
             return redirect('tracker')
         
