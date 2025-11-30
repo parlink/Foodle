@@ -11,6 +11,7 @@ class FastingSession(models.Model):
         (14, '14 hours'),
         (16, '16 hours'),
         (18, '18 hours'),
+        (20, '20 hours'),
     ]
 
     user = models.ForeignKey(
