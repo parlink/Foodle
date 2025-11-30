@@ -18,17 +18,52 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from recipes import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.welcome, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('log_in/', views.LogInView.as_view(), name='log_in'),
-    path('log_out/', views.log_out, name='log_out'),
+    path('tracker/', views.tracker, name='tracker'),
+    path('add-meal/', views.add_meal, name='add_meal'),
+    path('delete-meal/<int:meal_id>/', views.delete_meal, name='delete_meal'),
+    path('login/', views.LogInView.as_view(), name='log_in'),
+    path('logout/', views.log_out, name='log_out'),
     path('password/', views.PasswordView.as_view(), name='password'),
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
-    path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
-    path('feed/', views.feed, name='feed')
+    path('signup/', views.SignUpView.as_view(), name='sign_up'),
+    path('feed/', views.feed, name='feed'),
+    path('recipes/', views.recipes, name='recipes'),
+
+    # Password Reset URLs
+    path(
+        'password_reset/',
+        auth_views.PasswordResetView.as_view(
+            template_name='recipes/auth/password_reset.html'
+        ),
+        name='password_reset',
+    ),
+    path(
+        'password_reset/done/',
+        auth_views.PasswordResetDoneView.as_view(
+            template_name='recipes/auth/password_reset_done.html'
+        ),
+        name='password_reset_done',
+    ),
+    path(
+        'reset/<uidb64>/<token>/',
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name='recipes/auth/password_reset_confirm.html'
+        ),
+        name='password_reset_confirm',
+    ),
+    path(
+        'reset/done/',
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name='recipes/auth/password_reset_complete.html'
+        ),
+        name='password_reset_complete',
+    ),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
