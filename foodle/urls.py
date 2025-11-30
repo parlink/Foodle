@@ -35,7 +35,7 @@ urlpatterns = [
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
     path('signup/', views.SignUpView.as_view(), name='sign_up'),
     
-    # Password Reset URLs
+    #Password Reset URLs
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='recipes/auth/password_reset.html'), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='recipes/auth/password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='recipes/auth/password_reset_confirm.html'), name='password_reset_confirm'),
