@@ -3,6 +3,16 @@
   <div class="row">
     <div class="col-12">
       <h1>Browse Recipes</h1>
+
+      {% if recipes %}
+      <ul>
+        {% for recipe in recipes %}
+        <li>{{ recipe.name }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No recipes available.</p>
+      {% endif %}
     </div>
   </div>
 </div>
