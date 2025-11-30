@@ -79,7 +79,8 @@
                         <th scope="col">Start Time</th>
                         <th scope="col">End Time</th>
                         <th scope="col">Duration</th>
-                        <th scope="col" class="text-end pe-3">Status</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="text-end pe-3">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -89,7 +90,7 @@
                             <td>{{ session.start_time|date:"g:i A" }}</td>
                             <td>{{ session.end_time|date:"g:i A" }}</td>
                             <td>{{ session.duration_str }}</td>
-                            <td class="text-end pe-3">
+                            <td>
                                 {% if session.is_active %}
                                     <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill">
                                         <i class="bi bi-clock-history me-1"></i> Active (Running)
@@ -104,10 +105,20 @@
                                     </span>
                                 {% endif %}
                             </td>
+                            <td class="text-end pe-3">
+                                <button class="btn btn-sm btn-link text-secondary p-0 edit-btn" 
+                                        data-id="{{ session.id }}"
+                                        data-start="{{ session.start_time|date:'Y-m-d\TH:i' }}"
+                                        data-end="{{ session.end_time|date:'Y-m-d\TH:i' }}"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editFastingModal">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center py-4 text-muted">No fasting sessions recorded for this period.</td>
+                            <td colspan="6" class="text-center py-4 text-muted">No fasting sessions recorded for this period.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
