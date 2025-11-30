@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from datetime import timedelta
+from django.utils import timezone
 
 
 class FastingSession(models.Model):
@@ -10,6 +11,7 @@ class FastingSession(models.Model):
         (14, '14 hours'),
         (16, '16 hours'),
         (18, '18 hours'),
+        (20, '20 hours'),
     ]
 
     user = models.ForeignKey(
@@ -18,11 +20,20 @@ class FastingSession(models.Model):
         related_name='fasting_sessions'
     )
     start_date_time = models.DateTimeField()
+    end_date_time = models.DateTimeField(null=True, blank=True)
     target_duration = models.IntegerField(choices=TARGET_DURATION_CHOICES, default=16)
     is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['-start_date_time']
+        
+    @property
+    def duration(self):
+        if self.end_date_time and self.start_date_time:
+            return self.end_date_time - self.start_date_time
+        if self.is_active:
+             return timezone.now() - self.start_date_time
+        return timedelta(0)
 
     def end_time(self):
         """Calculate when the fast should finish."""

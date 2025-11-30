@@ -2,43 +2,68 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.utils import timezone
-from datetime import date
+from datetime import date, timedelta
 from recipes.models import Meal, Profile, WaterIntake, FastingSession
+
+def get_accounting_date():
+    """
+    Returns the date for accounting purposes based on the 6 AM rule.
+    If current time is before 6 AM, returns yesterday's date.
+    Otherwise, returns today's date.
+    This exists so that if the user drinks water at night, it doesn't count for the day after.
+    """
+    now = timezone.localtime(timezone.now())
+    if now.hour < 6:
+        return now.date() - timedelta(days=1)
+    return now.date()
 
 @login_required
 def tracker(request):
-    today = date.today()
+    today = get_accounting_date()
     
+    #Get or create user profile, default is 2000 calories per day
+    profile, _ = Profile.objects.get_or_create(
+        user=request.user,
+        defaults={
+            'calorie_goal': 2000,
+            'protein_goal': 150,
+            'fasting_goal': 16
+        }
+    )
+
     #Handle POST requests
     if request.method == 'POST':
         action = request.POST.get('action')
         
         #Handle water intake actions
-        if action == 'add_water':
+        if action == 'update_water':
+            amount = int(request.POST.get('amount', 0))
             water_intake_record, _ = WaterIntake.objects.get_or_create(
                 user=request.user,
                 date=today,
                 defaults={'amount_ml': 0}
             )
-            water_intake_record.amount_ml += 250
-            water_intake_record.save()
-            return redirect('tracker')
-        
-        elif action == 'remove_water':
-            water_intake_record, _ = WaterIntake.objects.get_or_create(
-                user=request.user,
-                date=today,
-                defaults={'amount_ml': 0}
-            )
-            water_intake_record.amount_ml = max(0, water_intake_record.amount_ml - 250)
+            #Update amount, ensuring it doesn't go below 0
+            new_amount = water_intake_record.amount_ml + amount
+            water_intake_record.amount_ml = max(0, new_amount)
             water_intake_record.save()
             return redirect('tracker')
         
         #Handle fasting actions
         elif action == 'start_fast':
             target_duration = int(request.POST.get('target_duration', 16))
+            
+            #Save user preference
+            profile.fasting_goal = target_duration
+            profile.save()
+
             #Deactivate any existing active sessions
-            FastingSession.objects.filter(user=request.user, is_active=True).update(is_active=False)
+            #Using update() is efficient but we want to ensure we don't leave zombie active sessions.
+            #Update sets end_date_time to now, effectively closing them.
+            FastingSession.objects.filter(user=request.user, is_active=True).update(
+                is_active=False,
+                end_date_time=timezone.now()
+            )
 
             #Create new active session
             FastingSession.objects.create(
@@ -49,19 +74,20 @@ def tracker(request):
             )
             return redirect('tracker')
         
+        elif action == 'update_fasting_goal':
+            target_duration = int(request.POST.get('target_duration', 16))
+            profile.fasting_goal = target_duration
+            profile.save()
+            return redirect('tracker')
+        
         elif action == 'end_fast':
             #Deactivate active fasting session
-            FastingSession.objects.filter(user=request.user, is_active=True).update(is_active=False)
+            FastingSession.objects.filter(user=request.user, is_active=True).update(
+                is_active=False,
+                end_date_time=timezone.now()
+            )
             return redirect('tracker')
     
-    #Get or create user profile, default is 2000 calories per day
-    profile, _ = Profile.objects.get_or_create(
-        user=request.user,
-        defaults={
-            'calorie_goal': 2000,
-            'protein_goal': 150,
-        }
-    )
     
     #Set default water goal if not in profile, default is 2500ml per day
     water_goal = 2500  # Default water goal in ml
@@ -81,10 +107,12 @@ def tracker(request):
     ).order_by('-start_date_time').first()
     
     fasting_status = {
-        'time_elapsed': '0h 0m',
-        'goal_time': '0h 0m',
+        'time_elapsed': '0h 00m 00s',
+        'goal_time': f"{profile.fasting_goal}h 00m",
         'is_active': False,
-        'target_duration': 18,
+        'target_duration': profile.fasting_goal,
+        'start_time': None,
+        'start_timestamp': None
     }
     
     if active_fasting:
@@ -92,10 +120,13 @@ def tracker(request):
         elapsed = now - active_fasting.start_date_time
         hours_elapsed = int(elapsed.total_seconds() // 3600)
         minutes_elapsed = int((elapsed.total_seconds() % 3600) // 60)
-        fasting_status['time_elapsed'] = f"{hours_elapsed}h {minutes_elapsed:02d}m"
+        seconds_elapsed = int(elapsed.total_seconds() % 60)
+        fasting_status['time_elapsed'] = f"{hours_elapsed}h {minutes_elapsed:02d}m {seconds_elapsed:02d}s"
         fasting_status['goal_time'] = f"{active_fasting.target_duration}h 00m"
         fasting_status['is_active'] = True
         fasting_status['target_duration'] = active_fasting.target_duration
+        fasting_status['start_time'] = active_fasting.start_date_time.isoformat()
+        fasting_status['start_timestamp'] = active_fasting.start_date_time.timestamp() * 1000
     
     #Get today's meals
     today_meals = Meal.objects.filter(
