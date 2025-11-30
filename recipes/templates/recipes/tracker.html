@@ -116,8 +116,11 @@
                 <div class="card-body text-center">
                     <h5 class="card-title">Fasting Status</h5>
                     
-                    <div class="display-6 my-3 text-green-accent" style="font-size: 1.5rem;">
+                    <div class="display-6 my-3 text-green-accent" style="font-size: 1.5rem;" id="fasting-timer" {% if fasting_status.start_timestamp %}data-start-timestamp="{{ fasting_status.start_timestamp }}"{% endif %}>
                         {{ fasting_status.time_elapsed }} / {{ fasting_status.goal_time }}
+                    </div>
+                    <div class="mb-3 text-center">
+                         <a href="{% url 'fasting_history' %}" class="small text-decoration-none text-primary">View History <i class="bi bi-arrow-right"></i></a>
                     </div>
                     
                     {% if fasting_status.is_active %}
@@ -129,11 +132,12 @@
                         </form>
                     {% else %}
                         <p class="text-muted">Not fasting</p>
-                        <form method="post">
+                        <form method="post" id="fasting-form">
                             {% csrf_token %}
-                            <input type="hidden" name="action" value="start_fast">
+                            <input type="hidden" name="action" value="start_fast" id="fasting-action">
                             <div class="mb-2">
-                                <select name="target_duration" class="form-select form-select-sm" aria-label="Fasting goal">
+                                <select name="target_duration" class="form-select form-select-sm" aria-label="Fasting goal" onchange="updateFastingGoal(this)">
+                                    <option value="12" {% if fasting_status.target_duration == 12 %}selected{% endif %}>12 hours</option>
                                     <option value="14" {% if fasting_status.target_duration == 14 %}selected{% endif %}>14 hours</option>
                                     <option value="16" {% if fasting_status.target_duration == 16 %}selected{% endif %}>16 hours</option>
                                     <option value="18" {% if fasting_status.target_duration == 18 %}selected{% endif %}>18 hours</option>
@@ -257,3 +261,55 @@
     </div>
 </div>
 {% endblock %}
+
+<script>
+    function updateFastingGoal(select) {
+        const form = document.getElementById('fasting-form');
+        const actionInput = document.getElementById('fasting-action');
+        
+        //Change action to update goal instead of start fast
+        actionInput.value = 'update_fasting_goal';
+        form.submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        //Progress bars logic
+        var bars = document.querySelectorAll('.progress-bar[data-width]');
+        bars.forEach(function(bar) {
+            bar.style.width = bar.getAttribute('data-width') + '%';
+        });
+
+        //Fasting Timer Logic
+        const fastingActive = JSON.parse("{{ fasting_status.is_active|yesno:'true,false' }}");
+        const timerElement = document.getElementById('fasting-timer');
+        const goalHours = parseInt("{{ fasting_status.target_duration }}", 10);
+        
+        if (fastingActive && timerElement && timerElement.dataset.startTime) {
+            const startTime = new Date(timerElement.dataset.startTime).getTime();
+
+            function updateTimer() {
+                const now = new Date().getTime();
+                const distance = now - startTime;
+
+                if (distance < 0) {
+                     timerElement.innerHTML = "0h 00m 00s / " + goalHours + "h 00m";
+                     return;
+                }
+
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                const formattedTime = 
+                    hours + "h " + 
+                    (minutes < 10 ? "0" + minutes : minutes) + "m " + 
+                    (seconds < 10 ? "0" + seconds : seconds) + "s";
+
+                timerElement.innerText = formattedTime + " / " + goalHours + "h 00m";
+            }
+
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+    });
+</script>

@@ -27,6 +27,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('tracker/', views.tracker, name='tracker'),
     path('water-history/', views.water_history, name='water_history'),
+    path('fasting-history/', views.fasting_history, name='fasting_history'),
     path('add-meal/', views.add_meal, name='add_meal'),
     path('delete-meal/<int:meal_id>/', views.delete_meal, name='delete_meal'),
     path('login/', views.LogInView.as_view(), name='log_in'),

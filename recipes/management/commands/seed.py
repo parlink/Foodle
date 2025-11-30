@@ -240,8 +240,7 @@ class Command(BaseCommand):
                     'protein_goal': randint(100, 200),
                     'carbs_goal': randint(150, 300),
                     'fat_goal': randint(50, 150),
-                    'current_weight': round(random() * 40 + 50, 1),  # 50-90 kg
-                    'height': round(random() * 40 + 150, 1),  # 150-190 cm
+                    # 'current_weight' and 'height' removed in recent migrations
                 }
             )
         except:
@@ -249,22 +248,29 @@ class Command(BaseCommand):
 
     def generate_user_history(self, user, days=30):
         """Generate tracker history for the last N days for a user."""
+        #Make the seeder idempotent for fasting data: clear old data first
+        FastingSession.objects.filter(user=user).delete()
+        
         today = date.today()
+        start_date = today - timedelta(days=days - 1)
+        
+        last_end_datetime = None
         
         for day_offset in range(days):
-            target_date = today - timedelta(days=day_offset)
+            current_date = start_date + timedelta(days=day_offset)
             
-            # Generate meals (3-5 per day)
+            #Generate meals (3-5 per day)
             meal_count = randint(3, 5)
             for _ in range(meal_count):
-                self.create_random_meal(user, target_date)
+                self.create_random_meal(user, current_date)
             
-            # Generate water intake
-            self.create_water_intake(user, target_date)
+            #Generate water intake
+            self.create_water_intake(user, current_date)
             
-            # Occasionally create fasting sessions (about 20% chance per day)
-            if random() < 0.2:
-                self.create_fasting_session(user, target_date)
+            #Generate fasting sessions sequentially
+            #70% chance to fast on any given day
+            if random() < 0.7:
+                last_end_datetime = self.create_sequential_fasting_session(user, current_date, last_end_datetime)
 
     def create_random_meal(self, user, meal_date):
         """Create a random meal for a user on a given date."""
@@ -334,33 +340,62 @@ class Command(BaseCommand):
         except:
             pass
 
-    def create_fasting_session(self, user, session_date):
-        """Create a fasting session for a user starting on a given date."""
+    def create_sequential_fasting_session(self, user, session_date, last_end_datetime):
+        """
+        Create a fasting session for a user starting on a given date, 
+        ensuring it doesn't overlap with the previous one.
+        Returns the end_datetime of the created session (or None if failed).
+        """
         target_durations = [14, 16, 18]
         target_duration = choice(target_durations)
         
-        # Random start time during the day
-        hours_into_day = randint(18, 23)  # Start between 6 PM and 11 PM
-        start_datetime = timezone.make_aware(
-            datetime.combine(
-                session_date,
-                datetime.min.time()
-            )
-        ) + timedelta(hours=hours_into_day)
+        #Proposed start: Evening time (18:00 - 22:00)
+        hour = randint(18, 22)
+        minute = randint(0, 59)
+        base_start_time = datetime.combine(session_date, datetime.min.time()) + timedelta(hours=hour, minutes=minute)
+        start_datetime = timezone.make_aware(base_start_time)
         
-        # About 30% of fasting sessions are still active (if recent)
-        days_ago = (date.today() - session_date).days
-        is_active = random() < 0.3 and days_ago <= 1
+        #Adjust start time if it overlaps with last_end_datetime
+        #Ensure we don't start before the previous fast ended
+        if last_end_datetime and start_datetime < last_end_datetime:
+            # If the calculated evening time is BEFORE the last fast ended (e.g. last fast ended tomorrow morning),
+            # we simply skip fasting today.
+            return last_end_datetime
+            
+        #Determine duration
+        actual_duration_hours = target_duration + (random() * 2 - 1) 
+        duration = timedelta(hours=actual_duration_hours)
         
+        end_datetime = start_datetime + duration
+        
+        #Check if this session is the "current/active" one
+        now = timezone.now()
+        is_active = False
+        end_datetime_record = end_datetime
+        
+        if end_datetime > now:
+            #Only make it active if it started in the past
+            if start_datetime <= now:
+                is_active = True
+                end_datetime_record = None
+            else:
+                #Started in future? Don't create it yet
+                return last_end_datetime 
+        else:
+            is_active = False
+
         try:
             FastingSession.objects.create(
                 user=user,
                 start_date_time=start_datetime,
+                end_date_time=end_datetime_record,
                 target_duration=target_duration,
                 is_active=is_active,
             )
+            #Return the calculated end time (even if active, conceptually it occupies time)
+            return end_datetime 
         except:
-            pass
+            return last_end_datetime
 
 
 def create_username(first_name, last_name):
