@@ -6,4 +6,9 @@ from .password_view import *
 from .profile_view import *
 from .recipes_view import *
 from .sign_up_view import *
+from .tracker_view import *
+from .water_history_view import *
+from .fasting_history_view import *
 from .welcome_view import *
+from .social_feed import feed
+from .add_meal_view import *

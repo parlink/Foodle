@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Social Feed</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f9f9f9; }
+        .feed { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+        .post-card { border: 1px solid #ddd; padding: 15px; border-radius: 10px; background: #fff; }
+        .tags { margin-top: 10px; }
+        .tag { background: #f1f1f1; padding: 3px 8px; border-radius: 5px; font-size: 12px; margin-right: 5px; }
+    </style>
+</head>
+<body>
+<h1>Social Feed</h1>
+<div class="feed">
+    {% for post in posts %}
+    <div class="post-card">
+        <h3>{{ post.title }}</h3>
+        <p>By {{ post.author.username }} • {{ post.created_at|date:"M d, Y H:i" }}</p>
+
+        {% if post.description %}
+            <p>{{ post.description }}</p>
+        {% endif %}
+
+        {% if post.tags.all %}
+        <div class="tags">
+            {% for tag in post.tags.all %}
+                <span class="tag">{{ tag.name }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% empty %}
+    <p>No posts yet.</p>
+    {% endfor %}
+</div>
+</body>
+</html>
