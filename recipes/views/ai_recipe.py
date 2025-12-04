@@ -3,6 +3,7 @@ import openai, os
 from openai import OpenAI
 from dotenv import load_dotenv
 from django.http.response import StreamingHttpResponse
+from django.shortcuts import redirect
 
 
 load_dotenv()
@@ -24,7 +25,7 @@ def chatbot(request):
           user_input = request.POST.get("user_input")
 
 
-          examplePrompt = f""" 
+          examplePrompt = f"""     
           Ingredients: Chicken and Rice
           Steps
           1. Cook rice
@@ -45,12 +46,14 @@ def chatbot(request):
 
           response = client.chat.completions.create(
                model = "gpt-4o",
-               messages = [{"role": "system", "content" : """You are a helpful chef, your job is to 
+               messages = [{"role": "system",
+                             "content" : """You are a helpful chef, your job is to 
                give a recipe name and give the  user brief instructions on how to make it
                make it line by line. If it is invalid then say it's invalid
                each instruction that you write should be on a new line
                Put each instruction on a separate line pls.
-               you're being too harsh with the invalid instructions
+               If there is not one valid ingredient, then reply with something like
+               this is an invalid ingredient etc etc, and DONT make a recipe for it
                don't say invalid to every thing that can't be made
                if they missed out some instructions then perhaps add some of your own
                but obv don't add too many or make it into some crazy dish
@@ -64,14 +67,13 @@ def chatbot(request):
                step 2 \n
                until all of the steps are done """
                },
-
-
                {"role":"user", "content":examplePrompt}])
 
           chatbot_response = response.choices[0].message.content
           instructions = chatbot_response.split("\n")
           recipes.append(instructions)
           request.session["recipes"] = recipes
+          return redirect('ai_recipe')
 
 
         if "clear_history" in request.POST:
