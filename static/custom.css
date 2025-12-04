@@ -6,7 +6,6 @@
   border-radius: 0px;
 }
 
-
 /*
  * Cover page
  */
@@ -20,9 +19,9 @@
   height: 100vh;
 }
 
-.vcenter-item{
-    display: flex;
-    align-items: center;
+.vcenter-item {
+  display: flex;
+  align-items: center;
 }
 
 /*
@@ -46,9 +45,8 @@ p.cover-text {
   border-radius: 15%;
 }
 .cover-card-block {
-  opacity: 1
+  opacity: 1;
 }
-
 
 /*
  * forms
@@ -82,13 +80,13 @@ ul.errorlist {
  */
 .profile-image {
   width: 120px;
-  clear:both;
-  float:left;
+  clear: both;
+  float: left;
 }
 
 .profile-text {
-  overflow:hidden;
-  padding-left:20px
+  overflow: hidden;
+  padding-left: 20px;
 }
 
 h3.profile-title {
@@ -101,6 +99,13 @@ h3.profile-title {
   font-style: italic;
 }
 
+/*
+ * Navbar
+ */
+nav.navbar.navbar-expand-lg.myCustomBackground,
+.navbar.navbar-expand-lg.myCustomBackground.navbar-dark {
+  background: #029f04 !important;
+}
 
 /*
  * Hyperlinks
