@@ -61,6 +61,9 @@ def chatbot(request):
                but only do that if they only put in like a couple items and you literally
                can't make anything with those
 
+               If an ingredient is not appropriate with the rest of the ingredients then do not 
+               include it in the recipe since it will not match.
+
 
                so in summary they layout be, recipe name \n 
                step 1 \n
