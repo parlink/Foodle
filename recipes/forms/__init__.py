@@ -1,2 +1,3 @@
-from .log_in_form import *
-from .user_forms import *
+from .log_in_form import LogInForm
+from .user_forms import UserForm, PasswordForm, SignUpForm
+from .auth_forms import UserRegisterForm, UserLoginForm
