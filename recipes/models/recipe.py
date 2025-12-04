@@ -26,5 +26,8 @@ class Recipe(models.Model):
     # multiline method text
     method = models.TextField()
 
+    # Image URL for the recipe
+    image_url = models.URLField(blank=True, null=True)
+
     def __str__(self):
         return self.name

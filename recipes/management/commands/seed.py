@@ -49,6 +49,14 @@ class Command(BaseCommand):
         super().__init__(*args, **kwargs)
         self.faker = Faker('en_GB')
 
+    def add_arguments(self, parser):
+        """Add command-line arguments."""
+        parser.add_argument(
+            '--with-recipes',
+            action='store_true',
+            help='Also create generic recipes (use seed_recipes for recipes with images)',
+        )
+
     def handle(self, *args, **options):
         """
         Django entrypoint for the command.
@@ -57,7 +65,10 @@ class Command(BaseCommand):
         post-processing or debugging (not required for operation).
         """
         self.create_users()
-        self.create_recipes()
+        # Recipes are now seeded separately with seed_recipes command
+        # Use --with-recipes flag to create generic recipes
+        if options.get('with_recipes'):
+            self.create_recipes()
         self.create_tracker_data()
         self.users = User.objects.all()
         self.stdout.write(self.style.SUCCESS("Seeding complete!"))
