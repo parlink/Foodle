@@ -76,7 +76,7 @@ def chatbot(request):
           instructions = chatbot_response.split("\n")
           recipes.append(instructions)
           request.session["recipes"] = recipes
-          return redirect('ai_recipe')
+          return redirect('ai_recipes')
 
 
         if "clear_history" in request.POST:
