@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
-
 @login_required
 def dashboard(request):
     """
@@ -12,6 +11,4 @@ def dashboard(request):
     is not authenticated, they are automatically redirected to the login
     page.
     """
-
-    current_user = request.user
-    return render(request, 'dashboard.html', {'user': current_user})
+    return render(request, 'recipes/dashboard.html', {'user': request.user})

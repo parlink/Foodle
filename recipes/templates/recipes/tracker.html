@@ -1,0 +1,315 @@
+{% extends 'base_content.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Custom styles for tracker page*/
+    .bg-green-accent {
+        background-color: #28a745 !important;
+    }
+    .text-green-accent {
+        color: #28a745 !important;
+    }
+    .btn-green-accent {
+        background-color: #28a745;
+        color: white;
+        border: none;
+    }
+    .btn-green-accent:hover {
+        background-color: #218838;
+        color: white;
+    }
+    .card {
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+    .progress-bar-custom {
+        background-color: #28a745;
+    }
+    .meal-card {
+        border-left: 4px solid #28a745;
+    }
+    .section-divider {
+        border-bottom: 2px solid #e9ecef;
+        margin: 20px 0;
+        padding-bottom: 10px;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+    /* Progress bar using CSS variable - override Bootstrap defaults */
+    .progress-bar {
+        width: var(--progress-width, 0%) !important;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="row">
+        <!-- Left Sidebar (35%) -->
+        <div class="col-md-4">
+
+            <!-- Daily Summary -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Daily Summary</h5>
+                    
+                    <!-- Calories -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Calories</span>
+                            <span class="text-muted">{{ macros_consumed.calories|floatformat:0 }} / {{ daily_goals.calories }}</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-custom" role="progressbar" 
+                                 style="--progress-width: {{ calories_pct|default:0 }}%;"
+                                 aria-valuenow="{{ macros_consumed.calories }}" aria-valuemin="0" aria-valuemax="{{ daily_goals.calories }}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Protein -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Protein</span>
+                            <span class="text-muted">{{ macros_consumed.protein|floatformat:1 }}g / {{ daily_goals.protein }}g</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-custom" role="progressbar" 
+                                 style="--progress-width: {{ protein_pct|default:0 }}%;"
+                                 aria-valuenow="{{ macros_consumed.protein }}" aria-valuemin="0" aria-valuemax="{{ daily_goals.protein }}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Carbs -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Carbs</span>
+                            <span class="text-muted">{{ macros_consumed.carbs|floatformat:1 }}g / {{ daily_goals.carbs|default:0 }}g</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                 style="--progress-width: {{ carbs_pct|default:0 }}%;"
+                                 aria-valuenow="{{ macros_consumed.carbs|floatformat:1 }}" aria-valuemin="0" aria-valuemax="{{ daily_goals.carbs|default:100 }}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Fat -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Fat</span>
+                            <span class="text-muted">{{ macros_consumed.fat|floatformat:1 }}g / {{ daily_goals.fat|default:0 }}g</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-warning" role="progressbar" 
+                                 style="--progress-width: {{ fat_pct|default:0 }}%;"
+                                 aria-valuenow="{{ macros_consumed.fat|floatformat:1 }}" aria-valuemin="0" aria-valuemax="{{ daily_goals.fat|default:100 }}"></div>
+                        </div>
+
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fasting Timer -->
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Fasting Status</h5>
+                    
+                    <div class="display-6 my-3 text-green-accent" style="font-size: 1.5rem;" id="fasting-timer" {% if fasting_status.start_timestamp %}data-start-timestamp="{{ fasting_status.start_timestamp }}"{% endif %}>
+                        {{ fasting_status.time_elapsed }} / {{ fasting_status.goal_time }}
+                    </div>
+                    <div class="mb-3 text-center">
+                         <a href="{% url 'fasting_history' %}" class="small text-decoration-none text-primary">View History <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    
+                    {% if fasting_status.is_active %}
+                        <p class="text-muted">Fasting active</p>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="end_fast">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Stop Fast</button>
+                        </form>
+                    {% else %}
+                        <p class="text-muted">Not fasting</p>
+                        <form method="post" id="fasting-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="start_fast" id="fasting-action">
+                            <div class="mb-2">
+                                <select name="target_duration" class="form-select form-select-sm" aria-label="Fasting goal" onchange="updateFastingGoal(this)">
+                                    <option value="12" {% if fasting_status.target_duration == 12 %}selected{% endif %}>12 hours</option>
+                                    <option value="14" {% if fasting_status.target_duration == 14 %}selected{% endif %}>14 hours</option>
+                                    <option value="16" {% if fasting_status.target_duration == 16 %}selected{% endif %}>16 hours</option>
+                                    <option value="18" {% if fasting_status.target_duration == 18 %}selected{% endif %}>18 hours</option>
+                                    <option value="20" {% if fasting_status.target_duration == 20 %}selected{% endif %}>20 hours</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-green-accent btn-sm">Start Fast</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Water Tracker -->
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Water Intake</h5>
+                    <div class="my-3">
+                        <i class="bi bi-droplet-fill text-primary" style="font-size: 2rem;"></i>
+                        <div class="mt-2">
+                             <span class="fw-bold">{{ water_intake }} ml</span> <span class="text-muted">/ {{ daily_goals.water }} ml</span>
+                        </div>
+                        <div class="progress mt-2" style="height: 10px;">
+                            <div class="progress-bar bg-primary" role="progressbar" 
+                                 style="--progress-width: {{ water_pct|default:0 }}%;"
+                                 aria-valuenow="{{ water_intake }}" aria-valuemin="0" aria-valuemax="{{ daily_goals.water }}"></div>
+                        </div>
+                        <div class="mt-2">
+                             <a href="{% url 'water_history' %}" class="small text-decoration-none text-primary">View History <i class="bi bi-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_water">
+                        <div class="d-grid gap-2">
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <button type="submit" name="amount" value="50" class="btn btn-success btn-sm w-100">+50ml</button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="submit" name="amount" value="100" class="btn btn-success btn-sm w-100">+100ml</button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="submit" name="amount" value="250" class="btn btn-success btn-sm w-100">+250ml</button>
+                                </div>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <button type="submit" name="amount" value="-50" class="btn btn-secondary btn-sm w-100">-50ml</button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="submit" name="amount" value="-100" class="btn btn-secondary btn-sm w-100">-100ml</button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="submit" name="amount" value="-250" class="btn btn-secondary btn-sm w-100">-250ml</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Feed -->
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h3">Track Meals</h2>
+                <a href="{% url 'add_meal' %}" class="btn btn-green-accent rounded-pill px-4">
+                    <i class="bi bi-plus-lg me-1"></i> Add Meal
+                </a>
+            </div>
+
+            {% for type, items in meals.items %}
+                <div class="mb-5">
+                    <div class="section-divider">
+                        {{ type }}
+                    </div>
+
+                    {% if items %}
+                        {% for meal in items %}
+                            <div class="card meal-card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="card-title mb-1">{{ meal.title }}</h5>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-green-accent rounded-pill">{{ meal.calories }} cal</span>
+                                            <form method="post" action="{% url 'delete_meal' meal.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this meal?');" title="Delete meal">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mt-3 g-2 text-center text-muted small">
+                                        <div class="col-4 border-end">
+                                            <div class="fw-bold text-dark">{{ meal.protein|floatformat:1 }}g</div>
+                                            <div>Protein</div>
+                                        </div>
+                                        <div class="col-4 border-end">
+                                            <div class="fw-bold text-dark">{{ meal.carbs|floatformat:1 }}g</div>
+                                            <div>Carbs</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="fw-bold text-dark">{{ meal.fat|floatformat:1 }}g</div>
+                                            <div>Fat</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-muted fst-italic py-3">No meals logged for {{ type }} yet.</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<script>
+    function updateFastingGoal(select) {
+        const form = document.getElementById('fasting-form');
+        const actionInput = document.getElementById('fasting-action');
+        
+        //Change action to update goal instead of start fast
+        actionInput.value = 'update_fasting_goal';
+        form.submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        //Progress bars logic
+        var bars = document.querySelectorAll('.progress-bar[data-width]');
+        bars.forEach(function(bar) {
+            bar.style.width = bar.getAttribute('data-width') + '%';
+        });
+
+        //Fasting Timer Logic
+        const fastingActive = JSON.parse("{{ fasting_status.is_active|yesno:'true,false' }}");
+        const timerElement = document.getElementById('fasting-timer');
+        const goalHours = parseInt("{{ fasting_status.target_duration }}", 10);
+        
+        if (fastingActive && timerElement && timerElement.dataset.startTime) {
+            const startTime = new Date(timerElement.dataset.startTime).getTime();
+
+            function updateTimer() {
+                const now = new Date().getTime();
+                const distance = now - startTime;
+
+                if (distance < 0) {
+                     timerElement.innerHTML = "0h 00m 00s / " + goalHours + "h 00m";
+                     return;
+                }
+
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                const formattedTime = 
+                    hours + "h " + 
+                    (minutes < 10 ? "0" + minutes : minutes) + "m " + 
+                    (seconds < 10 ? "0" + seconds : seconds) + "s";
+
+                timerElement.innerText = formattedTime + " / " + goalHours + "h 00m";
+            }
+
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+    });
+</script>

@@ -1,15 +1,16 @@
-# Team *enter team name here* Small Group project
+# Team Foodle Small Group project
 
 ## Team members
 The members of the team are:
-- *enter full name 1 here*
-- *enter full name 2 here*
-- *enter full name 3 here*
-- *enter full name 4 here*
-- *enter full name 5 here (or delete if not applicable)*
+- Daniel Darius Mani
+- Hikmet Ozan Kaya
+- Kasthury Aruleesan
+- Mohammad Raza Khan
+- Parlin Kaur
+
 
 ## Project structure
-The project is called `recipify`.  It currently consists of a single app `recipes`.
+The project is called `Foodle`.
 
 ## Deployed version of the application
 The deployed version of the application can be found at [*enter url here*](*enter_url_here*).
@@ -39,7 +40,8 @@ $ python3 manage.py migrate
 Seed the development database with:
 
 ```
-$ python3 manage.py seed
+$ python3 
+manage.py seed
 ```
 
 Run all tests with:

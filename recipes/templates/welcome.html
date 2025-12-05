@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<style>
+  /* Theme Styles */
+  body { background-color: #f9fafb; }
+  
+  /* Green Buttons */
+  .btn-emerald { background-color: #22c55e; border: none; color: white; }
+  .btn-emerald:hover { background-color: #16a34a; color: white; }
+  
+  /* Text Highlights */
+  .text-emerald { color: #22c55e; }
+  
+  /* Navbar styling */
+  .navbar-custom { background-color: white; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+  .navbar-brand { font-weight: 700; color: #111827; font-size: 1.5rem; }
+  
+  /* Card Styling */
+  .card-style {
+    background-color: white;
+    border: none;
+    border-radius: 16px; 
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<nav class="navbar navbar-custom py-3 mb-5">
+  <div class="container">
+     <a href="{% url 'home' %}" class="navbar-brand">Foodle</a>
+     <a href="{% url 'log_in' %}" class="btn btn-emerald px-4 rounded-3 fw-bold">Login</a>
+  </div>
+</nav>
+
+<div class="container">
+    <div class="p-5 mb-4 card-style text-center">
+      <div class="container-fluid py-4">
+        <h1 class="display-5 fw-bold text-dark">Welcome to Foodle</h1>
+        <p class="col-md-8 fs-4 mx-auto text-muted mb-4">Your ultimate companion for cooking, tracking, and sharing delicious meals.</p>
+        <a href="{% url 'sign_up' %}" class="btn btn-emerald btn-lg px-5 rounded-3 fw-bold" type="button">Get Started</a>
+      </div>
+    </div>
+
+    <div class="row align-items-md-stretch">
+      
+      <div class="col-md-6 mb-4">
+        <div class="h-100 p-5 card-style">
+          <h2 class="fw-bold mb-3">Features</h2>
+          <ul class="list-unstyled mt-3">
+              <li class="mb-3">
+                  <strong class="text-emerald">Recipe Creator:</strong> 
+                  <span class="text-muted">Input recipes and save to a personal cookbook.</span>
+              </li>
+              <li class="mb-3">
+                  <strong class="text-emerald">Smart Calorie Tracking:</strong> 
+                  <span class="text-muted">Auto-calculate calories and macros.</span>
+              </li>
+              <li class="mb-3">
+                  <strong class="text-emerald">Daily Log:</strong> 
+                  <span class="text-muted">Track daily intake.</span>
+              </li>
+              <li class="mb-3">
+                  <strong class="text-emerald">Meal Planning:</strong> 
+                  <span class="text-muted">Organize recipes into a weekly schedule.</span>
+              </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="col-md-6 mb-4">
+        <div class="h-100 p-5 card-style">
+          <h2 class="fw-bold mb-3">Socials</h2>
+          <p class="text-muted mb-4">Connect with other foodies! See other people's recipes, save them to your collection, and rate them. You can also share your thoughts by commenting on recipes.</p>
+        </div>
+      </div>
+
+    </div>
+</div>
+{% endblock %}

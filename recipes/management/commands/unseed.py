@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from recipes.models import User
+from recipes.models import User, FastingSession, Meal, WaterIntake, Profile
 
 class Command(BaseCommand):
     """
@@ -20,7 +20,7 @@ class Command(BaseCommand):
         """
         Execute the unseeding process.
 
-        Deletes all `User` records where `is_staff` is False, preserving
+        Deletes all tracker data and `User` records where `is_staff` is False, preserving
         administrative accounts. Prints a confirmation message upon completion.
 
         Args:
@@ -30,5 +30,14 @@ class Command(BaseCommand):
         Returns:
             None
         """
+        
+        # Clear all tracker data
+        FastingSession.objects.all().delete()
+        Meal.objects.all().delete()
+        WaterIntake.objects.all().delete()
+        Profile.objects.all().delete()
 
+        # Delete non-staff users
         User.objects.filter(is_staff=False).delete()
+        
+        self.stdout.write(self.style.SUCCESS("Successfully unseeded users and cleared all tracker history."))
