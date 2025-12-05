@@ -37,7 +37,7 @@ urlpatterns = [
     path('signup/', views.SignUpView.as_view(), name='sign_up'),
     path('feed/', views.feed, name='feed'),
     path('recipes/', views.recipes, name='recipes'),
-    path('ai_recipes/', views.ai_tracker, name='ai_recipes'),
+    path('ai_recipes/', views.chatbot, name='ai_recipes'),
 
     #Password Reset URLs
     path(
@@ -70,3 +70,4 @@ urlpatterns = [
     ),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
