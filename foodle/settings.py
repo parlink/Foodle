@@ -162,3 +162,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'apikey'
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+
+#OpenAI API Configuration
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')

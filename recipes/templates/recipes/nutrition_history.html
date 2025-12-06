@@ -1,0 +1,238 @@
+{% extends 'base_content.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container py-4">
+    <!-- Header & Navigation -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <a href="{% url 'tracker' %}" class="text-decoration-none text-muted small mb-1 d-inline-block">
+                <i class="bi bi-arrow-left"></i> Back to Tracker
+            </a>
+            <h1 class="h3 mb-0">Nutrition History</h1>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <div class="btn-group btn-group-sm" role="group">
+                <a href="?days=7" class="btn btn-outline-primary {% if days == 7 %}active{% endif %}">7 Days</a>
+                <a href="?days=30" class="btn btn-outline-primary {% if days == 30 %}active{% endif %}">30 Days</a>
+                <a href="?days=90" class="btn btn-outline-primary {% if days == 90 %}active{% endif %}">90 Days</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Range Display -->
+    <div class="card mb-4 bg-light border-0">
+        <div class="card-body py-2">
+            <div class="text-center">
+                <span class="fw-bold text-muted">
+                    {{ start_date|date:"M d" }} - {{ end_date|date:"M d, Y" }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calories Chart -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-white">
+            <h5 class="card-title mb-0 fs-6 text-muted text-uppercase">Calories vs Goal</h5>
+        </div>
+        <div class="card-body">
+            <div style="height: 300px; position: relative;">
+                <canvas id="caloriesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Macros Chart -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-white">
+            <h5 class="card-title mb-0 fs-6 text-muted text-uppercase">Macros vs Goals</h5>
+        </div>
+        <div class="card-body">
+            <div style="height: 300px; position: relative;">
+                <canvas id="macrosChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="chart-data" type="application/json">
+{
+    "labels": [{% for label in chart_labels %}"{{ label }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+    "calories_actual": [{% for value in calories_actual %}{{ value }}{% if not forloop.last %},{% endif %}{% endfor %}],
+    "calories_goal": [{% for value in calories_goal %}{{ value }}{% if not forloop.last %},{% endif %}{% endfor %}],
+    "protein_actual": [{% for value in protein_actual %}{{ value }}{% if not forloop.last %},{% endif %}{% endfor %}],
+    "protein_goal": [{% for value in protein_goal %}{{ value }}{% if not forloop.last %},{% endif %}{% endfor %}],
+    "carbs_actual": [{% for value in carbs_actual %}{{ value }}{% if not forloop.last %},{% endif %}{% endfor %}],
+    "carbs_goal": [{% for value in carbs_goal %}{{ value }}{% if not forloop.last %},{% endif %}{% endfor %}],
+    "fat_actual": [{% for value in fat_actual %}{{ value }}{% if not forloop.last %},{% endif %}{% endfor %}],
+    "fat_goal": [{% for value in fat_goal %}{{ value }}{% if not forloop.last %},{% endif %}{% endfor %}]
+}
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get data from Django
+        const chartDataElement = document.getElementById('chart-data');
+        const chartData = JSON.parse(chartDataElement.textContent);
+
+        // Calories Chart
+        const caloriesCtx = document.getElementById('caloriesChart').getContext('2d');
+        new Chart(caloriesCtx, {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: [
+                    {
+                        label: 'Actual Calories',
+                        data: chartData.calories_actual,
+                        backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'Goal Calories',
+                        data: chartData.calories_goal,
+                        type: 'line',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y + ' cal';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            borderDash: [2, 4],
+                            color: '#f0f0f0'
+                        },
+                        ticks: {
+                            callback: function(value) { return value + ' cal'; }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        //Macros Chart
+        const macrosCtx = document.getElementById('macrosChart').getContext('2d');
+        new Chart(macrosCtx, {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: [
+                    {
+                        label: 'Protein (Actual)',
+                        data: chartData.protein_actual,
+                        backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1,
+                    },
+                    {
+                        label: 'Protein (Goal)',
+                        data: chartData.protein_goal,
+                        backgroundColor: 'rgba(40, 167, 69, 0.3)',
+                        borderColor: 'rgba(40, 167, 69, 0.5)',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                    },
+                    {
+                        label: 'Carbs (Actual)',
+                        data: chartData.carbs_actual,
+                        backgroundColor: 'rgba(23, 162, 184, 0.7)',
+                        borderColor: 'rgba(23, 162, 184, 1)',
+                        borderWidth: 1,
+                    },
+                    {
+                        label: 'Carbs (Goal)',
+                        data: chartData.carbs_goal,
+                        backgroundColor: 'rgba(23, 162, 184, 0.3)',
+                        borderColor: 'rgba(23, 162, 184, 0.5)',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                    },
+                    {
+                        label: 'Fat (Actual)',
+                        data: chartData.fat_actual,
+                        backgroundColor: 'rgba(255, 193, 7, 0.7)',
+                        borderColor: 'rgba(255, 193, 7, 1)',
+                        borderWidth: 1,
+                    },
+                    {
+                        label: 'Fat (Goal)',
+                        data: chartData.fat_goal,
+                        backgroundColor: 'rgba(255, 193, 7, 0.3)',
+                        borderColor: 'rgba(255, 193, 7, 0.5)',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y + 'g';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        stacked: false,
+                        grid: {
+                            borderDash: [2, 4],
+                            color: '#f0f0f0'
+                        },
+                        ticks: {
+                            callback: function(value) { return value + 'g'; }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+

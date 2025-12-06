@@ -1,12 +1,7 @@
-from django.shortcuts import render
-import openai, os
+from django.shortcuts import render, redirect
+from django.conf import settings
 from openai import OpenAI
-from dotenv import load_dotenv
-from django.http.response import StreamingHttpResponse
-from django.shortcuts import redirect
-
-
-load_dotenv()
+from django.contrib import messages
 
 
 #recipes = []
@@ -42,11 +37,10 @@ def chatbot(request):
 
 
 
-          api_key = os.getenv("OPEN_API_KEY")
+          api_key = getattr(settings, 'OPENAI_API_KEY', None)
           if not api_key:
-              # Handle missing key gracefully - maybe add an error message to context
-              # For now, just print or do nothing to avoid crash, or let it crash here only when used
-              pass 
+              messages.error(request, 'OpenAI API key is not configured. Please contact the administrator.')
+              return redirect('ai_recipes')
           
           try:
               client = OpenAI(api_key=api_key)
@@ -84,8 +78,8 @@ def chatbot(request):
               request.session["recipes"] = recipes
               return redirect('ai_recipes')
           except Exception as e:
-              print(f"Error calling OpenAI: {e}")
-              # Optionally add error to messages context
+              messages.error(request, f'Error generating recipe: {str(e)}')
+              return redirect('ai_recipes')
 
 
         if "clear_history" in request.POST:

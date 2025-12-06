@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from datetime import timedelta
-from recipes.models import WaterIntake
+from recipes.models import DailyLog
 from django.db.models import Sum, Avg
 import calendar
 
@@ -51,7 +51,7 @@ def water_history(request):
         show_next = end_date < today
         
         # Fetch all records for the month
-        intake_records = WaterIntake.objects.filter(
+        intake_records = DailyLog.objects.filter(
             user=request.user,
             date__range=[start_date, end_date]
         )
@@ -108,7 +108,7 @@ def water_history(request):
         show_next = end_date < today
         
         # Fetch data
-        intake_records = WaterIntake.objects.filter(
+        intake_records = DailyLog.objects.filter(
             user=request.user,
             date__range=[start_date, end_date]
         )
@@ -139,7 +139,7 @@ def water_history(request):
         if edit_date_str and new_amount is not None:
             try:
                 amount_val = max(0, int(new_amount))
-                WaterIntake.objects.update_or_create(
+                DailyLog.objects.update_or_create(
                     user=request.user,
                     date=edit_date_str,
                     defaults={'amount_ml': amount_val}
