@@ -131,13 +131,10 @@ class Command(BaseCommand):
             first_name=data['first_name'],
             last_name=data['last_name'],
         )
-        # Set admin status if specified
-        if data.get('is_staff'):
-            user.is_staff = True
-        if data.get('is_superuser'):
-            user.is_superuser = True
-        if data.get('is_staff') or data.get('is_superuser'):
-            user.save()
+        # Set admin status explicitly before saving
+        user.is_staff = data.get('is_staff', False)
+        user.is_superuser = data.get('is_superuser', False)
+        user.save()
 
     def create_recipes(self):
         """
