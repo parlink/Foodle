@@ -37,7 +37,13 @@ urlpatterns = [
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
     path('signup/', views.SignUpView.as_view(), name='sign_up'),
     path('feed/', views.feed, name='feed'),
+    path('create-post/', views.create_post, name='create_post'),
     path('recipes/', views.recipes, name='recipes'),
+    path('post/<int:post_id>/like/', views.toggle_like, name='toggle_like'),
+    path('post/<int:post_id>/save/', views.toggle_save, name='toggle_save'),
+    path('post/<int:post_id>/rate/', views.submit_rating, name='submit_rating'),
+    path('post/<int:post_id>/comment/', views.submit_comment, name='submit_comment'),
+    path('user/<int:author_id>/follow/', views.toggle_follow, name='toggle_follow'),
     path('ai_recipes/', views.chatbot, name='ai_recipes'),
 
     #Password Reset URLs
@@ -71,4 +77,4 @@ urlpatterns = [
     ),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

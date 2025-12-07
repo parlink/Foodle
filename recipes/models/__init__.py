@@ -4,7 +4,10 @@ from .profile import Profile
 from .fasting_session import *
 from .daily_log import *
 from .meal import *
-from .post import Post
-from .comment import Comment
-from .like import Like
-from .tag import Tag
+from .comment import *
+from .like import *
+from .post import *
+from .tag import *
+from .follow import *
+from .rating import *
+from .save import *
