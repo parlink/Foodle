@@ -21,7 +21,6 @@ class Post(models.Model):
         
     @property
     def average_rating(self):
-        """Calculates the average rating."""
         if self.rating_count == 0:
             return 0.0
         return round(self.rating_total_score / self.rating_count, 1)

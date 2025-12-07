@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from recipes.models import User, FastingSession, Meal, WaterIntake, Profile
+from recipes.models import User, FastingSession, Meal, DailyLog, Profile
 
 class Command(BaseCommand):
     """
@@ -34,7 +34,7 @@ class Command(BaseCommand):
         # Clear all tracker data
         FastingSession.objects.all().delete()
         Meal.objects.all().delete()
-        WaterIntake.objects.all().delete()
+        DailyLog.objects.all().delete()
         Profile.objects.all().delete()
 
         # Delete non-staff users

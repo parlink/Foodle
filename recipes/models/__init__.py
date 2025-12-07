@@ -2,7 +2,7 @@ from .user import *
 from .recipe import *
 from .profile import Profile
 from .fasting_session import *
-from .water_intake import *
+from .daily_log import *
 from .meal import *
 from .comment import *
 from .like import *
