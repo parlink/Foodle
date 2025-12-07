@@ -2,49 +2,6 @@
 {% load static %}
 
 {% block content %}
-<style>
-    /* Custom styles for tracker page*/
-    .bg-green-accent {
-        background-color: #28a745 !important;
-    }
-    .text-green-accent {
-        color: #28a745 !important;
-    }
-    .btn-green-accent {
-        background-color: #28a745;
-        color: white;
-        border: none;
-    }
-    .btn-green-accent:hover {
-        background-color: #218838;
-        color: white;
-    }
-    .card {
-        border: none;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        margin-bottom: 1.5rem;
-    }
-    .progress-bar-custom {
-        background-color: #28a745;
-    }
-    .meal-card {
-        border-left: 4px solid #28a745;
-    }
-    .section-divider {
-        border-bottom: 2px solid #e9ecef;
-        margin: 20px 0;
-        padding-bottom: 10px;
-        color: #6c757d;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-    }
-
-    .progress-bar {
-        width: var(--progress-width, 0%) !important;
-    }
-</style>
-
 <div class="container py-4">
     <div class="row">
         <!-- Left Sidebar (35%) -->
@@ -283,15 +240,11 @@
                 {% csrf_token %}
                 <input type="hidden" name="action" value="update_goals">
                 <div class="modal-body">
-                    <!-- Calorie Dropdown -->
+                    <!-- Calorie Input -->
                     <div class="mb-4">
-                        <label for="calorie_goal" class="form-label">
-                            Calories: <span id="calorie_value">{{ daily_log.calorie_goal }}</span>
-                        </label>
-                        <select class="form-select" id="calorie_goal" name="calorie_goal" 
-                                onchange="updateCalorieDisplay(this.value); autoCalculateMacros(this.value);">
-                            <!-- Options will be populated by JavaScript -->
-                        </select>
+                        <label for="calorie_goal" class="form-label">Calories</label>
+                        <input type="number" id="calorie_goal" name="calorie_goal" class="form-control" 
+                               min="1000" max="4000" value="{{ daily_goals.calories }}" required>
                     </div>
 
                     <!-- Macro Inputs -->
@@ -299,32 +252,28 @@
                         <div class="col-4">
                             <label for="protein_goal" class="form-label small">Protein (g)</label>
                             <input type="number" class="form-control form-control-sm" id="protein_goal" 
-                                   name="protein_goal" value="{{ daily_log.protein_goal }}" min="0" 
+                                   name="protein_goal" value="{{ daily_log.protein_goal }}" min="0" max="300"
                                    oninput="handleMacroInput('protein')" onblur="validateMacro('protein')">
                         </div>
                         <div class="col-4">
                             <label for="carbs_goal" class="form-label small">Carbs (g)</label>
                             <input type="number" class="form-control form-control-sm" id="carbs_goal" 
-                                   name="carbs_goal" value="{{ daily_log.carbs_goal }}" min="0"
+                                   name="carbs_goal" value="{{ daily_log.carbs_goal }}" min="0" max="300"
                                    oninput="handleMacroInput('carbs')" onblur="validateMacro('carbs')">
                         </div>
                         <div class="col-4">
                             <label for="fat_goal" class="form-label small">Fat (g)</label>
                             <input type="number" class="form-control form-control-sm" id="fat_goal" 
-                                   name="fat_goal" value="{{ daily_log.fat_goal }}" min="0"
+                                   name="fat_goal" value="{{ daily_log.fat_goal }}" min="0" max="300"
                                    oninput="handleMacroInput('fat')" onblur="validateMacro('fat')">
                         </div>
                     </div>
 
-                    <!-- Water Dropdown -->
+                    <!-- Water Input -->
                     <div class="mb-3">
-                        <label for="water_goal" class="form-label">
-                            Water: <span id="water_value">{{ daily_log.water_goal }}</span> ml
-                        </label>
-                        <select class="form-select" id="water_goal" name="water_goal" 
-                                onchange="updateWaterDisplay(this.value)">
-                            <!-- Options will be populated by JavaScript -->
-                        </select>
+                        <label for="water_goal" class="form-label">Water (ml)</label>
+                        <input type="number" id="water_goal" name="water_goal" class="form-control" 
+                               min="2500" max="7000" value="{{ daily_goals.water }}" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -396,13 +345,38 @@
         fat: false
     };
 
-    // Real-time label updates
-    function updateCalorieDisplay(value) {
-        document.getElementById('calorie_value').textContent = value;
+    // Validate and clamp calorie input
+    function validateCalorieInput() {
+        const calorieInput = document.getElementById('calorie_goal');
+        if (!calorieInput) return;
+        
+        let value = parseInt(calorieInput.value) || 1000;
+        
+        // Clamp to valid range
+        if (value < 1000) {
+            value = 1000;
+        } else if (value > 4000) {
+            value = 4000;
+        }
+        
+        calorieInput.value = value;
     }
 
-    function updateWaterDisplay(value) {
-        document.getElementById('water_value').textContent = value;
+    // Validate and clamp water input
+    function validateWaterInput() {
+        const waterInput = document.getElementById('water_goal');
+        if (!waterInput) return;
+        
+        let value = parseInt(waterInput.value) || 2500;
+        
+        // Clamp to valid range
+        if (value < 2500) {
+            value = 2500;
+        } else if (value > 7000) {
+            value = 7000;
+        }
+        
+        waterInput.value = value;
     }
 
     // Auto-calculate macros based on calorie goal (40/30/30 split)
@@ -458,77 +432,65 @@
             maxValue = Math.round((calories * 0.60) / 9);
         }
         
-        // Clamp to maximum if exceeded
-        if (value > maxValue) {
-            value = maxValue;
+        // Enforce absolute maximum of 300g regardless of calorie-based calculations
+        const ABSOLUTE_MAX = 300;
+        const effectiveMax = Math.min(maxValue, ABSOLUTE_MAX);
+        
+        // Clamp to effective maximum (the smaller of calorie-based max or 300)
+        if (value > effectiveMax) {
+            value = effectiveMax;
         }
         
         macroInput.value = value;
     }
 
-    // Validate all macros before form submission
+    // Validate all inputs before form submission
     function validateAllMacros() {
+        validateCalorieInput();
+        validateWaterInput();
         validateMacro('protein');
         validateMacro('carbs');
         validateMacro('fat');
     }
 
-    // Initialize modal state when opened and populate dropdowns
+    // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
+        // Set up calorie input event listener for auto-calculation
+        const calorieInput = document.getElementById('calorie_goal');
+        if (calorieInput) {
+            // Auto-calculate macros when calorie value changes
+            calorieInput.addEventListener('input', function() {
+                const value = parseInt(this.value) || 0;
+                if (value >= 1000 && value <= 4000) {
+                    autoCalculateMacros(value);
+                }
+            });
+            
+            // Validate on blur
+            calorieInput.addEventListener('blur', function() {
+                validateCalorieInput();
+                // Re-trigger auto-calculation with validated value
+                const value = parseInt(this.value) || 1000;
+                autoCalculateMacros(value);
+            });
+        }
+        
+        // Set up water input event listener for validation
+        const waterInput = document.getElementById('water_goal');
+        if (waterInput) {
+            // Validate on blur
+            waterInput.addEventListener('blur', validateWaterInput);
+        }
+        
+        // Set up modal event listener for resetting flags
         const modal = document.getElementById('editGoalsModal');
         if (modal) {
-            // Get current values from the display spans
-            const calorieValueSpan = document.getElementById('calorie_value');
-            const waterValueSpan = document.getElementById('water_value');
-            const currentCalorie = parseInt(calorieValueSpan.textContent) || 2500;
-            const currentWater = parseInt(waterValueSpan.textContent) || 2500;
-            
-            // Populate calorie dropdown (1000-4000, step 100)
-            const calorieSelect = document.getElementById('calorie_goal');
-            for (let i = 1000; i <= 4000; i += 100) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i;
-                if (i == currentCalorie) {
-                    option.selected = true;
-                }
-                calorieSelect.appendChild(option);
-            }
-            
-            // Populate water dropdown (2000-5000, step 500)
-            const waterSelect = document.getElementById('water_goal');
-            for (let i = 2000; i <= 5000; i += 500) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i;
-                if (i == currentWater) {
-                    option.selected = true;
-                }
-                waterSelect.appendChild(option);
-            }
-            
             modal.addEventListener('show.bs.modal', function() {
                 // Reset auto-calc state
                 autoCalcEnabled = true;
                 manuallyEditedMacros.protein = false;
                 manuallyEditedMacros.carbs = false;
                 manuallyEditedMacros.fat = false;
-                
-                // Get current values and set dropdowns
-                const calorieVal = parseInt(calorieValueSpan.textContent) || 2500;
-                const waterVal = parseInt(waterValueSpan.textContent) || 2500;
-                
-                // Find closest match for calorie (round to nearest 100)
-                const roundedCalorie = Math.round(calorieVal / 100) * 100;
-                const finalCalorie = Math.max(1000, Math.min(4000, roundedCalorie));
-                calorieSelect.value = finalCalorie;
-                updateCalorieDisplay(finalCalorie);
-                
-                // Find closest match for water (round to nearest 500)
-                const roundedWater = Math.round(waterVal / 500) * 500;
-                const finalWater = Math.max(2000, Math.min(5000, roundedWater));
-                waterSelect.value = finalWater;
-                updateWaterDisplay(finalWater);
             });
         }
     });
