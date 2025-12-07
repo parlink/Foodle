@@ -283,14 +283,15 @@
                 {% csrf_token %}
                 <input type="hidden" name="action" value="update_goals">
                 <div class="modal-body">
-                    <!-- Calorie Slider -->
+                    <!-- Calorie Dropdown -->
                     <div class="mb-4">
                         <label for="calorie_goal" class="form-label">
                             Calories: <span id="calorie_value">{{ daily_log.calorie_goal }}</span>
                         </label>
-                        <input type="range" class="form-range" id="calorie_goal" name="calorie_goal" 
-                               min="1000" max="4000" step="100" value="{{ daily_log.calorie_goal }}"
-                               oninput="updateCalorieDisplay(this.value); autoCalculateMacros(this.value);">
+                        <select class="form-select" id="calorie_goal" name="calorie_goal" 
+                                onchange="updateCalorieDisplay(this.value); autoCalculateMacros(this.value);">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
                     </div>
 
                     <!-- Macro Inputs -->
@@ -315,14 +316,15 @@
                         </div>
                     </div>
 
-                    <!-- Water Slider -->
+                    <!-- Water Dropdown -->
                     <div class="mb-3">
                         <label for="water_goal" class="form-label">
                             Water: <span id="water_value">{{ daily_log.water_goal }}</span> ml
                         </label>
-                        <input type="range" class="form-range" id="water_goal" name="water_goal" 
-                               min="2000" max="8000" step="250" value="{{ daily_log.water_goal }}"
-                               oninput="updateWaterDisplay(this.value)">
+                        <select class="form-select" id="water_goal" name="water_goal" 
+                                onchange="updateWaterDisplay(this.value)">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -471,16 +473,62 @@
         validateMacro('fat');
     }
 
-    // Initialize modal state when opened
+    // Initialize modal state when opened and populate dropdowns
     document.addEventListener('DOMContentLoaded', function() {
         const modal = document.getElementById('editGoalsModal');
         if (modal) {
+            // Get current values from the display spans
+            const calorieValueSpan = document.getElementById('calorie_value');
+            const waterValueSpan = document.getElementById('water_value');
+            const currentCalorie = parseInt(calorieValueSpan.textContent) || 2500;
+            const currentWater = parseInt(waterValueSpan.textContent) || 2500;
+            
+            // Populate calorie dropdown (1000-4000, step 100)
+            const calorieSelect = document.getElementById('calorie_goal');
+            for (let i = 1000; i <= 4000; i += 100) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                if (i == currentCalorie) {
+                    option.selected = true;
+                }
+                calorieSelect.appendChild(option);
+            }
+            
+            // Populate water dropdown (2000-5000, step 500)
+            const waterSelect = document.getElementById('water_goal');
+            for (let i = 2000; i <= 5000; i += 500) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                if (i == currentWater) {
+                    option.selected = true;
+                }
+                waterSelect.appendChild(option);
+            }
+            
             modal.addEventListener('show.bs.modal', function() {
                 // Reset auto-calc state
                 autoCalcEnabled = true;
                 manuallyEditedMacros.protein = false;
                 manuallyEditedMacros.carbs = false;
                 manuallyEditedMacros.fat = false;
+                
+                // Get current values and set dropdowns
+                const calorieVal = parseInt(calorieValueSpan.textContent) || 2500;
+                const waterVal = parseInt(waterValueSpan.textContent) || 2500;
+                
+                // Find closest match for calorie (round to nearest 100)
+                const roundedCalorie = Math.round(calorieVal / 100) * 100;
+                const finalCalorie = Math.max(1000, Math.min(4000, roundedCalorie));
+                calorieSelect.value = finalCalorie;
+                updateCalorieDisplay(finalCalorie);
+                
+                // Find closest match for water (round to nearest 500)
+                const roundedWater = Math.round(waterVal / 500) * 500;
+                const finalWater = Math.max(2000, Math.min(5000, roundedWater));
+                waterSelect.value = finalWater;
+                updateWaterDisplay(finalWater);
             });
         }
     });
