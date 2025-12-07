@@ -12,21 +12,29 @@ from recipes.helpers import is_liked_util, is_saved_util, is_followed_util, get_
 
 @login_required
 def feed(request):
-    show_followed_only = request.GET.get('followed', 'false') == 'true'
+    show_saved = request.GET.get('saved') == 'true'
+    show_followed_only = request.GET.get('followed') == 'true'
 
-    if show_followed_only:
+    if show_saved:
+        # Get posts saved by the current user
+        posts = Post.objects.filter(saves__user=request.user)
+    elif show_followed_only:
+        # Get posts from followed users + own posts
         followed_ids = Follow.objects.filter(follower=request.user).values_list('followed_id', flat=True)
-        posts_queryset = Post.objects.filter(author__in=followed_ids).union(
+        posts = Post.objects.filter(author__in=followed_ids).union(
             Post.objects.filter(author=request.user)
-        ).order_by('-created_at')
-        post_ids = [post.id for post in posts_queryset]
-        posts = Post.objects.filter(id__in=post_ids)
+        )
     else:
+        # Get all posts
         posts = Post.objects.all()
 
+    # Optimize queries
     posts = posts.select_related('author').prefetch_related('tags', 'comments__user').order_by('-created_at')
 
+    # 2. Pre-calculate interactions for the UI
+    # (We execute the queryset list to get IDs for the optimized lookups below)
     post_ids = [post.id for post in posts]
+    
     liked_posts_set = set(Like.objects.filter(user=request.user, post_id__in=post_ids).values_list('post_id', flat=True))
     saved_posts_set = set(Save.objects.filter(user=request.user, post_id__in=post_ids).values_list('post_id', flat=True))
     user_ratings_dict = {r.post_id: r.score for r in Rating.objects.filter(user=request.user, post_id__in=post_ids)}
@@ -35,19 +43,19 @@ def feed(request):
     following_status = Follow.objects.filter(follower=request.user, followed_id__in=author_ids).values_list('followed_id', flat=True)
     is_following_map = {author_id: True for author_id in following_status}
     
-    posts_with_status = []
+    # Attach attributes to post objects for the template to use
     for post in posts:
         post.is_liked_by_user = is_liked_util(post.id, liked_posts_set)
         post.is_saved_by_user = is_saved_util(post.id, saved_posts_set)
         post.user_rating_score = get_rating_util(post.id, user_ratings_dict)
         post.is_followed_by_user = is_followed_util(post.author_id, is_following_map)
-        posts_with_status.append(post)
 
     form = PostForm()
 
     context = {
-        'posts': posts_with_status,
+        'posts': posts,
         'show_followed_only': show_followed_only,
+        'view_saved': show_saved, # Passed to template to highlight sidebar
         'form': form,
     }
     return render(request, 'recipes/feed.html', context)
@@ -71,10 +79,14 @@ def toggle_like(request, post_id):
                 Like.objects.create(user=request.user, post=post)
                 liked = True
             
-            post.likes_count = Post.objects.get(id=post_id).likes.count()
-            post.save(update_fields=['likes_count'])
+            # Recalculate count dynamically to ensure accuracy
+            current_count = post.likes.count()
             
-            return JsonResponse({'liked': liked, 'likes_count': post.likes_count})
+            # If your Post model has a denormalized 'likes_count' field, update it:
+            # post.likes_count = current_count
+            # post.save(update_fields=['likes_count'])
+            
+            return JsonResponse({'liked': liked, 'likes_count': current_count})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
@@ -99,6 +111,21 @@ def toggle_save(request, post_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+@login_required
+def delete_post(request, post_id):
+    """
+    Allows the author to delete their own post.
+    """
+    post = get_object_or_404(Post, pk=post_id)
+    
+    # Security check: ensure only the author can delete
+    if request.user == post.author:
+        post.delete()
+        
+    # Redirect back to feed (or wherever they were)
+    return redirect('feed')
+
+# ... (Keep submit_rating, submit_comment, toggle_follow, and create_post exactly as they were) ...
 @login_required
 @require_POST
 def submit_rating(request, post_id):

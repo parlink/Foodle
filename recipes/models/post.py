@@ -9,7 +9,8 @@ class Post(models.Model):
     image = models.ImageField(upload_to='posts_images/', blank=True, null=True) 
     rating_total_score = models.PositiveIntegerField(default=0)
     rating_count = models.PositiveIntegerField(default=0)
-    
+    prep_time = models.CharField(max_length=50, blank=True, help_text="e.g. 25 min")
+    servings = models.CharField(max_length=50, blank=True, help_text="e.g. 4 servings")
     created_at = models.DateTimeField(auto_now_add= True)
     tags = models.ManyToManyField(Tag, blank=True)
 
@@ -18,6 +19,12 @@ class Post(models.Model):
     
     def total_comments(self):
         return self.comments.count()
+    
+    def is_liked_by(self, user):
+        return self.likes.filter(user=user).exists()
+
+    def is_saved_by(self, user):
+        return self.saves.filter(user=user).exists()
         
     @property
     def average_rating(self):

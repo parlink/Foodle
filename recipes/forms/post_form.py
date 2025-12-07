@@ -10,7 +10,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ['title', 'caption', 'image', 'tags']
+        fields = ['title', 'caption', 'image', 'tags', 'prep_time', 'servings']
         
         widgets = {
             'title': forms.TextInput(attrs={
@@ -24,5 +24,13 @@ class PostForm(forms.ModelForm):
             }),
             'tags': forms.SelectMultiple(attrs={
                 'class': 'form-control rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500'
+            }),
+            'prep_time': forms.TextInput(attrs={
+                 'class': 'form-control rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500',
+                 'placeholder': 'e.g. 30 min'
+            }),
+            'servings': forms.TextInput(attrs={
+                 'class': 'form-control rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500',
+                 'placeholder': 'e.g. 2 people'
             }),
         }
