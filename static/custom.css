@@ -113,3 +113,101 @@ h3.profile-title {
   text-decoration: underline;
   color: #0d6efd;
 }
+
+/* --- Tracker Page Styles --- */
+.bg-green-accent {
+    background-color: #28a745 !important;
+}
+.text-green-accent {
+    color: #28a745 !important;
+}
+.btn-green-accent {
+    background-color: #28a745;
+    color: white;
+    border: none;
+}
+.btn-green-accent:hover {
+    background-color: #218838;
+    color: white;
+}
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+}
+.progress-bar-custom {
+    background-color: #28a745;
+}
+.meal-card {
+    border-left: 4px solid #28a745;
+}
+.section-divider {
+    border-bottom: 2px solid #e9ecef;
+    margin: 20px 0;
+    padding-bottom: 10px;
+    color: #6c757d;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+.progress-bar {
+    width: var(--progress-width, 0%) !important;
+}
+
+/* --- Welcome Page Styles --- */
+body {
+    background-color: #f9fafb;
+}
+
+/* Green Buttons */
+.btn-emerald {
+    background-color: #22c55e;
+    border: none;
+    color: white;
+}
+.btn-emerald:hover {
+    background-color: #16a34a;
+    color: white;
+}
+
+/* Text Highlights */
+.text-emerald {
+    color: #22c55e;
+}
+
+/* Navbar styling */
+.navbar-custom {
+    background-color: white;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.navbar-brand {
+    font-weight: 700;
+    color: #111827;
+    font-size: 1.5rem;
+}
+
+/* Card Styling */
+.card-style {
+    background-color: white;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Add Meal Page Styles --- */
+/* Note: .btn-green-accent is already defined in Tracker Page Styles section above */
+
+/* --- Auth Pages Styles --- */
+/* Note: body background-color, .btn-emerald, and .text-emerald are already defined in Welcome Page Styles section above */
+
+/* Secondary Soft Button (used in password reset pages) */
+.btn-secondary-soft {
+    background-color: #e5e7eb;
+    color: #374151;
+    border: none;
+    font-weight: 600;
+}
+.btn-secondary-soft:hover {
+    background-color: #d1d5db;
+    color: #111827;
+}
