@@ -10,7 +10,7 @@ is swallowed and generation continues.
 
 
 from faker import Faker
-from random import randint, random, choice
+from random import randint, random, choice 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 from datetime import timedelta, date, datetime
@@ -156,6 +156,8 @@ class Command(BaseCommand):
         servings = randint(2, 8)
         ingredients = self.generate_ingredients()
         method = self.generate_method()
+        users = User.objects.all()
+        random_user = choice(users)
 
         self.try_create_recipe({
             'name': name,
@@ -165,6 +167,7 @@ class Command(BaseCommand):
             'servings': servings,
             'ingredients': ingredients,
             'method': method,
+            'created_by': random_user,
         })
 
     def try_create_recipe(self, data):
@@ -184,6 +187,7 @@ class Command(BaseCommand):
             servings = data['servings'],
             ingredients = data['ingredients'],
             method = data['method'],
+            created_by = data['created_by'],
         )
 
     def generate_ingredients(self):
