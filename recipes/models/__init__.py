@@ -8,3 +8,6 @@ from .comment import *
 from .like import *
 from .post import *
 from .tag import *
+from .follow import *
+from .rating import *
+from .save import *

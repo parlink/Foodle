@@ -10,5 +10,5 @@ from .tracker_view import *
 from .water_history_view import *
 from .fasting_history_view import *
 from .welcome_view import *
-from .social_feed import feed, toggle_like, create_post
+from .social_feed import *
 from .add_meal_view import *
