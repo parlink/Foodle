@@ -1,45 +1,17 @@
+{% extends 'base_content.html' %}
 {% load static %}
 {% load i18n %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Feed</title>
+{% block content %}
+    <!-- Tailwind CSS for this page -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .recipe-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .recipe-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .icon-action {
-            cursor: pointer;
-            transition: color 0.15s ease, transform 0.15s ease;
-        }
-        .icon-action:hover {
-            transform: scale(1.05);
-        }
-        .star-rating button {
-            transition: color 0.1s ease;
-        }
-        .form-control {
-            @apply block w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500;
-        }
-        input[type="file"]::file-selector-button {
-            @apply mr-4 py-2 px-4 rounded-full border-0 text-sm font-semibold bg-green-50 file:text-green-700 hover:bg-green-100;
-        }
-    </style>
-    <!-- Include necessary helper for CSRF token -->
-    {% csrf_token %}
-</head>
-<body class="bg-gray-50 font-sans min-h-screen">
+    
+    <!-- CSRF Token for AJAX requests -->
+    <div style="display: none;">
+        {% csrf_token %}
+    </div>
+
+    <div class="bg-gray-50 font-sans min-h-screen">
 
     <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         
@@ -426,5 +398,5 @@
             
         });
     </script>
-</body>
-</html>
+    </div>
+{% endblock %}
