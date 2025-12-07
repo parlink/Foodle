@@ -4,3 +4,4 @@ from .profile import Profile
 from .fasting_session import *
 from .water_intake import *
 from .meal import *
+from .post import *

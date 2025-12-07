@@ -20,6 +20,7 @@ from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from recipes import views
+from recipes.views.ai_recipe import chatbot
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,6 +38,7 @@ urlpatterns = [
     path('signup/', views.SignUpView.as_view(), name='sign_up'),
     path('feed/', views.feed, name='feed'),
     path('recipes/', views.recipes, name='recipes'),
+    path('ai_recipe/',chatbot,name='ai_recipe'),
 
     #Password Reset URLs
     path(
