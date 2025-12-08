@@ -13,6 +13,12 @@ class Post(models.Model):
     servings = models.CharField(max_length=50, blank=True, help_text="e.g. 4 servings")
     created_at = models.DateTimeField(auto_now_add= True)
     tags = models.ManyToManyField(Tag, blank=True)
+    prep_time = models.CharField(max_length=20, blank=True, help_text="e.g. 25 min")
+    servings = models.PositiveIntegerField(default=1, blank=True)
+    difficulty = models.CharField(max_length=20, choices=[("Easy", "Easy"), ("Moderate", "Moderate"), ("Hard", "Hard"),],default="Easy")
+    CUISINE_CHOICES = [('Italian', 'Italian'), ('Mexican', 'Mexican'), ('Chinese', 'Chinese'), ('Indian', 'Indian'), ('Japanese', 'Japanese'), ('Thai', 'Thai'), ('French', 'French'), ('American', 'American'), ('Greek', 'Greek'), ('Spanish', 'Spanish'), ('Mediterranean', 'Mediterranean'), ('Korean', 'Korean'), ('Other', 'Other'),
+    ]
+    cuisine = models.CharField(max_length=50, choices=CUISINE_CHOICES, blank=True, null=True)
 
     def total_likes(self):
         return self.likes.count()

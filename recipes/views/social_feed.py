@@ -210,7 +210,7 @@ def toggle_follow(request, author_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-@login_required
+login_required
 def create_post(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
@@ -220,4 +220,7 @@ def create_post(request):
             post.save()
             form.save_m2m()
             return redirect('feed')
+        else:
+            print("Form Errors:", form.errors)
+            
     return redirect('feed')

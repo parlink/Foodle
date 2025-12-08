@@ -55,12 +55,10 @@
             {% for post in posts %}
                 {% with post_id=post.id %}
                 
-                <div id="post-{{ post_id }}" class="recipe-card bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-                    
+                <div id="post-{{ post_id }}" class="max-w-xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden border border-green-500">
                     <!-- Author Header -->
                     <div class="flex items-center p-4 sm:p-6 justify-between">
                         <div class="flex items-center space-x-3">
-                            <!-- Avatar (using gravatar from User model) -->
                             <img src="{{ post.author.mini_gravatar }}" alt="{{ post.author.username }}" class="w-10 h-10 rounded-full object-cover border-2 border-green-200">
                             <div>
                                 <p class="font-semibold text-gray-900">{{ post.author.full_name }}</p>
@@ -68,7 +66,6 @@
                             </div>
                         </div>
                         
-                        <!-- Follow Button -->
                         {% if post.author != request.user %}
                             <button 
                                 data-author-id="{{ post.author.id }}"
@@ -78,6 +75,15 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 14v1.5c0 .712-.137 1.385-.386 2h1.386a3 3 0 003-3V11a2 2 0 00-2-2h-3.5c-.712 0-1.385.137-2 .386"></path></svg>
                                 <span data-is-following="{% if post.is_followed_by_user %}true{% else %}false{% endif %}">{% if post.is_followed_by_user %}Following{% else %}Follow{% endif %}</span>
                             </button>
+                        {% else %}
+                            <form action="{% url 'delete_post' post.id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                                {% csrf_token %}
+                                <button type="submit" class="text-gray-400 hover:text-red-500 transition duration-150 p-1 rounded-full hover:bg-red-50" title="Delete Post">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </form>
                         {% endif %}
                     </div>
 
@@ -88,8 +94,10 @@
                              class="w-full h-full object-cover"
                              onerror="this.onerror=null;this.src='https://placehold.co/800x400/81c784/1b5e20?text=Recipe+Image+Missing'">
                         <!-- First Tag as Badge -->
-                        {% if post.tags.all %}
-                        <span class="absolute top-3 right-3 bg-green-500 text-white text-xs font-medium px-3 py-1 rounded-full shadow-md">{{ post.tags.first.name }}</span>
+                        {% if post.cuisine %}
+                        <span class="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wide">
+                            {{ post.cuisine }}
+                        </span>
                         {% endif %}
                     </div>
 
@@ -150,18 +158,48 @@
 
                         <!-- Title and Caption -->
                         <div class="border-t pt-4">
-                            <h2 class="text-xl font-bold text-gray-800 mb-1">{{ post.title }}</h2>
-                            <p class="text-sm text-gray-600 mb-3">{{ post.caption }}</p>
+                            <h2 class="text-xl font-bold text-gray-900 mb-1">{{ post.title }}</h2>
+                            
+                            <p class="text-gray-800 mb-3">
+                                <span class="font-semibold text-gray-900">@{{ post.author.username }}</span> 
+                                {{ post.caption }}
+                            </p>
+                            
+                            <div class="flex items-center flex-wrap gap-4 mb-3 text-sm text-gray-600">
+                                
+                                {% if post.prep_time %}
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>{{ post.prep_time }}</span>
+                                </div>
+                                {% endif %}
+
+                                {% if post.servings %}
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2c0-.656-.126-1.283-.356-1.857M20 18v.01M10 9l2-2m0 0l2 2m-2-2v8m-3 2h6a2 2 0 002-2V7a2 2 0 00-2-2H9a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    <span>{{ post.servings }} servings</span>
+                                </div>
+                                {% endif %}
+
+                                {% if post.difficulty %}
+                                <span class="px-2.5 py-0.5 rounded-full border border-green-200 text-green-700 bg-green-50 text-xs font-medium">
+                                    {{ post.difficulty }}
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            {% if post.tags.all %}
+                            <div class="flex flex-wrap gap-2 text-xs text-gray-500">
+                                {% for tag in post.tags.all %}
+                                    <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded font-medium">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
-                        
-                        <!-- Tags -->
-                        {% if post.tags.all %}
-                        <div class="flex space-x-2 text-xs text-gray-500">
-                            {% for tag in post.tags.all %}
-                                <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-medium">{{ tag.name }}</span>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
 
                         <!-- Comments Section -->
                         <div id="comments-{{ post_id }}" class="hidden mt-4 pt-4 border-t border-gray-100">
