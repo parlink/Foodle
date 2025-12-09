@@ -18,7 +18,7 @@ class UserRegisterForm(UserCreationForm):
 
 class UserLoginForm(AuthenticationForm):
     username = forms.CharField(
-        label="Email Address",
-        widget=forms.TextInput(attrs={'type': 'email', 'class': 'form-control'})
+        label="Username",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
     )
 

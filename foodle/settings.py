@@ -127,6 +127,10 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -134,11 +138,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # User model for authentication and login purposes
 AUTH_USER_MODEL = 'recipes.User'
-
-AUTHENTICATION_BACKENDS = [
-    'recipes.backends.EmailBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
 
 # Login URL for redirecting users from login protected views
 LOGIN_URL = 'log_in'
@@ -162,3 +161,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'apikey'
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+
+#OpenAI API Configuration
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')

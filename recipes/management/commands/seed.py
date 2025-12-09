@@ -10,11 +10,11 @@ is swallowed and generation continues.
 
 
 from faker import Faker
-from random import randint, random, choice
+from random import randint, random, choice 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 from datetime import timedelta, date, datetime
-from recipes.models import User, Recipe, Profile, Meal, WaterIntake, FastingSession
+from recipes.models import User, Recipe, Profile, Meal, DailyLog, FastingSession
 
 
 user_fixtures = [
@@ -131,13 +131,10 @@ class Command(BaseCommand):
             first_name=data['first_name'],
             last_name=data['last_name'],
         )
-        # Set admin status if specified
-        if data.get('is_staff'):
-            user.is_staff = True
-        if data.get('is_superuser'):
-            user.is_superuser = True
-        if data.get('is_staff') or data.get('is_superuser'):
-            user.save()
+        # Set admin status explicitly before saving
+        user.is_staff = data.get('is_staff', False)
+        user.is_superuser = data.get('is_superuser', False)
+        user.save()
 
     def create_recipes(self):
         """
@@ -159,6 +156,8 @@ class Command(BaseCommand):
         servings = randint(2, 8)
         ingredients = self.generate_ingredients()
         method = self.generate_method()
+        users = User.objects.all()
+        random_user = choice(users)
 
         self.try_create_recipe({
             'name': name,
@@ -168,6 +167,7 @@ class Command(BaseCommand):
             'servings': servings,
             'ingredients': ingredients,
             'method': method,
+            'created_by': random_user,
         })
 
     def try_create_recipe(self, data):
@@ -187,6 +187,7 @@ class Command(BaseCommand):
             servings = data['servings'],
             ingredients = data['ingredients'],
             method = data['method'],
+            created_by = data['created_by'],
         )
 
     def generate_ingredients(self):
@@ -264,8 +265,8 @@ class Command(BaseCommand):
             for _ in range(meal_count):
                 self.create_random_meal(user, current_date)
             
-            #Generate water intake
-            self.create_water_intake(user, current_date)
+            #Generate daily log
+            self.create_daily_log(user, current_date)
             
             #Generate fasting sessions sequentially
             #70% chance to fast on any given day
@@ -327,15 +328,43 @@ class Command(BaseCommand):
         except:
             pass
 
-    def create_water_intake(self, user, intake_date):
-        """Create a water intake record for a user on a given date."""
+    def create_daily_log(self, user, intake_date):
         amount_ml = randint(1000, 3000)
         
+        #Randomize calorie goal - higher on weekends (Saturday=5, Sunday=6) but within realistic range
+        weekday = intake_date.weekday()
+        is_weekend = weekday >= 5
+        
+        if is_weekend:
+            #Higher goals on weekends (within 1800-3000 range)
+            calorie_goal = randint(2500, 3000)
+        else:
+            #Normal goals on weekdays (within 1800-3000 range)
+            calorie_goal = randint(1800, 2500)
+        
+        #Calculate macros based on calorie goal (40% carbs, 30% protein, 30% fat)
+        #Protein: 30% of calories / 4 cal per gram
+        protein_goal = round((calorie_goal * 0.30) / 4)
+        #Carbs: 40% of calories / 4 cal per gram
+        carbs_goal = round((calorie_goal * 0.40) / 4)
+        #Fat: 30% of calories / 9 cal per gram
+        fat_goal = round((calorie_goal * 0.30) / 9)
+        #Water goal
+        water_goal = randint(2000, 3000)
+        
         try:
-            WaterIntake.objects.get_or_create(
+            #Use update_or_create to ensure goals are always set, even if record exists
+            DailyLog.objects.update_or_create(
                 user=user,
                 date=intake_date,
-                defaults={'amount_ml': amount_ml}
+                defaults={
+                    'amount_ml': amount_ml,
+                    'calorie_goal': calorie_goal,
+                    'protein_goal': protein_goal,
+                    'carbs_goal': carbs_goal,
+                    'fat_goal': fat_goal,
+                    'water_goal': water_goal,
+                }
             )
         except:
             pass

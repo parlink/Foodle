@@ -29,6 +29,7 @@ urlpatterns = [
     path('tracker/', views.tracker, name='tracker'),
     path('water-history/', views.water_history, name='water_history'),
     path('fasting-history/', views.fasting_history, name='fasting_history'),
+    path('nutrition-history/', views.nutrition_history, name='nutrition_history'),
     path('add-meal/', views.add_meal, name='add_meal'),
     path('delete-meal/<int:meal_id>/', views.delete_meal, name='delete_meal'),
     path('login/', views.LogInView.as_view(), name='log_in'),
@@ -37,8 +38,17 @@ urlpatterns = [
     path('profile/', views.ProfileUpdateView.as_view(), name='profile'),
     path('signup/', views.SignUpView.as_view(), name='sign_up'),
     path('feed/', views.feed, name='feed'),
+    path('create-post/', views.create_post, name='create_post'),
     path('recipes/', views.recipes, name='recipes'),
-    path('ai_recipe/',chatbot,name='ai_recipe'),
+
+
+    path('post/<int:post_id>/like/', views.toggle_like, name='toggle_like'),
+    path('post/<int:post_id>/save/', views.toggle_save, name='toggle_save'),
+    path('post/<int:post_id>/rate/', views.submit_rating, name='submit_rating'),
+    path('post/<int:post_id>/comment/', views.submit_comment, name='submit_comment'),
+    path('user/<int:author_id>/follow/', views.toggle_follow, name='toggle_follow'),
+    path('ai_recipe/', chatbot, name='ai_recipe'),
+
 
     #Password Reset URLs
     path(
@@ -71,3 +81,4 @@ urlpatterns = [
     ),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

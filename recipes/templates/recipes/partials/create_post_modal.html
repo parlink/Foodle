@@ -1,0 +1,14 @@
+<div id="create-post-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl w-full max-w-lg shadow-2xl p-6 relative">
+        <button data-modal-close class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">✕</button>
+        <h2 class="text-2xl font-bold text-green-700 mb-4 border-b pb-2">Share Your Recipe</h2>
+        <form method="POST" action="{% url 'create_post' %}" enctype="multipart/form-data" class="space-y-4">
+            {% csrf_token %}
+            <div><label class="block text-sm font-medium">Title</label>{{ form.title }}</div>
+            <div><label class="block text-sm font-medium">Image</label>{{ form.image }}</div>
+            <div><label class="block text-sm font-medium">Caption</label>{{ form.caption }}</div>
+            <div><label class="block text-sm font-medium">Tags</label>{{ form.tags }}</div>
+            <button type="submit" class="w-full py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700">Post Recipe</button>
+        </form>
+    </div>
+</div>

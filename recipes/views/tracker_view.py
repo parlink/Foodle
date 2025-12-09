@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.utils import timezone
 from datetime import date, timedelta
-from recipes.models import Meal, Profile, WaterIntake, FastingSession
+from recipes.models import Meal, Profile, DailyLog, FastingSession
 
 def get_accounting_date():
     """
@@ -27,6 +27,8 @@ def tracker(request):
         defaults={
             'calorie_goal': 2000,
             'protein_goal': 150,
+            'carbs_goal': 250,
+            'fat_goal': 70,
             'fasting_goal': 16
         }
     )
@@ -38,15 +40,60 @@ def tracker(request):
         #Handle water intake actions
         if action == 'update_water':
             amount = int(request.POST.get('amount', 0))
-            water_intake_record, _ = WaterIntake.objects.get_or_create(
+            daily_log = DailyLog.objects.filter(user=request.user, date=today).first()
+            if not daily_log:
+                daily_log = DailyLog.objects.create(
+                    user=request.user,
+                    date=today,
+                    calorie_goal=profile.calorie_goal,
+                    protein_goal=profile.protein_goal,
+                    carbs_goal=profile.carbs_goal,
+                    fat_goal=profile.fat_goal,
+                    water_goal=2500,
+                    amount_ml=0
+                )
+            #Update amount, ensuring it doesn't go below 0
+            new_amount = daily_log.amount_ml + amount
+            daily_log.amount_ml = max(0, new_amount)
+            daily_log.save()
+            return redirect('tracker')
+        
+        #Handle goal updates
+        elif action == 'update_goals':
+            calorie_goal = int(request.POST.get('calorie_goal', 2500))
+            protein_goal = int(request.POST.get('protein_goal', 187))
+            carbs_goal = int(request.POST.get('carbs_goal', 250))
+            fat_goal = int(request.POST.get('fat_goal', 83))
+            water_goal = int(request.POST.get('water_goal', 2500))
+            
+            # Get or create DailyLog for today
+            daily_log, _ = DailyLog.objects.get_or_create(
                 user=request.user,
                 date=today,
-                defaults={'amount_ml': 0}
+                defaults={
+                    'calorie_goal': profile.calorie_goal,
+                    'protein_goal': profile.protein_goal,
+                    'carbs_goal': profile.carbs_goal,
+                    'fat_goal': profile.fat_goal,
+                    'water_goal': 2500,
+                }
             )
-            #Update amount, ensuring it doesn't go below 0
-            new_amount = water_intake_record.amount_ml + amount
-            water_intake_record.amount_ml = max(0, new_amount)
-            water_intake_record.save()
+            
+            # Update DailyLog goals
+            daily_log.calorie_goal = calorie_goal
+            daily_log.protein_goal = protein_goal
+            daily_log.carbs_goal = carbs_goal
+            daily_log.fat_goal = fat_goal
+            daily_log.water_goal = water_goal
+            daily_log.save()
+            
+            # Update Profile defaults (so tomorrow uses these as defaults)
+            profile.calorie_goal = calorie_goal
+            profile.protein_goal = protein_goal
+            profile.carbs_goal = carbs_goal
+            profile.fat_goal = fat_goal
+            profile.save()
+            
             return redirect('tracker')
         
         #Handle fasting actions
@@ -89,16 +136,20 @@ def tracker(request):
             return redirect('tracker')
     
     
-    #Set default water goal if not in profile, default is 2500ml per day
-    water_goal = 2500  # Default water goal in ml
-    
-    #Get or create water intake for today
-    water_intake_record, _ = WaterIntake.objects.get_or_create(
+    #Get or create DailyLog for today, copying defaults from Profile
+    daily_log, _ = DailyLog.objects.get_or_create(
         user=request.user,
         date=today,
-        defaults={'amount_ml': 0}
+        defaults={
+            'calorie_goal': profile.calorie_goal,
+            'protein_goal': profile.protein_goal,
+            'carbs_goal': profile.carbs_goal,
+            'fat_goal': profile.fat_goal,
+            'water_goal': 2500,
+            'amount_ml': 0
+        }
     )
-    water_intake = water_intake_record.amount_ml
+    water_intake = daily_log.amount_ml
     
     #Get active fasting session
     active_fasting = FastingSession.objects.filter(
@@ -149,13 +200,13 @@ def tracker(request):
         'fat': float(totals['total_fat'] or 0) if totals['total_fat'] is not None else 0.0,
     }
     
-    #Get daily goals from profile
+
     daily_goals = {
-        'calories': int(profile.calorie_goal or 2000),
-        'protein': int(profile.protein_goal or 0),
-        'carbs': int(profile.carbs_goal or 0),
-        'fat': int(profile.fat_goal or 0),
-        'water': water_goal,
+        'calories': int(daily_log.calorie_goal or 2000),
+        'protein': int(daily_log.protein_goal or 0),
+        'carbs': int(daily_log.carbs_goal or 0),
+        'fat': int(daily_log.fat_goal or 0),
+        'water': int(daily_log.water_goal or 2500),
     }
 
     #Calculate percentages for progress bars
@@ -178,7 +229,7 @@ def tracker(request):
     else:
         fat_pct = 0
     
-    water_pct = min(100, max(0, int((water_intake / water_goal) * 100))) if water_goal > 0 else 0
+    water_pct = min(100, max(0, int((water_intake / daily_goals['water']) * 100))) if daily_goals['water'] > 0 else 0
     
     #Organize meals by type
     meals_dict = {
@@ -203,6 +254,7 @@ def tracker(request):
             meals_dict[meal_type].append(meal_data)
     
     context = {
+        'daily_log': daily_log,
         'daily_goals': daily_goals,
         'macros_consumed': macros_consumed,
         'calories_pct': calories_pct,
