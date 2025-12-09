@@ -3,11 +3,11 @@ from django.contrib.auth import authenticate
 from django.core.validators import RegexValidator
 from recipes.models import User
 
-class UserForm(forms.ModelForm):
+class AccountForm(forms.ModelForm):
     """
-    Form to update user profile information.
+    Form to update user account information.
 
-    This form allows authenticated users to update their basic profile
+    This form allows authenticated users to update their account
     details such as first name, last name, username, and email address.
     It is typically used in a profile settings or account management page.
     """
@@ -17,6 +17,22 @@ class UserForm(forms.ModelForm):
 
         model = User
         fields = ['first_name', 'last_name', 'username', 'email']
+
+
+class ProfileForm(forms.ModelForm):
+    """
+    Form to update user profile information.
+
+    This form allows authenticated users to update their public profile
+    details such as profile picture, bio, and dietary preference.
+    It is typically used in a profile settings page.
+    """
+
+    class Meta:
+        """Form options."""
+
+        model = User
+        fields = ['profile_picture', 'bio', 'dietary_preference']
 
 class NewPasswordMixin(forms.Form):
     """
@@ -41,7 +57,7 @@ class NewPasswordMixin(forms.Form):
         min_length=8,
         validators=[
             RegexValidator(
-                regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+                regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$',
                 message=(
                     'Password must contain at least 8 characters, including '
                     'an uppercase letter, a lowercase letter, a number, and a special character.'
@@ -66,13 +82,16 @@ class NewPasswordMixin(forms.Form):
             ValidationError: If the password and confirmation do not match.
         """
         super().clean()
-        new_password = self.cleaned_data.get('new_password')
-        password_confirmation = self.cleaned_data.get('password_confirmation')
-        if new_password != password_confirmation:
-            self.add_error(
-                'password_confirmation', 
-                'Confirmation does not match password.'
-            )
+        # Get raw values to check matching even if regex validation failed
+        new_password = self.cleaned_data.get('new_password') or self.data.get('new_password')
+        password_confirmation = self.cleaned_data.get('password_confirmation') or self.data.get('password_confirmation')
+        if new_password and password_confirmation:
+            if new_password != password_confirmation:
+                self.add_error(
+                    'password_confirmation', 
+                    'Confirmation does not match password.'
+                )
+        return self.cleaned_data
 
 
 class PasswordForm(NewPasswordMixin):
@@ -103,7 +122,7 @@ class PasswordForm(NewPasswordMixin):
         Validate the current and new password fields.
 
         Ensures that:
-        - The current password matches the user’s existing password.
+        - The current password matches the user's existing password.
         - The new password and confirmation fields (via `NewPasswordMixin`)
           match and meet complexity requirements.
 
@@ -120,12 +139,11 @@ class PasswordForm(NewPasswordMixin):
 
         super().clean()
         password = self.cleaned_data.get('password')
-        if self.user is not None:
+        if password and self.user is not None:
             user = authenticate(username=self.user.username, password=password)
-        else:
-            user = None
-        if user is None:
-            self.add_error('password', "Password is invalid")
+            if user is None:
+                self.add_error('password', "Password is invalid")
+        return self.cleaned_data
 
     def save(self):
         """

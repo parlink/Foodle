@@ -3,68 +3,66 @@
 {% load i18n %}
 
 {% block content %}
-    <!-- Tailwind CSS for this page -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
     <!-- CSRF Token for AJAX requests -->
     <div style="display: none;">
         {% csrf_token %}
     </div>
 
-    <div class="bg-gray-50 font-sans min-h-screen">
-
-    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        
+    <div class="container py-4">
         <!-- Top Header Section -->
-        <header class="mb-8 flex justify-between items-center border-b pb-4">
-            <div class="flex items-center space-x-3">
+        <header class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <div class="d-flex align-items-center gap-3">
                 <!-- Icon and Title -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3 .895 3 2v6a2 2 0 11-4 0v-6c0-1.105 1.343-2 3-2zM4 21v-2a4 4 0 014-4h4a4 4 0 014 4v2M12 11V3" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="text-success" style="width: 32px; height: 32px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3 .895 3 2v6a2 2 0 11-4 0v-6c0-1.105 1.343-2 3-2zM4 21v-2a4 4 0 014-4h4a4 4 0 014 4v2M12 11V3" /></svg>
                 <div>
-                    <h1 class="text-3xl font-bold text-green-700">Social Feed</h1>
-                    <p class="text-sm text-gray-500">See what others are cooking</p>
+                    <h1 class="h3 fw-bold text-success mb-0">Social Feed</h1>
+                    <p class="small text-muted mb-0">See what others are cooking</p>
                 </div>
             </div>
-            
-            <div class="flex space-x-3">
+            <div class="d-flex gap-2">
                 <!-- Create Post Button (Opens Modal) -->
                 <button 
-                    onclick="document.getElementById('create-post-modal').classList.remove('hidden')"
-                    class="flex items-center bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-full transition duration-150 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                    type="button"
+                    class="btn btn-success rounded-pill d-flex align-items-center"
+                    data-bs-toggle="modal"
+                    data-bs-target="#createPostModal"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px;" class="me-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                     Post Recipe
                 </button>
 
                 <!-- Toggle Button for Followed Feed -->
                 <a href="{% url 'feed' %}?followed={% if show_followed_only %}false{% else %}true{% endif %}"
-                   class="flex items-center text-sm px-3 py-1.5 rounded-full transition 
+                   class="btn btn-sm d-flex align-items-center rounded-pill
                    {% if show_followed_only %}
-                       bg-green-100 text-green-700 border border-green-300
+                       btn-success
                    {% else %}
-                       bg-gray-200 text-gray-600 hover:bg-gray-300
+                       btn-outline-secondary
                    {% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2c0-.656-.126-1.283-.356-1.857M20 18v.01M10 9l2-2m0 0l2 2m-2-2v8m-3 2h6a2 2 0 002-2V7a2 2 0 00-2-2H9a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px;" class="me-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2c0-.656-.126-1.283-.356-1.857M20 18v.01M10 9l2-2m0 0l2 2m-2-2v8m-3 2h6a2 2 0 002-2V7a2 2 0 00-2-2H9a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                     {% if show_followed_only %}Following Feed{% else %}All Posts{% endif %}
                 </a>
             </div>
         </header>
 
         <!-- Feed Content -->
-        <div id="feed-container" class="space-y-10">
+        <div id="feed-container">
             {% for post in posts %}
                 {% with post_id=post.id %}
                 
-                <div id="post-{{ post_id }}" class="recipe-card bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+                <div id="post-{{ post_id }}" class="recipe-card card border-0 shadow-sm rounded-4 mb-4">
                     
                     <!-- Author Header -->
-                    <div class="flex items-center p-4 sm:p-6 justify-between">
-                        <div class="flex items-center space-x-3">
+                    <div class="card-header bg-white d-flex align-items-center justify-content-between p-3">
+                        <div class="d-flex align-items-center gap-3">
                             <!-- Avatar (using gravatar from User model) -->
-                            <img src="{{ post.author.mini_gravatar }}" alt="{{ post.author.username }}" class="w-10 h-10 rounded-full object-cover border-2 border-green-200">
+                            <img src="{% if post.author.profile_picture %}{{ post.author.profile_picture.url }}{% else %}{{ post.author.mini_gravatar }}{% endif %}" 
+                                 alt="{{ post.author.username }}" 
+                                 class="rounded-circle border border-2 border-success" 
+                                 style="width: 40px; height: 40px; object-fit: cover;">
                             <div>
-                                <p class="font-semibold text-gray-900">{{ post.author.full_name }}</p>
-                                <p class="text-xs text-gray-500">{{ post.created_at|date:"M j, Y" }}</p>
+                                <p class="fw-semibold mb-0">{{ post.author.full_name }}</p>
+                                <p class="small text-muted mb-0">{{ post.created_at|date:"M j, Y" }}</p>
                             </div>
                         </div>
                         
@@ -73,65 +71,66 @@
                             <button 
                                 data-author-id="{{ post.author.id }}"
                                 data-action="follow"
-                                class="follow-btn flex items-center text-sm font-medium px-3 py-1 rounded-full transition duration-150 
-                                {% if post.is_followed_by_user %}bg-gray-200 text-gray-700 hover:bg-gray-300{% else %}bg-green-500 text-white hover:bg-green-600 shadow-md{% endif %}">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 14v1.5c0 .712-.137 1.385-.386 2h1.386a3 3 0 003-3V11a2 2 0 00-2-2h-3.5c-.712 0-1.385.137-2 .386"></path></svg>
+                                class="follow-btn btn btn-sm rounded-pill d-flex align-items-center
+                                {% if post.is_followed_by_user %}btn-outline-secondary{% else %}btn-success{% endif %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px;" class="me-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 14v1.5c0 .712-.137 1.385-.386 2h1.386a3 3 0 003-3V11a2 2 0 00-2-2h-3.5c-.712 0-1.385.137-2 .386"></path></svg>
                                 <span data-is-following="{% if post.is_followed_by_user %}true{% else %}false{% endif %}">{% if post.is_followed_by_user %}Following{% else %}Follow{% endif %}</span>
                             </button>
                         {% endif %}
                     </div>
 
                     <!-- Image -->
-                    <div class="w-full h-80 bg-gray-200 relative overflow-hidden">
+                    <div class="position-relative" style="width: 100%; height: 320px; background-color: #e9ecef; overflow: hidden;">
                         <img src="{% if post.image %}{{ post.image.url }}{% else %}https://placehold.co/800x400/81c784/1b5e20?text=Recipe+Image+Missing{% endif %}" 
                              alt="{{ post.title }}" 
-                             class="w-full h-full object-cover"
+                             class="w-100 h-100" 
+                             style="object-fit: cover;"
                              onerror="this.onerror=null;this.src='https://placehold.co/800x400/81c784/1b5e20?text=Recipe+Image+Missing'">
                         <!-- First Tag as Badge -->
                         {% if post.tags.all %}
-                        <span class="absolute top-3 right-3 bg-green-500 text-white text-xs font-medium px-3 py-1 rounded-full shadow-md">{{ post.tags.first.name }}</span>
+                        <span class="badge bg-success position-absolute top-0 end-0 m-3">{{ post.tags.first.name }}</span>
                         {% endif %}
                     </div>
 
                     <!-- Content & Actions -->
-                    <div class="p-4 sm:p-6">
+                    <div class="card-body p-4">
                         
                         <!-- Interaction Row -->
-                        <div class="flex justify-between items-center pb-3">
-                            <div class="flex space-x-4 text-gray-500">
+                        <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                            <div class="d-flex gap-4 text-muted">
                                 
                                 <!-- Like -->
                                 <button 
                                     data-post-id="{{ post_id }}"
                                     data-action="like"
-                                    class="like-btn flex items-center space-x-1 icon-action transform transition duration-150 group">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition {% if post.is_liked_by_user %}fill-red-500 text-red-500{% else %}text-gray-500 group-hover:text-red-500{% endif %}" fill="{% if post.is_liked_by_user %}currentColor{% else %}none{% endif %}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                                    <span class="like-count text-sm font-medium text-gray-600" data-like-count="{{ post.total_likes }}">{{ post.total_likes }}</span>
+                                    class="like-btn btn btn-link text-decoration-none p-0 d-flex align-items-center me-2 icon-action">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;" class="{% if post.is_liked_by_user %}text-danger{% else %}text-muted{% endif %}" fill="{% if post.is_liked_by_user %}currentColor{% else %}none{% endif %}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                                    <span class="like-count small fw-medium ms-1" data-like-count="{{ post.total_likes }}">{{ post.total_likes }}</span>
                                 </button>
 
                                 <!-- Comment -->
-                                <button onclick="document.getElementById('comments-{{ post_id }}').classList.toggle('hidden')" class="flex items-center space-x-1 icon-action transform transition duration-150 group hover:text-blue-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z" /></svg>
-                                    <span class="comment-count text-sm font-medium text-gray-600">{{ post.total_comments }}</span>
+                                <button onclick="document.getElementById('comments-{{ post_id }}').classList.toggle('d-none')" class="btn btn-link text-decoration-none p-0 d-flex align-items-center me-2 icon-action text-muted">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z" /></svg>
+                                    <span class="comment-count small fw-medium ms-1">{{ post.total_comments }}</span>
                                 </button>
 
                                 <!-- Rating -->
-                                <div class="relative">
+                                <div class="position-relative me-2">
                                     <button 
                                         data-post-id="{{ post_id }}"
                                         data-action="toggle-rating-menu"
-                                        class="rate-btn flex items-center space-x-1 icon-action transform transition duration-150 group hover:text-yellow-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition {% if post.average_rating > 0 %}fill-yellow-500 text-yellow-500{% else %}group-hover:text-yellow-500{% endif %}" fill="{% if post.average_rating > 0 %}currentColor{% else %}none{% endif %}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.197a.75.75 0 011.902 0l2.956 5.992 6.632.964a.75.75 0 01.417 1.28l-4.793 4.672 1.132 6.604a.75.75 0 01-1.091.794L12 18.01l-5.914 3.109a.75.75 0 01-1.09-.794l1.131-6.604-4.793-4.672a.75.75 0 01.417-1.28l6.632-.964L11.049 2.197z" /></svg>
-                                        <span class="rating-text text-sm font-medium text-gray-600" data-avg-rating="{{ post.average_rating }}">{{ post.average_rating|floatformat:1 }}{% if post.average_rating > 0 %} / 5.0{% else %} Rate{% endif %}</span>
+                                        class="rate-btn btn btn-link text-decoration-none p-0 d-flex align-items-center icon-action text-muted">
+                                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;" class="{% if post.average_rating > 0 %}text-warning{% else %}text-muted{% endif %}" fill="{% if post.average_rating > 0 %}currentColor{% else %}none{% endif %}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.197a.75.75 0 011.902 0l2.956 5.992 6.632.964a.75.75 0 01.417 1.28l-4.793 4.672 1.132 6.604a.75.75 0 01-1.091.794L12 18.01l-5.914 3.109a.75.75 0 01-1.09-.794l1.131-6.604-4.793-4.672a.75.75 0 01.417-1.28l6.632-.964L11.049 2.197z" /></svg>
+                                        <span class="rating-text small fw-medium ms-1" data-avg-rating="{{ post.average_rating }}">{{ post.average_rating|floatformat:1 }}{% if post.average_rating > 0 %} / 5.0{% else %} Rate{% endif %}</span>
                                     </button>
                                     <!-- Rating Menu -->
-                                    <div id="rating-menu-{{ post_id }}" class="hidden absolute left-0 mt-2 z-20 bg-white border border-gray-200 rounded-lg shadow-xl p-2 flex space-x-1 star-rating">
+                                    <div id="rating-menu-{{ post_id }}" class="d-none position-absolute start-0 mt-2 bg-white border rounded shadow-lg p-2 d-flex gap-1 star-rating" style="z-index: 20;">
                                         {% for i in "12345" %}
                                         <button 
                                             data-post-id="{{ post_id }}"
                                             data-rating-value="{{ forloop.counter }}"
                                             data-action="rate"
-                                            class="rate-star text-2xl {% if forloop.counter <= post.user_rating_score %}text-yellow-500{% else %}text-gray-300 hover:text-yellow-500{% endif %}">
+                                            class="rate-star btn btn-link text-decoration-none p-0 fs-4 {% if forloop.counter <= post.user_rating_score %}text-warning{% else %}text-muted{% endif %}">
                                             {% if forloop.counter <= post.user_rating_score %}★{% else %}☆{% endif %}
                                         </button>
                                         {% endfor %}
@@ -143,43 +142,43 @@
                             <button 
                                 data-post-id="{{ post_id }}"
                                 data-action="save"
-                                class="save-btn group icon-action transform transition duration-150">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition {% if post.is_saved_by_user %}fill-green-500 text-green-500{% else %}text-gray-500 group-hover:text-green-500{% endif %}" fill="{% if post.is_saved_by_user %}currentColor{% else %}none{% endif %}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                                class="save-btn btn btn-link text-decoration-none p-0 icon-action">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;" class="{% if post.is_saved_by_user %}text-success{% else %}text-muted{% endif %}" fill="{% if post.is_saved_by_user %}currentColor{% else %}none{% endif %}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                             </button>
                         </div>
 
                         <!-- Title and Caption -->
-                        <div class="border-t pt-4">
-                            <h2 class="text-xl font-bold text-gray-800 mb-1">{{ post.title }}</h2>
-                            <p class="text-sm text-gray-600 mb-3">{{ post.caption }}</p>
+                        <div class="border-top pt-3 mt-3">
+                            <h2 class="h5 fw-bold mb-1">{{ post.title }}</h2>
+                            <p class="small text-muted mb-3">{{ post.caption }}</p>
                         </div>
                         
                         <!-- Tags -->
                         {% if post.tags.all %}
-                        <div class="flex space-x-2 text-xs text-gray-500">
+                        <div class="d-flex flex-wrap gap-2">
                             {% for tag in post.tags.all %}
-                                <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-medium">{{ tag.name }}</span>
+                                <span class="badge bg-light text-dark">{{ tag.name }}</span>
                             {% endfor %}
                         </div>
                         {% endif %}
 
                         <!-- Comments Section -->
-                        <div id="comments-{{ post_id }}" class="hidden mt-4 pt-4 border-t border-gray-100">
-                            <h3 class="font-semibold text-gray-700 mb-2">Comments ({{ post.total_comments }})</h3>
-                            <div class="max-h-48 overflow-y-auto space-y-3 mb-4 p-2 bg-gray-50 rounded-lg comment-list">
+                        <div id="comments-{{ post_id }}" class="d-none mt-4 pt-4 border-top">
+                            <h3 class="fw-semibold mb-2">Comments ({{ post.total_comments }})</h3>
+                            <div class="comment-list mb-3 p-2 bg-light rounded" style="max-height: 192px; overflow-y: auto;">
                                 {% for comment in post.comments.all %}
                                     {% include "recipes/partials/comment_fragment.html" with comment=comment %}
                                 {% empty %}
-                                    <p class="text-sm text-gray-500 no-comments-msg">Be the first to comment!</p>
+                                    <p class="small text-muted mb-0 no-comments-msg">Be the first to comment!</p>
                                 {% endfor %}
                             </div>
 
                             <!-- Comment Input -->
-                            <form data-post-id="{{ post_id }}" data-action="comment" class="comment-form flex space-x-2">
+                            <form data-post-id="{{ post_id }}" data-action="comment" class="comment-form d-flex gap-2">
                                 <input type="text" name="comment_text" placeholder="Add a comment..." required
-                                    class="flex-grow p-2 border border-gray-300 rounded-full focus:ring-green-500 focus:border-green-500 transition">
-                                <button type="submit" class="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                                    class="form-control form-control-sm rounded-pill">
+                                <button type="submit" class="btn btn-success btn-sm rounded-pill">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                                 </button>
                             </form>
                         </div>
@@ -188,9 +187,9 @@
                 </div>
                 {% endwith %}
             {% empty %}
-                <div class="text-center py-10 bg-white rounded-xl shadow-lg mt-10">
-                    <p class="text-lg font-medium text-gray-500">No recipes to show.</p>
-                    <p class="text-sm text-gray-400">Try creating one or following some new cooks!</p>
+                <div class="text-center py-5 bg-white rounded-4 shadow-sm mt-4">
+                    <p class="h6 fw-medium text-muted mb-1">No recipes to show.</p>
+                    <p class="small text-muted">Try creating one or following some new cooks!</p>
                 </div>
             {% endfor %}
         </div>
@@ -260,10 +259,12 @@
 
                             if (data.liked) {
                                 likeIcon.setAttribute('fill', 'currentColor');
-                                likeIcon.classList.add('fill-red-500', 'text-red-500');
+                                likeIcon.classList.remove('text-muted');
+                                likeIcon.classList.add('text-danger');
                             } else {
                                 likeIcon.setAttribute('fill', 'none');
-                                likeIcon.classList.remove('fill-red-500', 'text-red-500');
+                                likeIcon.classList.remove('text-danger');
+                                likeIcon.classList.add('text-muted');
                             }
                         })
                         .catch(error => console.error('Like failed:', error.message));
@@ -277,10 +278,12 @@
                         .then(data => {
                             if (data.saved) {
                                 saveIcon.setAttribute('fill', 'currentColor');
-                                saveIcon.classList.add('fill-green-500', 'text-green-500');
+                                saveIcon.classList.remove('text-muted');
+                                saveIcon.classList.add('text-success');
                             } else {
                                 saveIcon.setAttribute('fill', 'none');
-                                saveIcon.classList.remove('fill-green-500', 'text-green-500');
+                                saveIcon.classList.remove('text-success');
+                                saveIcon.classList.add('text-muted');
                             }
                         })
                         .catch(error => console.error('Save failed:', error.message));
@@ -294,12 +297,12 @@
                             
                             if (data.is_following) {
                                 span.textContent = 'Following';
-                                target.classList.remove('bg-green-500', 'text-white', 'hover:bg-green-600', 'shadow-md');
-                                target.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                                target.classList.remove('btn-success');
+                                target.classList.add('btn-outline-secondary');
                             } else {
                                 span.textContent = 'Follow';
-                                target.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
-                                target.classList.add('bg-green-500', 'text-white', 'hover:bg-green-600', 'shadow-md');
+                                target.classList.remove('btn-outline-secondary');
+                                target.classList.add('btn-success');
                             }
                         })
                         .catch(error => console.error('Follow failed:', error.message));
@@ -308,10 +311,10 @@
                     // Hide all other rating menus
                     document.querySelectorAll('.star-rating').forEach(menu => {
                         if (menu.id !== `rating-menu-${postId}`) {
-                            menu.classList.add('hidden');
+                            menu.classList.add('d-none');
                         }
                     });
-                    document.getElementById(`rating-menu-${postId}`).classList.toggle('hidden');
+                    document.getElementById(`rating-menu-${postId}`).classList.toggle('d-none');
                 
                 } else if (action === 'rate') {
                     const ratingValue = target.dataset.ratingValue;
@@ -329,23 +332,24 @@
                             
                             // Color the main rating icon
                             rateSvg.setAttribute('fill', 'currentColor');
-                            rateSvg.classList.add('fill-yellow-500', 'text-yellow-500');
+                            rateSvg.classList.remove('text-muted');
+                            rateSvg.classList.add('text-warning');
 
                             // Update the stars in the menu to reflect the user's current rating
                             ratingMenu.querySelectorAll('.rate-star').forEach(starBtn => {
                                 const btnValue = parseInt(starBtn.dataset.ratingValue);
                                 if (btnValue <= data.score) {
                                     starBtn.innerHTML = '★';
-                                    starBtn.classList.add('text-yellow-500');
-                                    starBtn.classList.remove('text-gray-300');
+                                    starBtn.classList.remove('text-muted');
+                                    starBtn.classList.add('text-warning');
                                 } else {
                                     starBtn.innerHTML = '☆';
-                                    starBtn.classList.remove('text-yellow-500');
-                                    starBtn.classList.add('text-gray-300');
+                                    starBtn.classList.remove('text-warning');
+                                    starBtn.classList.add('text-muted');
                                 }
                             });
 
-                            ratingMenu.classList.add('hidden');
+                            ratingMenu.classList.add('d-none');
                         })
                         .catch(error => console.error('Rating failed:', error.message));
                 }
@@ -367,7 +371,7 @@
                     fetchDjango(url, 'POST', { text: text })
                         .then(data => {
                             if (data.success) {
-                                const commentList = form.closest('.p-4').querySelector('.comment-list');
+                                const commentList = form.closest('.card-body').querySelector('.comment-list');
                                 const commentCountSpan = document.getElementById(`post-${postId}`).querySelector('.comment-count');
                                 
                                 // Append new comment
@@ -389,14 +393,6 @@
                 }
             });
             
-            // --- Modal Close Handler ---
-            document.querySelectorAll('[data-modal-close]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.getElementById('create-post-modal').classList.add('hidden');
-                });
-            });
-            
         });
     </script>
-    </div>
 {% endblock %}
