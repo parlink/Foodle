@@ -1,7 +1,7 @@
 from django.views import generic
 from django.urls import reverse_lazy
 from recipes.views.decorators import LoginProhibitedMixin
-from recipes.forms import UserRegisterForm
+from recipes.forms import SignUpForm
 
 class SignUpView(LoginProhibitedMixin, generic.CreateView):
     """
@@ -11,7 +11,7 @@ class SignUpView(LoginProhibitedMixin, generic.CreateView):
     the creation of their accounts. Authenticated users are automatically
     redirected away using `LoginProhibitedMixin`.
     """
-    form_class = UserRegisterForm
+    form_class = SignUpForm
     template_name = 'recipes/auth/signup.html'
     success_url = reverse_lazy('log_in')
 

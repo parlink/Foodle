@@ -38,12 +38,13 @@ class NewPasswordMixin(forms.Form):
     new_password = forms.CharField(
         label='Password',
         widget=forms.PasswordInput(),
+        min_length=8,
         validators=[
             RegexValidator(
-                regex=r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$',
+                regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
                 message=(
-                    'Password must contain an uppercase character, '
-                    'a lowercase character, and a number'
+                    'Password must contain at least 8 characters, including '
+                    'an uppercase letter, a lowercase letter, a number, and a special character.'
                 )
             )
         ]
