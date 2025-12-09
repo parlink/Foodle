@@ -37,8 +37,13 @@
               </div>
             {% endfor %}
 
+            <p class="text-muted small mt-3 mb-3">
+              Your password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character (symbol).
+            </p>
+
             <button type="submit" class="btn btn-emerald w-100 py-2 rounded-3 fw-bold">Login</button>
           </form>
+          
 
           <div class="mt-4 text-center">
              <a href="{% url 'password_reset' %}" class="text-muted small text-decoration-none">Forgot Password?</a>
