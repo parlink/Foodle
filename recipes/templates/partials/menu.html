@@ -3,23 +3,17 @@
     <li class="nav-item">
       <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
     </li>
+        <li class="nav-item">
+      <a class="nav-link" href="{% url 'recipes' %}">Recipes</a>
+    </li>
     <li class="nav-item">
       <a class="nav-link" href="{% url 'tracker' %}">Tracker</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{% url 'add_meal' %}">Add Meal</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{% url 'water_history' %}">Water History</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{% url 'fasting_history' %}">Fasting History</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="{% url 'feed' %}">Feed</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="{% url 'recipes' %}">Recipes</a>
+      <a class="nav-link" href="{% url 'ai_recipes' %}">AI Recipes</a>
     </li>
     <li class="nav-item dropdown">
       <a
@@ -40,8 +34,8 @@
           <a class="dropdown-item" href="{% url 'profile' %}">Change profile</a>
         </li>
         <li>
-          <a class="dropdown-item" href="{% url 'password' %}"
-            >Change password</a
+          <a class="dropdown-item" href="{% url 'settings' %}"
+            >Settings</a
           >
         </li>
         <li><hr class="dropdown-divider" /></li>
