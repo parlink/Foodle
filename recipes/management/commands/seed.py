@@ -10,7 +10,7 @@ is swallowed and generation continues.
 
 import os
 from faker import Faker
-from random import randint, random, choice 
+from random import randint, random, choice, sample
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 from datetime import timedelta, date, datetime
