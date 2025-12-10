@@ -14,7 +14,7 @@ from random import randint, random, choice, sample
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 from datetime import timedelta, date, datetime
-from recipes.models import User, Recipe, Profile, Meal, DailyLog, FastingSession, Tag, Post
+from recipes.models import User, Recipe, Profile, Meal, DailyLog, FastingSession, Tag, Post, Like, Comment, Rating
 from django.core.files import File
 
 
@@ -62,6 +62,7 @@ class Command(BaseCommand):
         self.create_tracker_data()
         self.create_tags()
         self.create_posts()
+        self.create_post_interactions()
         self.users = User.objects.all()
         self.stdout.write(self.style.SUCCESS("Seeding complete!"))
 
@@ -502,7 +503,7 @@ class Command(BaseCommand):
         ]
         
         # Locate the image directory relative to this script file
-        image_dir = os.path.join(os.path.dirname(__file__), 'seed_images')
+        image_dir = os.path.join(os.path.dirname(__file__), '..', 'seed_images')
         image_files = []
         try:
             # Create a list of all files in the directory
@@ -542,7 +543,8 @@ class Command(BaseCommand):
                 random_image_name = choice(image_files)
                 image_path = os.path.join(image_dir, random_image_name)
                 # Open the file in binary mode so Django can read it
-                image_file_handler = File(open(image_path, 'rb'))
+                f = open(image_path, 'rb')
+                image_file_handler = File(f, name=random_image_name)
 
             # Create the post, passing the image file handler if it exists
             if image_file_handler:
@@ -557,6 +559,59 @@ class Command(BaseCommand):
                 post.tags.set(random_tags)
                 
         self.stdout.write("Social posts seeded successfully.")
+
+    def create_post_interactions(self):
+        """Generate Likes, Comments, and Ratings for posts."""
+        users = list(User.objects.all())
+        posts = Post.objects.all()
+        
+        comments_list = [
+            "This looks amazing!", "Can't wait to try this.", "Delicious!", 
+            "Great recipe.", "My family loved it.", "Yum!", "So tasty.", 
+            "Thanks for sharing!", "Added to my list.", "Wow!"
+        ]
+
+        if not users or not posts:
+            return
+
+        self.stdout.write("Seeding likes, comments, and ratings...")
+
+        for post in posts:
+            # 1. Generate Likes
+            # Randomly select 0 to 20 unique users to like this post
+            num_likes = randint(0, 20)
+            likers = sample(users, k=min(num_likes, len(users)))
+            for user in likers:
+                Like.objects.get_or_create(user=user, post=post)
+
+            # 2. Generate Comments
+            # Randomly select 0 to 5 users to comment
+            num_comments = randint(0, 5)
+            commenters = sample(users, k=min(num_comments, len(users)))
+            for user in commenters:
+                Comment.objects.create(user=user, post=post, text=choice(comments_list))
+
+            # 3. Generate Ratings
+            # Randomly select 0 to 15 unique users to rate
+            num_ratings = randint(0, 15)
+            raters = sample(users, k=min(num_ratings, len(users)))
+            
+            total_score = 0
+            for user in raters:
+                # Skew ratings towards positive (3, 4, or 5)
+                score = randint(3, 5)
+                Rating.objects.create(user=user, post=post, score=score)
+                total_score += score
+            
+            # Update Post aggregates to match the created ratings
+            if num_ratings > 0:
+                post.rating_count = num_ratings
+                post.rating_total_score = total_score
+                # Note: average_rating is a @property, so we don't set it directly.
+                # It will calculate automatically from total_score / rating_count
+                post.save()
+
+        self.stdout.write("Interactions seeded.")
 
 def create_username(first_name, last_name):
     """

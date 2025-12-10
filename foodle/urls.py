@@ -39,6 +39,7 @@ urlpatterns = [
     path('feed/', views.feed, name='feed'),
     path('create-post/', views.create_post, name='create_post'),
     path('recipes/', views.recipes, name='recipes'),
+    path('post/<int:post_id>/', views.post_detail, name='post_detail'),
     path('post/<int:post_id>/like/', views.toggle_like, name='toggle_like'),
     path('post/<int:post_id>/save/', views.toggle_save, name='toggle_save'),
     path('post/<int:post_id>/rate/', views.submit_rating, name='submit_rating'),
