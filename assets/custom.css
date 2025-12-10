@@ -254,13 +254,6 @@ body {
 }
 
 /* --- Recipe Cards --- */
-
-.card-style {
-    width: 100%;          
-    max-width: 450px;      
-    margin: 0 auto;        
-}
-
 .card-style .card-body {
     padding: 20px;
 }
@@ -299,19 +292,7 @@ body {
 }
 
 .recipe-summary {
-    display: flex;
-    flex-direction: column; 
-    justify-content: space-between; 
-    padding-left: 15px;
-}
-
-.recipe-summary p {
-    margin: 5px 0; 
-}
-
-.recipe-summary h5 {
-    font-size: 1.2rem;    
-    font-weight: 600;      
+    margin-left: 20px;
 }
 
 /* Alphabet filter banner */
@@ -354,13 +335,6 @@ body {
 .recipe-image {
     margin-right: 20px; 
 }
-
-.recipe-image img {
-    width: 200px; 
-    height: 230px;  
-    object-fit: cover; 
-}
-
 
 /* Recipe cards display = 3 per row */
 .row .col-md-4 {

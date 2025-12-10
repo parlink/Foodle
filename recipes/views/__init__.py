@@ -14,3 +14,4 @@ from .welcome_view import *
 from .social_feed import *
 from .add_meal_view import *
 from .ai_recipe import chatbot
+from .my_recipes_view import *

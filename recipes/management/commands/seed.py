@@ -8,9 +8,10 @@ is swallowed and generation continues.
 """
 
 
-
+import os
+import random
 from faker import Faker
-from random import randint, random, choice 
+from random import randint, random, choice
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 from datetime import timedelta, date, datetime
@@ -39,10 +40,19 @@ class Command(BaseCommand):
         faker (Faker): Locale-specific Faker instance used for random data.
     """
 
-    USER_COUNT = 100
+    USER_COUNT = 5
     RECIPE_COUNT = 50 
     DEFAULT_PASSWORD = 'Password123'
     help = 'Seeds the database with sample data'
+
+    RECIPE_NAMES = [
+        'Spicy Chicken Stir Fry', 'Classic Beef Lasagna', 'Vegetarian Chili', 'Lemon Herb Salmon', 'Creamy Tomato Soup', 'Aussie Meat Pie', 
+        'Tuna Casserole', 'Garlic Butter Steak', 'Chocolate Chip Cookies', 'Banana Bread', 'Perfect Roasted Chicken', 'Homestyle Mac and Cheese',
+        'Quick Shrimp Scampi', 'Authentic Tacos al Pastor', 'Mediterranean Quinoa Salad', 'Mushroom and Spinach Omelette', 'Slow Cooker Pulled Pork',
+        'Classic Margherita Pizza', 'Vietnamese Pho', 'Spaghetti Bolognese', 'Cheesy Garlic Bread', 'French Onion Soup',  'Easy Chicken and Rice Casserole',
+        'Black Bean Burgers', 'No-Bake Cheesecake', 'Sweet Potato Fries', 'Crockpot BBQ Ribs', 'Pesto Pasta with Sundried Tomatoes', 'Butternut Squash Risotto',
+        'Simple Apple Crumble'
+    ]
 
     def __init__(self, *args, **kwargs):
         """Initialize the command with a locale-specific Faker instance."""
@@ -136,28 +146,40 @@ class Command(BaseCommand):
         user.is_superuser = data.get('is_superuser', False)
         user.save()
 
+
     def create_recipes(self):
         """
         Create random recipes until the number of recipes = RECIPE_COUNT
         """
+
+        print("Starting recipe seeding...")
         recipe_count = Recipe.objects.count()
         while recipe_count < self.RECIPE_COUNT:
             self.generate_recipe()
             recipe_count = Recipe.objects.count()
         print("Recipe seeding complete")
 
+    IMAGES =  [
+        'images/food1.jpg', 'images/food2.jpg', 'images/food3.jpg', 'images/food4.jpg', 'images/food5.jpg',
+        'images/food8.jpg', 'images/food9.jpg', 'images/food10.jpg',
+        'images/food11.jpg', 'images/food12.jpg', 'images/food13.jpg', 'images/food14.jpg', 'images/food15.jpg', 'images/food16.jpg'
+    ]
+
     def generate_recipe(self):
         """Generate random recipes"""
-        recipe_number = Recipe.objects.count() + 1
-        name = f"Recipe_{recipe_number}"
-        average_rating = randint(1,5)
-        difficulty = self.faker.random_element(['Easy', 'Moderate', 'Hard'])
+
+        name = choice(self.RECIPE_NAMES)
+        average_rating = randint(1, 5)
+        difficulty = self.faker.random_element(['Very Easy', 'Easy', 'Moderate', 'Hard', 'Very Hard'])
         total_time = f"{randint(1,5)} hours"
-        servings = randint(2, 8)
-        ingredients = self.generate_ingredients()
+        servings = randint(1, 12)
+        ingredients = self.generate_ingredients()  # Ensure ingredients are being generated
         method = self.generate_method()
         users = User.objects.all()
-        random_user = choice(users)
+        random_user = choice(users)  # Randomly select a user for the recipe
+        image = choice(self.IMAGES)  # Select an image for the recipe
+
+        print(f"Assigning recipe: {name}, to user: {random_user.username}, image: {image}")
 
         self.try_create_recipe({
             'name': name,
@@ -168,7 +190,9 @@ class Command(BaseCommand):
             'ingredients': ingredients,
             'method': method,
             'created_by': random_user,
+            'image': image,
         })
+
 
     def try_create_recipe(self, data):
         """Attempt to make a recipe & ignore errors"""
@@ -188,29 +212,21 @@ class Command(BaseCommand):
             ingredients = data['ingredients'],
             method = data['method'],
             created_by = data['created_by'],
+            image = data["image"],
         )
 
     def generate_ingredients(self):
-        """Generate placeholder ingredients: e.g. Ingredient 1, Ingredient 2 ...
-        Also generate optional spices in the form: Spice_1, Spice_2 ... --> could be 0 """
+        """Generate placeholder ingredients: e.g. Ingredient 1, Ingredient 2 ..."""
         ingredient_count = randint(3, 12)
         ingredients = [f"Ingredient_{i}" for i in range(1, ingredient_count + 1)]
-        
-        spice_count = randint(0, 5)
-        spices = [f"Spice_{i}" for i in range(1, spice_count + 1)]
 
-        lines = []
-        lines.append("Ingredients: " + ", ".join(ingredients))
-
-        if spices:
-            lines.append("Spices: " + ", ".join(spices))
-
-        return ', '.join(lines)
+        return ingredients
 
     def generate_method(self):
         """Generate random steps"""
-        steps = randint(5, 10)
-        return "\n".join([f"{i + 1}) Step_{i + 1}" for i in range(steps)])
+        steps_count = randint(5, 12)
+        steps = [f"Do something_{i}" for i in range(1, steps_count + 1)]
+        return steps
 
     def create_tracker_data(self):
         """Create tracker data (profiles, meals, water, fasting) for all users."""
