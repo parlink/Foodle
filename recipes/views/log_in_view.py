@@ -1,7 +1,7 @@
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse_lazy
 from recipes.views.decorators import LoginProhibitedMixin
-from recipes.forms import UserLoginForm
 
 class LogInView(LoginProhibitedMixin, auth_views.LoginView):
     """
@@ -11,7 +11,7 @@ class LogInView(LoginProhibitedMixin, auth_views.LoginView):
     and processes login submissions. Authenticated users are redirected
     away automatically via `LoginProhibitedMixin`.
     """
-    form_class = UserLoginForm
+    form_class = AuthenticationForm
     template_name = 'recipes/auth/login.html'
     redirect_authenticated_user = True
     

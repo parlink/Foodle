@@ -10,7 +10,7 @@ is swallowed and generation continues.
 
 import os
 from faker import Faker
-from random import randint, random, choice, sample
+from random import randint, random, choice 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 from datetime import timedelta, date, datetime
@@ -135,13 +135,10 @@ class Command(BaseCommand):
             first_name=data['first_name'],
             last_name=data['last_name'],
         )
-        # Set admin status if specified
-        if data.get('is_staff'):
-            user.is_staff = True
-        if data.get('is_superuser'):
-            user.is_superuser = True
-        if data.get('is_staff') or data.get('is_superuser'):
-            user.save()
+        # Set admin status explicitly before saving
+        user.is_staff = data.get('is_staff', False)
+        user.is_superuser = data.get('is_superuser', False)
+        user.save()
 
     def create_recipes(self):
         """
@@ -163,6 +160,8 @@ class Command(BaseCommand):
         servings = randint(2, 8)
         ingredients = self.generate_ingredients()
         method = self.generate_method()
+        users = User.objects.all()
+        random_user = choice(users)
 
         self.try_create_recipe({
             'name': name,
@@ -172,6 +171,7 @@ class Command(BaseCommand):
             'servings': servings,
             'ingredients': ingredients,
             'method': method,
+            'created_by': random_user,
         })
 
     def try_create_recipe(self, data):
@@ -191,6 +191,7 @@ class Command(BaseCommand):
             servings = data['servings'],
             ingredients = data['ingredients'],
             method = data['method'],
+            created_by = data['created_by'],
         )
 
     def generate_ingredients(self):

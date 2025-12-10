@@ -139,11 +139,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # User model for authentication and login purposes
 AUTH_USER_MODEL = 'recipes.User'
 
-AUTHENTICATION_BACKENDS = [
-    'recipes.backends.EmailBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
-
 # Login URL for redirecting users from login protected views
 LOGIN_URL = 'log_in'
 
