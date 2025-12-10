@@ -53,7 +53,7 @@
                 <div id="post-{{ post_id }}" class="recipe-card card border-0 shadow-sm rounded-4 mb-4">
                     
                     <!-- Author Header -->
-                    <div class="card-header bg-white d-flex align-items-center justify-content-between p-3">
+                    <div class="card-header d-flex align-items-center justify-content-between p-3">
                         <div class="d-flex align-items-center gap-3">
                             <!-- Avatar (using gravatar from User model) -->
                             <img src="{% if post.author.profile_picture %}{{ post.author.profile_picture.url }}{% else %}{{ post.author.mini_gravatar }}{% endif %}" 
@@ -124,7 +124,7 @@
                                         <span class="rating-text small fw-medium ms-1" data-avg-rating="{{ post.average_rating }}">{{ post.average_rating|floatformat:1 }}{% if post.average_rating > 0 %} / 5.0{% else %} Rate{% endif %}</span>
                                     </button>
                                     <!-- Rating Menu -->
-                                    <div id="rating-menu-{{ post_id }}" class="d-none position-absolute start-0 mt-2 bg-white border rounded shadow-lg p-2 d-flex gap-1 star-rating" style="z-index: 20;">
+                                    <div id="rating-menu-{{ post_id }}" class="d-none position-absolute start-0 mt-2 border rounded shadow-lg p-2 d-flex gap-1 star-rating" style="z-index: 20;">
                                         {% for i in "12345" %}
                                         <button 
                                             data-post-id="{{ post_id }}"
@@ -157,7 +157,7 @@
                         {% if post.tags.all %}
                         <div class="d-flex flex-wrap gap-2">
                             {% for tag in post.tags.all %}
-                                <span class="badge bg-light text-dark">{{ tag.name }}</span>
+                                <span class="badge bg-light">{{ tag.name }}</span>
                             {% endfor %}
                         </div>
                         {% endif %}
@@ -165,7 +165,7 @@
                         <!-- Comments Section -->
                         <div id="comments-{{ post_id }}" class="d-none mt-4 pt-4 border-top">
                             <h3 class="fw-semibold mb-2">Comments ({{ post.total_comments }})</h3>
-                            <div class="comment-list mb-3 p-2 bg-light rounded" style="max-height: 192px; overflow-y: auto;">
+                            <div class="comment-list mb-3 p-2 rounded" style="max-height: 192px; overflow-y: auto;">
                                 {% for comment in post.comments.all %}
                                     {% include "recipes/partials/comment_fragment.html" with comment=comment %}
                                 {% empty %}
@@ -187,7 +187,7 @@
                 </div>
                 {% endwith %}
             {% empty %}
-                <div class="text-center py-5 bg-white rounded-4 shadow-sm mt-4">
+                <div class="text-center py-5 rounded-4 shadow-sm mt-4">
                     <p class="h6 fw-medium text-muted mb-1">No recipes to show.</p>
                     <p class="small text-muted">Try creating one or following some new cooks!</p>
                 </div>

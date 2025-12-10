@@ -1,11 +1,9 @@
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import update_session_auth_hash
 from django.views.generic import TemplateView
-from django.urls import reverse
 from recipes.forms import AccountForm, ProfileForm, PasswordForm
-from recipes.models import Post, Follow
+from recipes.services import UserStatsService
 
 
 class ProfileUpdateView(LoginRequiredMixin, TemplateView):
@@ -25,10 +23,15 @@ class ProfileUpdateView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         
-        # Calculate stats
-        context['posts_count'] = Post.objects.filter(author=user).count()
-        context['followers_count'] = Follow.objects.filter(followed=user).count()
-        context['following_count'] = Follow.objects.filter(follower=user).count()
+        # Get comprehensive stats using the stats service
+        stats_service = UserStatsService(user)
+        stats = stats_service.get_stats()
+        
+        # Add stats to context
+        context['stats'] = stats
+        context['posts_count'] = stats['total_recipes_shared']
+        context['followers_count'] = stats['total_followers']
+        context['following_count'] = stats['total_following']
         
         # Initialize forms
         context['profile_form'] = ProfileForm(instance=user)

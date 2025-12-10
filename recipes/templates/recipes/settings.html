@@ -1,0 +1,217 @@
+{% extends 'base_content.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="fw-bold mb-1">Settings</h2>
+                            <p class="text-muted mb-0">Customize your display preferences and accessibility options.</p>
+                        </div>
+                        <div id="saveStatus" class="text-muted small" style="display: none;">
+                            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                            Saving...
+                        </div>
+                    </div>
+                    
+                    <form method="post" id="settingsForm">
+                        {% csrf_token %}
+                        
+                        <!-- Theme Selection -->
+                        <div class="mb-4">
+                            <label for="{{ settings_form.theme.id_for_label }}" class="form-label fw-bold">
+                                <i class="bi bi-palette me-2"></i>{{ settings_form.theme.label }}
+                            </label>
+                            {% render_field settings_form.theme class="form-select" id="id_theme" %}
+                            {% if settings_form.theme.help_text %}
+                                <small class="form-text text-muted">{{ settings_form.theme.help_text }}</small>
+                            {% endif %}
+                            {% for error in settings_form.theme.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Color Blind Mode -->
+                        <div class="mb-4">
+                            <label for="{{ settings_form.color_blind_mode.id_for_label }}" class="form-label fw-bold">
+                                <i class="bi bi-eye me-2"></i>{{ settings_form.color_blind_mode.label }}
+                            </label>
+                            {% render_field settings_form.color_blind_mode class="form-select" id="id_color_blind_mode" %}
+                            {% if settings_form.color_blind_mode.help_text %}
+                                <small class="form-text text-muted">{{ settings_form.color_blind_mode.help_text }}</small>
+                            {% endif %}
+                            {% for error in settings_form.color_blind_mode.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Font Scale -->
+                        <div class="mb-4">
+                            <label for="{{ settings_form.font_scale.id_for_label }}" class="form-label fw-bold">
+                                <i class="bi bi-fonts me-2"></i>{{ settings_form.font_scale.label }}: <span id="fontScaleValue">{{ settings_form.font_scale.value|default:"1.0" }}</span>x
+                            </label>
+                            {% render_field settings_form.font_scale class="form-range" id="id_font_scale" min="0.8" max="1.5" step="0.1" %}
+                            {% if settings_form.font_scale.help_text %}
+                                <small class="form-text text-muted d-block mt-1">{{ settings_form.font_scale.help_text }}</small>
+                            {% endif %}
+                            {% for error in settings_form.font_scale.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Auto-save notice -->
+                        <div class="text-center">
+                            <small class="text-muted">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Changes are saved automatically
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const body = document.body;
+        const form = document.getElementById('settingsForm');
+        const themeSelect = document.getElementById('id_theme');
+        const colorBlindSelect = document.getElementById('id_color_blind_mode');
+        const fontScaleRange = document.getElementById('id_font_scale');
+        const fontScaleValue = document.getElementById('fontScaleValue');
+        const saveStatus = document.getElementById('saveStatus');
+        const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        let saveTimeout = null;
+        
+        // Show saving indicator
+        function showSaving() {
+            saveStatus.style.display = 'block';
+            saveStatus.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving...';
+        }
+        
+        // Show saved indicator
+        function showSaved() {
+            saveStatus.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i> Saved!';
+            setTimeout(() => {
+                saveStatus.style.display = 'none';
+            }, 2000);
+        }
+        
+        // Show error indicator
+        function showError() {
+            saveStatus.innerHTML = '<i class="bi bi-exclamation-circle text-danger me-1"></i> Error saving';
+            setTimeout(() => {
+                saveStatus.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Auto-save function
+        function autoSave() {
+            showSaving();
+            
+            const formData = new FormData(form);
+            
+            fetch(form.action || window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSaved();
+                } else {
+                    showError();
+                    console.error('Save error:', data.errors);
+                }
+            })
+            .catch(error => {
+                showError();
+                console.error('Network error:', error);
+            });
+        }
+        
+        // Debounced save (for slider)
+        function debouncedSave() {
+            if (saveTimeout) {
+                clearTimeout(saveTimeout);
+            }
+            saveTimeout = setTimeout(autoSave, 500);
+        }
+        
+        // Apply theme immediately and save
+        function applyTheme(theme) {
+            body.classList.remove('dark-mode');
+            if (theme === 'dark') {
+                body.classList.add('dark-mode');
+            }
+        }
+        
+        // Apply color blind mode immediately
+        function applyColorBlindMode(mode) {
+            body.classList.remove('cb-protanopia', 'cb-deuteranopia', 'cb-tritanopia', 'cb-achromatopsia');
+            if (mode !== 'none') {
+                body.classList.add('cb-' + mode);
+            }
+        }
+        
+        // Apply font scale immediately
+        function applyFontScale(scale) {
+            if (scale != 1.0) {
+                body.style.fontSize = scale + 'rem';
+            } else {
+                body.style.fontSize = '';
+            }
+        }
+        
+        // Theme change handler
+        if (themeSelect) {
+            themeSelect.addEventListener('change', function() {
+                applyTheme(this.value);
+                autoSave();
+            });
+        }
+        
+        // Color blind mode change handler
+        if (colorBlindSelect) {
+            colorBlindSelect.addEventListener('change', function() {
+                applyColorBlindMode(this.value);
+                autoSave();
+            });
+        }
+        
+        // Font scale change handler
+        if (fontScaleRange) {
+            fontScaleRange.addEventListener('input', function() {
+                fontScaleValue.textContent = this.value;
+                applyFontScale(this.value);
+            });
+            
+            // Save on mouse up (after sliding)
+            fontScaleRange.addEventListener('change', function() {
+                autoSave();
+            });
+            
+            // Initialize display value
+            if (fontScaleValue) {
+                fontScaleValue.textContent = fontScaleRange.value;
+            }
+        }
+        
+        // Prevent form submission (we're using AJAX)
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            autoSave();
+        });
+    });
+</script>
+{% endblock %}

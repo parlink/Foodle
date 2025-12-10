@@ -10,11 +10,11 @@ is swallowed and generation continues.
 
 
 from faker import Faker
-from random import randint, random, choice 
+from random import randint, random, choice, sample
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 from datetime import timedelta, date, datetime
-from recipes.models import User, Recipe, Profile, Meal, DailyLog, FastingSession
+from recipes.models import User, Recipe, Profile, Meal, DailyLog, FastingSession, Post, Follow, Save, Like, Comment, Tag
 
 
 user_fixtures = [
@@ -59,6 +59,7 @@ class Command(BaseCommand):
         self.create_users()
         self.create_recipes()
         self.create_tracker_data()
+        self.create_social_data()
         self.users = User.objects.all()
         self.stdout.write(self.style.SUCCESS("Seeding complete!"))
 
@@ -425,6 +426,128 @@ class Command(BaseCommand):
             return end_datetime 
         except:
             return last_end_datetime
+
+    def create_social_data(self):
+        """Create social data (posts, follows, saves, likes, comments) for all users."""
+        self.stdout.write("Creating social data...")
+        self.create_tags()
+        self.create_posts()
+        self.create_follows()
+        self.create_post_interactions()
+        self.stdout.write("Social data creation complete.")
+
+    def create_tags(self):
+        """Create recipe/food tags."""
+        tag_names = [
+            'Breakfast', 'Lunch', 'Dinner', 'Snack', 'Dessert',
+            'Healthy', 'Quick', 'Vegetarian', 'Vegan', 'Keto',
+            'Low-Carb', 'High-Protein', 'Gluten-Free', 'Dairy-Free',
+            'Italian', 'Mexican', 'Asian', 'Mediterranean', 'American',
+        ]
+        for name in tag_names:
+            try:
+                Tag.objects.get_or_create(name=name)
+            except:
+                pass
+
+    def create_posts(self):
+        """Create recipe posts for users."""
+        all_users = list(User.objects.all())
+        all_tags = list(Tag.objects.all())
+        
+        recipe_titles = [
+            'My Famous Chicken Stir Fry', 'Quick Morning Oatmeal', 'Healthy Buddha Bowl',
+            'Grandma\'s Pasta Recipe', 'Easy Overnight Oats', 'Protein-Packed Smoothie',
+            'Mediterranean Salad', 'Classic Avocado Toast', 'Homemade Pizza Night',
+            'Spicy Thai Curry', 'Comfort Mac and Cheese', 'Fresh Summer Salad',
+        ]
+        
+        captions = [
+            'Made this today and it was amazing!',
+            'Perfect for meal prep!',
+            'My go-to recipe when I\'m short on time.',
+            'Family loved this one!',
+            'Healthy AND delicious!',
+        ]
+        
+        for user in all_users:
+            num_posts = randint(0, 5)
+            for _ in range(num_posts):
+                try:
+                    days_ago = randint(0, 60)
+                    created_at = timezone.now() - timedelta(days=days_ago, hours=randint(0, 23))
+                    post = Post.objects.create(
+                        author=user,
+                        title=choice(recipe_titles),
+                        caption=choice(captions),
+                        created_at=created_at,
+                    )
+                    if all_tags:
+                        num_tags = randint(1, 3)
+                        post.tags.set(sample(all_tags, min(num_tags, len(all_tags))))
+                except:
+                    pass
+        
+        self.stdout.write(f"  Created {Post.objects.count()} posts")
+
+    def create_follows(self):
+        """Create follow relationships between users."""
+        all_users = list(User.objects.all())
+        if len(all_users) < 2:
+            return
+        
+        for user in all_users:
+            num_to_follow = randint(3, min(15, len(all_users) - 1))
+            potential_followees = [u for u in all_users if u != user]
+            if potential_followees:
+                users_to_follow = sample(potential_followees, min(num_to_follow, len(potential_followees)))
+                for followee in users_to_follow:
+                    try:
+                        Follow.objects.get_or_create(follower=user, followed=followee)
+                    except:
+                        pass
+        
+        self.stdout.write(f"  Created {Follow.objects.count()} follows")
+
+    def create_post_interactions(self):
+        """Create saves, likes, and comments on posts."""
+        all_users = list(User.objects.all())
+        all_posts = list(Post.objects.all())
+        if not all_posts or not all_users:
+            return
+        
+        comment_texts = [
+            'Looks delicious!', 'Need to try this!', 'Yum!',
+            'Saved for later!', 'Great idea!', 'Making this tonight!',
+        ]
+        
+        for post in all_posts:
+            # Saves
+            num_savers = randint(0, len(all_users) // 4)
+            for user in sample(all_users, min(num_savers, len(all_users))):
+                if user != post.author:
+                    try:
+                        Save.objects.get_or_create(user=user, post=post)
+                    except:
+                        pass
+            
+            # Likes
+            num_likers = randint(0, len(all_users) // 2)
+            for user in sample(all_users, min(num_likers, len(all_users))):
+                try:
+                    Like.objects.get_or_create(user=user, post=post)
+                except:
+                    pass
+            
+            # Comments
+            num_comments = randint(0, 5)
+            for user in sample(all_users, min(num_comments, len(all_users))):
+                try:
+                    Comment.objects.create(user=user, post=post, text=choice(comment_texts))
+                except:
+                    pass
+        
+        self.stdout.write(f"  Created saves, likes, and comments")
 
 
 def create_username(first_name, last_name):
