@@ -10,11 +10,9 @@ class Post(models.Model):
     rating_total_score = models.PositiveIntegerField(default=0)
     rating_count = models.PositiveIntegerField(default=0)
     prep_time = models.CharField(max_length=50, blank=True, help_text="e.g. 25 min")
-    servings = models.CharField(max_length=50, blank=True, help_text="e.g. 4 servings")
+    servings = models.PositiveIntegerField(default=1, blank=True)
     created_at = models.DateTimeField(auto_now_add= True)
     tags = models.ManyToManyField(Tag, blank=True)
-    prep_time = models.CharField(max_length=20, blank=True, help_text="e.g. 25 min")
-    servings = models.PositiveIntegerField(default=1, blank=True)
     difficulty = models.CharField(max_length=20, choices=[("Easy", "Easy"), ("Moderate", "Moderate"), ("Hard", "Hard"),],default="Easy")
     CUISINE_CHOICES = [('Italian', 'Italian'), ('Mexican', 'Mexican'), ('Chinese', 'Chinese'), ('Indian', 'Indian'), ('Japanese', 'Japanese'), ('Thai', 'Thai'), ('French', 'French'), ('American', 'American'), ('Greek', 'Greek'), ('Spanish', 'Spanish'), ('Mediterranean', 'Mediterranean'), ('Korean', 'Korean'), ('Other', 'Other'),
     ]
