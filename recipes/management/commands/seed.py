@@ -11,6 +11,7 @@ is swallowed and generation continues.
 import os
 from faker import Faker
 from random import randint, random, choice, sample
+from random import randint, random, choice, sample
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 from datetime import timedelta, date, datetime
@@ -19,9 +20,9 @@ from django.core.files import File
 
 
 user_fixtures = [
-    {'username': '@johndoe', 'email': 'john.doe@example.org', 'first_name': 'John', 'last_name': 'Doe', 'is_staff': True, 'is_superuser': True},
-    {'username': '@janedoe', 'email': 'jane.doe@example.org', 'first_name': 'Jane', 'last_name': 'Doe'},
-    {'username': '@charlie', 'email': 'charlie.johnson@example.org', 'first_name': 'Charlie', 'last_name': 'Johnson'},
+    {'name': 'John','surname': 'Doe', 'username': '@johndoe', 'email': 'john.doe@example.org', 'first_name': 'John', 'last_name': 'Doe', 'is_staff': True, 'is_superuser': True},
+    {'name': 'Jane','surname': 'Doe', 'username': '@janedoe', 'email': 'jane.doe@example.org', 'first_name': 'Jane', 'last_name': 'Doe'},
+    {'name': 'Charlie','surname': 'Johnson', 'username': '@charlie', 'email': 'charlie.johnson@example.org', 'first_name': 'Charlie', 'last_name': 'Johnson'},
 ]
 
 
@@ -50,6 +51,14 @@ class Command(BaseCommand):
         super().__init__(*args, **kwargs)
         self.faker = Faker('en_GB')
 
+    def add_arguments(self, parser):
+        """Add command-line arguments."""
+        parser.add_argument(
+            '--with-recipes',
+            action='store_true',
+            help='Also create generic recipes (use seed_recipes for recipes with images)',
+        )
+
     def handle(self, *args, **options):
         """
         Django entrypoint for the command.
@@ -58,7 +67,10 @@ class Command(BaseCommand):
         post-processing or debugging (not required for operation).
         """
         self.create_users()
-        self.create_recipes()
+        # Recipes are now seeded separately with seed_recipes command
+        # Use --with-recipes flag to create generic recipes
+        if options.get('with_recipes'):
+            self.create_recipes()
         self.create_tracker_data()
         self.create_tags()
         self.create_posts()

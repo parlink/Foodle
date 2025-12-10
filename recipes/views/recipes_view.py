@@ -1,6 +1,11 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from recipes.models import Recipe
 
-@login_required
+#login_required
 def recipes(request):
-    return render(request, 'recipes.html')
+    context = {
+        'recipes': Recipe.objects.all()
+    }
+    return render(request, 'recipes.html', context)
+
