@@ -1,0 +1,62 @@
+{% load widget_tweaks %}
+
+<div class="modal fade" id="createPostModal" tabindex="-1" aria-labelledby="createPostModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createPostModalLabel">Share Your Recipe</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" enctype="multipart/form-data" action="{% url 'create_post' %}">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">{{ form.title.label }}</label>
+            {% render_field form.title class="form-control" %}
+            {% if form.title.errors %}
+              {% for error in form.title.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+            {% endif %}
+          </div>
+          
+          <div class="mb-3">
+            <label for="{{ form.caption.id_for_label }}" class="form-label fw-bold">{{ form.caption.label }}</label>
+            {% render_field form.caption class="form-control" rows="3" %}
+            {% if form.caption.errors %}
+              {% for error in form.caption.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+            {% endif %}
+          </div>
+          
+          <div class="mb-3">
+            <label for="{{ form.image.id_for_label }}" class="form-label fw-bold">{{ form.image.label }}</label>
+            {% render_field form.image class="form-control" %}
+            {% if form.image.errors %}
+              {% for error in form.image.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+            {% endif %}
+          </div>
+          
+          <div class="mb-3">
+            <label for="{{ form.tags.id_for_label }}" class="form-label fw-bold">{{ form.tags.label }}</label>
+            {% render_field form.tags class="form-select" %}
+            {% if form.tags.errors %}
+              {% for error in form.tags.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+            {% endif %}
+          </div>
+          
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success">Post Recipe</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -68,6 +68,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'recipes.context_processors.user_profile',
+                'recipes.context_processors.user_theme_context',
             ],
         },
     },
@@ -127,6 +129,10 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -134,11 +140,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # User model for authentication and login purposes
 AUTH_USER_MODEL = 'recipes.User'
-
-AUTHENTICATION_BACKENDS = [
-    'recipes.backends.EmailBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
 
 # Login URL for redirecting users from login protected views
 LOGIN_URL = 'log_in'
@@ -154,11 +155,8 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-# Email Configuration (Switching to SMTP for SendGrid/Twilio)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+# Email Backend - Development (Prints to Console)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+#OpenAI API Configuration
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
