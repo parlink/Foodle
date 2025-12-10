@@ -17,6 +17,18 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
     email = models.EmailField(unique=True, blank=False)
+    
+    # Profile fields
+    bio = models.TextField(blank=True, max_length=500)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    DIETARY_CHOICES = [
+        ('None', 'No Restriction'),
+        ('Vegan', 'Vegan'),
+        ('Vegetarian', 'Vegetarian'),
+        ('Keto', 'Keto'),
+        ('Paleo', 'Paleo'),
+    ]
+    dietary_preference = models.CharField(max_length=20, choices=DIETARY_CHOICES, default='None')
 
 
     class Meta:
@@ -30,8 +42,13 @@ class User(AbstractUser):
         return f'{self.first_name} {self.last_name}'
 
     def gravatar(self, size=120):
-        """Return a URL to the user's gravatar."""
-
+        """Return a URL to the user's profile picture or gravatar."""
+        
+        # If profile_picture is set, return its URL
+        if self.profile_picture:
+            return self.profile_picture.url
+        
+        # Otherwise, fall back to gravatar
         gravatar_object = Gravatar(self.email)
         gravatar_url = gravatar_object.get_image(size=size, default='mp')
         return gravatar_url

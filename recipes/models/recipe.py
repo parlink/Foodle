@@ -20,6 +20,9 @@ class Recipe(models.Model):
 
     method = models.TextField()
 
+    # Image URL for the recipe
+    image_url = models.URLField(blank=True, null=True)
+
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)  
 
     #image = models.ImageField(upload_to='images/')

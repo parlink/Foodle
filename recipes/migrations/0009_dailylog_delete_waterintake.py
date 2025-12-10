@@ -12,25 +12,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='DailyLog',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateField()),
-                ('amount_ml', models.IntegerField(default=0)),
-                ('calorie_goal', models.IntegerField(default=2500)),
-                ('protein_goal', models.IntegerField(default=187)),
-                ('carbs_goal', models.IntegerField(default=250)),
-                ('fat_goal', models.IntegerField(default=83)),
-                ('water_goal', models.IntegerField(default=2500)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='daily_logs', to=settings.AUTH_USER_MODEL)),
-            ],
-            options={
-                'ordering': ['-date'],
-                'unique_together': {('user', 'date')},
-            },
-        ),
-        migrations.DeleteModel(
-            name='WaterIntake',
-        ),
     ]

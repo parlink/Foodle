@@ -1,0 +1,326 @@
+{% extends 'base_content.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+  <!-- Profile Header Section -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <!-- Profile Picture -->
+          <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{{ user.gravatar }}{% endif %}" alt="{{ user.full_name }}" 
+               class="rounded-circle border border-3 border-success" 
+               style="width: 120px; height: 120px; object-fit: cover;">
+        </div>
+        <div class="col">
+          <h2 class="fw-bold mb-1">{{ user.full_name }}</h2>
+          <p class="text-muted mb-2">{{ user.username }}</p>
+          {% if user.bio %}
+            <p class="text-muted small mb-2">{{ user.bio }}</p>
+          {% endif %}
+          <!-- Dietary Badge -->
+          {% if user.dietary_preference != 'None' %}
+            <span class="badge bg-success">{{ user.get_dietary_preference_display }}</span>
+          {% endif %}
+          <span class="badge bg-secondary ms-1">
+            <i class="bi bi-calendar3 me-1"></i>Member for {{ stats.days_as_member }} days
+          </span>
+        </div>
+        <div class="col-auto">
+          <!-- Quick Stats -->
+          <div class="d-flex gap-4 text-center">
+            <div>
+              <div class="fw-bold fs-5">{{ posts_count }}</div>
+              <div class="text-muted small">Posts</div>
+            </div>
+            <div>
+              <div class="fw-bold fs-5">{{ followers_count }}</div>
+              <div class="text-muted small">Followers</div>
+            </div>
+            <div>
+              <div class="fw-bold fs-5">{{ following_count }}</div>
+              <div class="text-muted small">Following</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Dashboard -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+      <h4 class="fw-bold mb-4">
+        <i class="bi bi-graph-up text-success me-2"></i>Your Statistics
+      </h4>
+      
+      <!-- Stats Grid -->
+      <div class="row g-3 mb-4">
+        <!-- Meals Logged -->
+        <div class="col-6 col-md-3">
+          <div class="text-center p-3 rounded-3 bg-light">
+            <i class="bi bi-egg-fried text-success fs-3 mb-2 d-block"></i>
+            <div class="fw-bold fs-4">{{ stats.total_meals_logged }}</div>
+            <div class="text-muted small">Meals Logged</div>
+          </div>
+        </div>
+        
+        <!-- Current Streak -->
+        <div class="col-6 col-md-3">
+          <div class="text-center p-3 rounded-3 bg-light">
+            <i class="bi bi-fire text-danger fs-3 mb-2 d-block"></i>
+            <div class="fw-bold fs-4">{{ stats.current_streak }}</div>
+            <div class="text-muted small">Day Streak</div>
+          </div>
+        </div>
+        
+        <!-- Water Logged -->
+        <div class="col-6 col-md-3">
+          <div class="text-center p-3 rounded-3 bg-light">
+            <i class="bi bi-droplet text-primary fs-3 mb-2 d-block"></i>
+            <div class="fw-bold fs-4">{{ stats.total_water_liters }}L</div>
+            <div class="text-muted small">Water Logged</div>
+          </div>
+        </div>
+        
+        <!-- Fasting Hours -->
+        <div class="col-6 col-md-3">
+          <div class="text-center p-3 rounded-3 bg-light">
+            <i class="bi bi-clock-history text-warning fs-3 mb-2 d-block"></i>
+            <div class="fw-bold fs-4">{{ stats.total_fasting_hours }}h</div>
+            <div class="text-muted small">Fasting Hours</div>
+          </div>
+        </div>
+        
+        <!-- Recipes Shared -->
+        <div class="col-6 col-md-3">
+          <div class="text-center p-3 rounded-3 bg-light">
+            <i class="bi bi-share text-info fs-3 mb-2 d-block"></i>
+            <div class="fw-bold fs-4">{{ stats.total_recipes_shared }}</div>
+            <div class="text-muted small">Recipes Shared</div>
+          </div>
+        </div>
+        
+        <!-- Saved Recipes -->
+        <div class="col-6 col-md-3">
+          <div class="text-center p-3 rounded-3 bg-light">
+            <i class="bi bi-bookmark-star text-secondary fs-3 mb-2 d-block"></i>
+            <div class="fw-bold fs-4">{{ stats.saved_recipes }}</div>
+            <div class="text-muted small">Saved Recipes</div>
+          </div>
+        </div>
+        
+        <!-- Completed Fasts -->
+        <div class="col-6 col-md-3">
+          <div class="text-center p-3 rounded-3 bg-light">
+            <i class="bi bi-check-circle text-success fs-3 mb-2 d-block"></i>
+            <div class="fw-bold fs-4">{{ stats.completed_fasts }}</div>
+            <div class="text-muted small">Fasts Completed</div>
+          </div>
+        </div>
+        
+        <!-- Longest Streak -->
+        <div class="col-6 col-md-3">
+          <div class="text-center p-3 rounded-3 bg-light">
+            <i class="bi bi-trophy text-warning fs-3 mb-2 d-block"></i>
+            <div class="fw-bold fs-4">{{ stats.longest_streak }}</div>
+            <div class="text-muted small">Best Streak</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <ul class="nav nav-pills mb-4" id="profileTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="public-tab" data-bs-toggle="pill" data-bs-target="#public" type="button" role="tab">
+        <i class="bi bi-person me-1"></i>Public Profile
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="account-tab" data-bs-toggle="pill" data-bs-target="#account" type="button" role="tab">
+        <i class="bi bi-gear me-1"></i>Account Settings
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="security-tab" data-bs-toggle="pill" data-bs-target="#security" type="button" role="tab">
+        <i class="bi bi-shield-lock me-1"></i>Security
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content" id="profileTabsContent">
+    <!-- Tab 1: Public Profile -->
+    <div class="tab-pane fade show active" id="public" role="tabpanel">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+          <h4 class="fw-bold mb-4">Edit Public Profile</h4>
+          
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_profile">
+            
+            <!-- Profile Picture -->
+            <div class="mb-3">
+              <label for="{{ profile_form.profile_picture.id_for_label }}" class="form-label fw-bold small">Profile Picture</label>
+              {% render_field profile_form.profile_picture class="form-control py-2 rounded-3 border" %}
+              {% if profile_form.profile_picture.errors %}
+                {% for error in profile_form.profile_picture.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              {% endif %}
+            </div>
+            
+            <!-- Bio -->
+            <div class="mb-3">
+              <label for="{{ profile_form.bio.id_for_label }}" class="form-label fw-bold small">Bio</label>
+              {% render_field profile_form.bio class="form-control py-2 rounded-3 border" rows="4" %}
+              {% if profile_form.bio.errors %}
+                {% for error in profile_form.bio.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              {% endif %}
+            </div>
+            
+            <!-- Dietary Preference -->
+            <div class="mb-3">
+              <label for="{{ profile_form.dietary_preference.id_for_label }}" class="form-label fw-bold small">Dietary Preference</label>
+              {% render_field profile_form.dietary_preference class="form-select py-2 rounded-3 border" %}
+              {% if profile_form.dietary_preference.errors %}
+                {% for error in profile_form.dietary_preference.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              {% endif %}
+            </div>
+            
+            <button type="submit" class="btn btn-emerald w-100 py-2 rounded-3 fw-bold">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Account Settings -->
+    <div class="tab-pane fade" id="account" role="tabpanel">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+          <h4 class="fw-bold mb-4">Account Settings</h4>
+          
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_account">
+            
+            <!-- First Name -->
+            <div class="mb-3">
+              <label for="{{ account_form.first_name.id_for_label }}" class="form-label fw-bold small">First Name</label>
+              {% render_field account_form.first_name class="form-control py-2 rounded-3 border" %}
+              {% if account_form.first_name.errors %}
+                {% for error in account_form.first_name.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              {% endif %}
+            </div>
+            
+            <!-- Last Name -->
+            <div class="mb-3">
+              <label for="{{ account_form.last_name.id_for_label }}" class="form-label fw-bold small">Last Name</label>
+              {% render_field account_form.last_name class="form-control py-2 rounded-3 border" %}
+              {% if account_form.last_name.errors %}
+                {% for error in account_form.last_name.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              {% endif %}
+            </div>
+            
+            <!-- Username -->
+            <div class="mb-3">
+              <label for="{{ account_form.username.id_for_label }}" class="form-label fw-bold small">Username</label>
+              {% render_field account_form.username class="form-control py-2 rounded-3 border" %}
+              {% if account_form.username.errors %}
+                {% for error in account_form.username.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              {% endif %}
+            </div>
+            
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="{{ account_form.email.id_for_label }}" class="form-label fw-bold small">Email</label>
+              {% render_field account_form.email class="form-control py-2 rounded-3 border" %}
+              {% if account_form.email.errors %}
+                {% for error in account_form.email.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              {% endif %}
+            </div>
+            
+            <button type="submit" class="btn btn-emerald w-100 py-2 rounded-3 fw-bold">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Security -->
+    <div class="tab-pane fade" id="security" role="tabpanel">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+          <h4 class="fw-bold mb-4">Change Password</h4>
+          
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="change_password">
+            
+            {% if password_form.non_field_errors %}
+              <div class="alert alert-danger">
+                {% for error in password_form.non_field_errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+            
+            <!-- Current Password -->
+            <div class="mb-3">
+              <label for="{{ password_form.password.id_for_label }}" class="form-label fw-bold small">Current Password</label>
+              {% render_field password_form.password class="form-control py-2 rounded-3 border" %}
+              {% if password_form.password.errors %}
+                {% for error in password_form.password.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              {% endif %}
+            </div>
+            
+            <!-- New Password -->
+            <div class="mb-3">
+              <label for="{{ password_form.new_password.id_for_label }}" class="form-label fw-bold small">New Password</label>
+              {% render_field password_form.new_password class="form-control py-2 rounded-3 border" %}
+              {% if password_form.new_password.errors %}
+                {% for error in password_form.new_password.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              {% endif %}
+              <small class="form-text text-muted">
+                Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.
+              </small>
+            </div>
+            
+            <!-- Password Confirmation -->
+            <div class="mb-3">
+              <label for="{{ password_form.password_confirmation.id_for_label }}" class="form-label fw-bold small">Confirm New Password</label>
+              {% render_field password_form.password_confirmation class="form-control py-2 rounded-3 border" %}
+              {% if password_form.password_confirmation.errors %}
+                {% for error in password_form.password_confirmation.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              {% endif %}
+            </div>
+            
+            <button type="submit" class="btn btn-emerald w-100 py-2 rounded-3 fw-bold">Change Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

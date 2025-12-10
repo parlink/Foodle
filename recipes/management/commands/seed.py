@@ -9,19 +9,19 @@ is swallowed and generation continues.
 
 
 import os
-import random
 from faker import Faker
-from random import randint, random, choice
+from random import randint, random, choice, sample
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 from datetime import timedelta, date, datetime
-from recipes.models import User, Recipe, Profile, Meal, DailyLog, FastingSession
+from recipes.models import User, Recipe, Profile, Meal, DailyLog, FastingSession, Tag, Post, Like, Comment, Rating
+from django.core.files import File
 
 
 user_fixtures = [
-    {'username': '@johndoe', 'email': 'john.doe@example.org', 'first_name': 'John', 'last_name': 'Doe', 'is_staff': True, 'is_superuser': True},
-    {'username': '@janedoe', 'email': 'jane.doe@example.org', 'first_name': 'Jane', 'last_name': 'Doe'},
-    {'username': '@charlie', 'email': 'charlie.johnson@example.org', 'first_name': 'Charlie', 'last_name': 'Johnson'},
+    {'name': 'John','surname': 'Doe', 'username': '@johndoe', 'email': 'john.doe@example.org', 'first_name': 'John', 'last_name': 'Doe', 'is_staff': True, 'is_superuser': True},
+    {'name': 'Jane','surname': 'Doe', 'username': '@janedoe', 'email': 'jane.doe@example.org', 'first_name': 'Jane', 'last_name': 'Doe'},
+    {'name': 'Charlie','surname': 'Johnson', 'username': '@charlie', 'email': 'charlie.johnson@example.org', 'first_name': 'Charlie', 'last_name': 'Johnson'},
 ]
 
 
@@ -59,6 +59,14 @@ class Command(BaseCommand):
         super().__init__(*args, **kwargs)
         self.faker = Faker('en_GB')
 
+    def add_arguments(self, parser):
+        """Add command-line arguments."""
+        parser.add_argument(
+            '--with-recipes',
+            action='store_true',
+            help='Also create generic recipes (use seed_recipes for recipes with images)',
+        )
+
     def handle(self, *args, **options):
         """
         Django entrypoint for the command.
@@ -67,8 +75,14 @@ class Command(BaseCommand):
         post-processing or debugging (not required for operation).
         """
         self.create_users()
-        self.create_recipes()
+        # Recipes are now seeded separately with seed_recipes command
+        # Use --with-recipes flag to create generic recipes
+        if options.get('with_recipes'):
+            self.create_recipes()
         self.create_tracker_data()
+        self.create_tags()
+        self.create_posts()
+        self.create_post_interactions()
         self.users = User.objects.all()
         self.stdout.write(self.style.SUCCESS("Seeding complete!"))
 
@@ -441,7 +455,190 @@ class Command(BaseCommand):
             return end_datetime 
         except:
             return last_end_datetime
+        
+    def create_tags(self):
+        """Create standard tags for posts."""
+        tags = [
+            "Breakfast", "Lunch", "Dinner", "Dessert", 
+            "Snack", "Vegan", "Vegetarian", "Gluten-Free", 
+            "Keto", "Paleo", "High Protein", "Low Carb", 
+            "Spicy", "Quick & Easy", "Meal Prep", "Healthy"
+        ]
+        
+        for tag_name in tags:
+            # get_or_create prevents duplicates if you run seed multiple times
+            Tag.objects.get_or_create(name=tag_name)
+            
+        self.stdout.write("Tags seeding complete.")
 
+    def create_posts(self):
+        """Generate social posts using real food titles, captions, and images."""
+        users = list(User.objects.all())
+        tags = list(Tag.objects.all())
+        
+        # Real Food Data
+        FOOD_TITLES = [
+            "Homemade Margherita Pizza with Fresh Basil",
+            "Creamy Roasted Tomato Soup & Grilled Cheese",
+            "Baja-Style Spicy Chicken Tacos",
+            "The Ultimate Classic Cheeseburger",
+            "Fluffy Buttermilk Pancakes with Berries",
+            "Fresh Mediterranean Greek Salad",
+            "Garlic Herb Hummus with Veggie Sticks",
+            "Chewy Salted Chocolate Chip Cookies",
+            "Creamy Wild Mushroom Risotto",
+            "Slow-Cooked BBQ Ribs with Slaw",
+            "Authentic Chicken Pad Thai",
+            "Rich & Creamy Chicken Tikka Masala",
+            "Classic Spaghetti Carbonara",
+            "Quick Veggie Stir-Fry with Tofu",
+            "Avocado Toast with a Perfect Poached Egg",
+            "Acai Berry Smoothie Bowl with Granola",
+            "Crispy Fried Calamari with Marinara",
+            "Decadent Lobster Mac and Cheese",
+            "Baked French Onion Soup",
+            "Steak Frites with Garlic Aioli"
+        ]
+
+        FOOD_CAPTIONS = [
+            "Finally perfected my dough recipe! The crust was crunchy on the outside and soft inside. Fresh basil is a must.",
+            "Perfect comfort food for this chilly weather. Highly recommend pairing it with a sourdough grilled cheese.",
+            "A little spicy, a little tangy, and totally delicious. Don't skimp on the lime juice!",
+            "Sometimes you just need a classic. Juicy patty, melted cheddar, and all the fixings on a brioche bun.",
+            "Weekend breakfast done right. These were so fluffy! Served with real maple syrup and fresh strawberries.",
+            "Fresh, healthy, and packed with flavor. The homemade lemon-oregano dressing ties it all together.",
+            "The perfect snack for sharing. So much better than store-bought! Super creamy and garlicky.",
+            "Warm, gooey, and loaded with chocolate pools. A sprinkle of sea salt on top makes them addictive.",
+            "A labor of love that requires constant stirring, but the creamy texture is so worth it.",
+            "Fall-off-the-bone tender after cooking low and slow for 6 hours. The homemade BBQ sauce is a game changer.",
+            "Tastes just like takeout! It's all about balancing the sweet, sour, and savory flavors.",
+            "Rich, aromatic, and full of spices. Best enjoyed with some warm garlic naan to scoop up the sauce.",
+            "A Roman classic made the right way—no cream, just eggs, Pecorino Romano, guanciale, and lots of black pepper.",
+            "A super fast and healthy weeknight dinner. A great way to use up whatever veggies are in the fridge.",
+            "My go-to breakfast. Simple, nutritious, and delicious. The runny yolk is the best part.",
+            "Packed with antioxidants and energy. Topped with homemade granola, banana, and coconut flakes.",
+            "Crispy golden coating on the outside, tender on the inside. A squeeze of fresh lemon is essential.",
+            "Indulgent and cheesy with big chunks of lobster meat. A real treat for a special occasion.",
+            "Rich beef broth, caramelized onions, and a thick layer of melted Gruyère cheese on toast. So satisfying.",
+            "Cooked medium-rare with a crispy sear. The garlic aioli for dipping the fries is incredible."
+        ]
+
+        cuisine_choices = [
+            'Italian', 'Mexican', 'Chinese', 'Indian', 'Japanese', 
+            'Thai', 'French', 'American', 'Greek', 'Spanish', 
+            'Mediterranean', 'Korean', 'Other'
+        ]
+        
+        # Locate the image directory relative to this script file
+        image_dir = os.path.join(os.path.dirname(__file__), '..', 'seed_images')
+        image_files = []
+        try:
+            # Create a list of all files in the directory
+            image_files = [f for f in os.listdir(image_dir) if os.path.isfile(os.path.join(image_dir, f))]
+        except FileNotFoundError:
+            self.stdout.write(self.style.WARNING(f"Warning: Image directory '{image_dir}' not found. Posts will be created without images."))
+
+        if not users:
+            self.stdout.write("No users found. Skipping post generation.")
+            return
+
+        num_posts = len(FOOD_TITLES)
+        self.stdout.write(f"Seeding {num_posts} social posts with real data...")
+        
+        for i in range(num_posts):
+            author = choice(users)
+            
+            # Use titles sequentially from the list
+            title = FOOD_TITLES[i]
+            # Cycle through captions if we have more titles than captions
+            caption = FOOD_CAPTIONS[i % len(FOOD_CAPTIONS)]
+            
+            # Prepare post data
+            post_data = {
+                'author': author,
+                'title': title,
+                'caption': caption,
+                'cuisine': choice(cuisine_choices),
+                'difficulty': choice(['Easy', 'Moderate', 'Hard']),
+                'prep_time': f"{randint(15, 90)} min",
+                'servings': randint(2, 6),
+            }
+
+            # Pick a random image file if any exist
+            image_file_handler = None
+            if image_files:
+                random_image_name = choice(image_files)
+                image_path = os.path.join(image_dir, random_image_name)
+                # Open the file in binary mode so Django can read it
+                f = open(image_path, 'rb')
+                image_file_handler = File(f, name=random_image_name)
+
+            # Create the post, passing the image file handler if it exists
+            if image_file_handler:
+                post = Post.objects.create(image=image_file_handler, **post_data)
+                image_file_handler.close()
+            else:
+                post = Post.objects.create(**post_data)
+            
+            # Add random tags
+            if tags:
+                random_tags = sample(tags, k=randint(1, min(3, len(tags))))
+                post.tags.set(random_tags)
+                
+        self.stdout.write("Social posts seeded successfully.")
+
+    def create_post_interactions(self):
+        """Generate Likes, Comments, and Ratings for posts."""
+        users = list(User.objects.all())
+        posts = Post.objects.all()
+        
+        comments_list = [
+            "This looks amazing!", "Can't wait to try this.", "Delicious!", 
+            "Great recipe.", "My family loved it.", "Yum!", "So tasty.", 
+            "Thanks for sharing!", "Added to my list.", "Wow!"
+        ]
+
+        if not users or not posts:
+            return
+
+        self.stdout.write("Seeding likes, comments, and ratings...")
+
+        for post in posts:
+            # 1. Generate Likes
+            # Randomly select 0 to 20 unique users to like this post
+            num_likes = randint(0, 20)
+            likers = sample(users, k=min(num_likes, len(users)))
+            for user in likers:
+                Like.objects.get_or_create(user=user, post=post)
+
+            # 2. Generate Comments
+            # Randomly select 0 to 5 users to comment
+            num_comments = randint(0, 5)
+            commenters = sample(users, k=min(num_comments, len(users)))
+            for user in commenters:
+                Comment.objects.create(user=user, post=post, text=choice(comments_list))
+
+            # 3. Generate Ratings
+            # Randomly select 0 to 15 unique users to rate
+            num_ratings = randint(0, 15)
+            raters = sample(users, k=min(num_ratings, len(users)))
+            
+            total_score = 0
+            for user in raters:
+                # Skew ratings towards positive (3, 4, or 5)
+                score = randint(3, 5)
+                Rating.objects.create(user=user, post=post, score=score)
+                total_score += score
+            
+            # Update Post aggregates to match the created ratings
+            if num_ratings > 0:
+                post.rating_count = num_ratings
+                post.rating_total_score = total_score
+                # Note: average_rating is a @property, so we don't set it directly.
+                # It will calculate automatically from total_score / rating_count
+                post.save()
+
+        self.stdout.write("Interactions seeded.")
 
 def create_username(first_name, last_name):
     """
