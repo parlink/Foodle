@@ -6,9 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('recipes', '0007_merge_20251130_2346'),
-        ('recipes', '0009_recipe_image_url'),
-        ('recipes', '0015_profile_email_follower_notifications_and_more'),
+        ('recipes', '0003_alter_profile_theme'),
     ]
 
     operations = [
