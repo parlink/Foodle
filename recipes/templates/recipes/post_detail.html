@@ -3,6 +3,13 @@
 
 {% block content %}
 <script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        corePlugins: {
+            preflight: false,
+        }
+    }
+</script>
 
 <div class="bg-gray-50 font-sans min-h-screen relative z-0 py-8 px-4">
     

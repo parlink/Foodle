@@ -130,11 +130,9 @@ body.dark-mode .card-header {
   color: var(--text-primary);
 }
 
-/* Navbar styling - always dark */
-.navbar,
+/* Navbar styling - green theme */
 .navbar-custom {
-  background-color: var(--navbar-bg) !important;
-  color: var(--navbar-text) !important;
+  background-color: #029f04 !important;
 }
 
 .navbar-dark .navbar-nav .nav-link {
@@ -150,8 +148,121 @@ body.dark-mode .card-header {
   color: #ffffff !important;
 }
 
-body.dark-mode .navbar {
-  background-color: var(--navbar-bg) !important;
+body.dark-mode .navbar-custom {
+  background-color: #1a472a !important;
+}
+
+/* Fix Bootstrap navbar collapse when Tailwind is loaded */
+nav.navbar .navbar-collapse,
+nav.navbar #navbarSupportedContent,
+.navbar-custom .navbar-collapse,
+.navbar-custom #navbarSupportedContent {
+  display: flex !important;
+  flex-basis: auto !important;
+  flex-grow: 1 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+nav.navbar .navbar-collapse.collapse:not(.show),
+.navbar-custom .navbar-collapse.collapse:not(.show) {
+  display: flex !important;
+}
+
+nav.navbar .navbar-nav,
+.navbar-custom .navbar-nav,
+nav.navbar ul.navbar-nav,
+.navbar-custom ul.navbar-nav {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  visibility: visible !important;
+}
+
+nav.navbar .navbar-nav .nav-item,
+.navbar-custom .navbar-nav .nav-item,
+nav.navbar .navbar-nav li,
+.navbar-custom .navbar-nav li {
+  display: list-item !important;
+  list-style: none !important;
+  visibility: visible !important;
+}
+
+nav.navbar .navbar-nav .nav-link,
+.navbar-custom .navbar-nav .nav-link {
+  display: block !important;
+  padding: 0.5rem 1rem !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  visibility: visible !important;
+}
+
+nav.navbar .dropdown-menu,
+.navbar-custom .dropdown-menu {
+  position: absolute !important;
+}
+
+nav.navbar .dropdown-menu.show,
+.navbar-custom .dropdown-menu.show {
+  display: block !important;
+}
+
+/* Direct ID targeting for navbar menu */
+#navbarSupportedContent {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  transform: none !important;
+  justify-content: flex-end !important;
+}
+
+#navbarSupportedContent > ul,
+#navbarSupportedContent > .navbar-nav {
+  display: flex !important;
+  visibility: visible !important;
+  margin-left: auto !important;
+}
+
+#navbarSupportedContent > ul > li,
+#navbarSupportedContent .nav-item {
+  display: list-item !important;
+  visibility: visible !important;
+}
+
+#navbarSupportedContent > ul > li > a,
+#navbarSupportedContent .nav-link {
+  display: block !important;
+  visibility: visible !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Ensure ms-auto works for navbar */
+.navbar-nav.ms-auto,
+.navbar .ms-auto {
+  margin-left: auto !important;
+}
+
+/* Mobile responsive navbar */
+@media (max-width: 991.98px) {
+  nav.navbar .navbar-collapse.collapse:not(.show),
+  .navbar-custom .navbar-collapse.collapse:not(.show) {
+    display: none !important;
+  }
+  
+  nav.navbar .navbar-collapse.show,
+  .navbar-custom .navbar-collapse.show {
+    display: block !important;
+  }
+  
+  nav.navbar .navbar-nav,
+  .navbar-custom .navbar-nav {
+    flex-direction: column !important;
+  }
 }
 
 /* Progress bars */
@@ -596,4 +707,445 @@ h3.profile-title {
 .btn-secondary-soft:hover {
     background-color: #d1d5db;
     color: #111827;
+}
+
+/* Dashboard Styles */
+.dashboard-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
+}
+
+.dashboard-card h5 {
+    color: var(--text-primary);
+}
+
+body.dark-mode .dashboard-card:hover {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Outline success button for dark mode */
+body.dark-mode .btn-outline-success {
+    color: #22c55e !important;
+    border-color: #22c55e !important;
+}
+
+body.dark-mode .btn-outline-success:hover {
+    background-color: #22c55e !important;
+    color: white !important;
+}
+
+/* Dark mode alerts */
+body.dark-mode .alert-info {
+    background-color: rgba(34, 197, 94, 0.15) !important;
+    border-color: rgba(34, 197, 94, 0.3) !important;
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .alert-success {
+    background-color: rgba(34, 197, 94, 0.15) !important;
+    border-color: rgba(34, 197, 94, 0.3) !important;
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .alert-warning {
+    background-color: rgba(251, 191, 36, 0.15) !important;
+    border-color: rgba(251, 191, 36, 0.3) !important;
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .alert-danger {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Sorting/custom buttons - base styles */
+.btn-custom {
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.btn-custom:hover,
+.btn-custom.active {
+    background-color: #22c55e;
+    color: white;
+    border-color: #22c55e;
+}
+
+/* Dark mode sorting/custom buttons */
+body.dark-mode .btn-custom {
+    background-color: var(--secondary-bg);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .btn-custom:hover,
+body.dark-mode .btn-custom.active {
+    background-color: #22c55e;
+    color: white;
+    border-color: #22c55e;
+}
+
+/* Dark mode outline secondary buttons */
+body.dark-mode .btn-outline-secondary {
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+body.dark-mode .btn-outline-secondary:hover,
+body.dark-mode .btn-outline-secondary.active {
+    background-color: var(--secondary-bg) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Pagination text in dark mode */
+body.dark-mode .pagination .current {
+    color: var(--text-primary) !important;
+}
+
+/* ============================================
+   Dark Mode Support for Tailwind Classes (Feed Page)
+   ============================================ */
+
+/* Main container background */
+body.dark-mode .bg-gray-50 {
+  background-color: var(--bg-primary) !important;
+}
+
+/* White backgrounds (cards, modals, sidebars) */
+body.dark-mode .bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+/* Gray backgrounds */
+body.dark-mode .bg-gray-100 {
+  background-color: var(--secondary-bg) !important;
+}
+
+body.dark-mode .bg-gray-200 {
+  background-color: #3d3d3d !important;
+}
+
+/* Text colors */
+body.dark-mode .text-gray-900 {
+  color: var(--text-primary) !important;
+}
+
+body.dark-mode .text-gray-800 {
+  color: var(--text-primary) !important;
+}
+
+body.dark-mode .text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+body.dark-mode .text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+
+body.dark-mode .text-gray-500 {
+  color: var(--text-muted) !important;
+}
+
+body.dark-mode .text-gray-400 {
+  color: var(--text-muted) !important;
+}
+
+/* Border colors */
+body.dark-mode .border-gray-200,
+body.dark-mode .border-gray-100,
+body.dark-mode .border-gray-300 {
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode .border-b {
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode .border-t {
+  border-color: var(--border-color) !important;
+}
+
+/* Input fields in feed */
+body.dark-mode input.border-gray-300 {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode input.border-gray-300::placeholder {
+  color: var(--text-muted) !important;
+}
+
+body.dark-mode input.border-gray-300:focus {
+  background-color: var(--card-bg) !important;
+  border-color: #22c55e !important;
+}
+
+/* Shadow adjustments for dark mode */
+body.dark-mode .shadow-lg,
+body.dark-mode .shadow-md,
+body.dark-mode .shadow-xl,
+body.dark-mode .shadow-2xl {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Comment list background */
+body.dark-mode .bg-gray-50.comment-list,
+body.dark-mode .p-2.bg-gray-50.rounded-lg {
+  background-color: var(--secondary-bg) !important;
+}
+
+/* Hover states */
+body.dark-mode .hover\:bg-gray-50:hover {
+  background-color: var(--secondary-bg) !important;
+}
+
+body.dark-mode .hover\:bg-gray-200:hover {
+  background-color: #4d4d4d !important;
+}
+
+body.dark-mode .hover\:bg-gray-300:hover {
+  background-color: #5d5d5d !important;
+}
+
+/* Star rating popup in feed */
+body.dark-mode .star-rating,
+body.dark-mode #saved-sidebar .bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+/* Saved sidebar specific styles */
+body.dark-mode #saved-sidebar {
+  background-color: var(--card-bg) !important;
+}
+
+body.dark-mode #saved-sidebar .border-b {
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode #saved-backdrop {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Modal backdrop in feed */
+body.dark-mode #create-post-modal .bg-gray-900 {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Green color adjustments for dark mode (keep them readable) */
+body.dark-mode .text-green-700 {
+  color: #4ade80 !important;
+}
+
+body.dark-mode .text-green-800 {
+  color: #86efac !important;
+}
+
+body.dark-mode .bg-green-50 {
+  background-color: rgba(34, 197, 94, 0.15) !important;
+}
+
+body.dark-mode .bg-green-100 {
+  background-color: rgba(34, 197, 94, 0.2) !important;
+}
+
+body.dark-mode .border-green-200 {
+  border-color: rgba(34, 197, 94, 0.4) !important;
+}
+
+/* Modal specific dark mode styles */
+body.dark-mode #create-post-modal .bg-gray-500 {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+body.dark-mode #create-post-modal .bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+body.dark-mode #create-post-modal .text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+body.dark-mode #create-post-modal .text-gray-500 {
+  color: var(--text-muted) !important;
+}
+
+/* Form inputs inside modals and feed (Tailwind styled) */
+body.dark-mode select,
+body.dark-mode textarea,
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"],
+body.dark-mode input[type="file"] {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode select:focus,
+body.dark-mode textarea:focus,
+body.dark-mode input[type="text"]:focus,
+body.dark-mode input[type="number"]:focus {
+  border-color: #22c55e !important;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2) !important;
+}
+
+/* Select multiple (tags) */
+body.dark-mode select[multiple] {
+  background-color: var(--card-bg) !important;
+}
+
+body.dark-mode select[multiple] option {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+body.dark-mode select[multiple] option:checked {
+  background-color: #22c55e !important;
+  color: white !important;
+}
+
+/* Fix action buttons in dark mode */
+body.dark-mode .like-btn,
+body.dark-mode .save-btn,
+body.dark-mode .rate-btn,
+body.dark-mode .icon-action {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body.dark-mode .like-btn:focus,
+body.dark-mode .save-btn:focus,
+body.dark-mode .rate-btn:focus,
+body.dark-mode .icon-action:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure SVG icons don't have background */
+body.dark-mode .like-btn svg,
+body.dark-mode .save-btn svg,
+body.dark-mode .rate-btn svg {
+  background-color: transparent !important;
+}
+
+/* Fix the action button container backgrounds */
+body.dark-mode .flex.space-x-4.text-gray-500 {
+  background-color: transparent !important;
+}
+
+/* Keep follow button styling in dark mode */
+body.dark-mode .follow-btn.bg-green-500 {
+  background-color: #22c55e !important;
+}
+
+body.dark-mode .follow-btn.bg-gray-200 {
+  background-color: #4b5563 !important;
+}
+
+/* Fix like/comment/rating count spans in dark mode */
+body.dark-mode .like-count,
+body.dark-mode .comment-count,
+body.dark-mode .rating-text {
+  background-color: transparent !important;
+  color: var(--text-secondary) !important;
+}
+
+/* Fix any border/outline on feed buttons */
+body.dark-mode [class*="icon-action"],
+body.dark-mode [class*="like-btn"],
+body.dark-mode [class*="save-btn"],
+body.dark-mode [class*="rate-btn"] {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Remove any ring/focus styles that might create white squares */
+body.dark-mode button:focus,
+body.dark-mode button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+body.dark-mode .group {
+  background-color: transparent !important;
+}
+
+/* Reset button styles for feed action buttons only (since Tailwind preflight is disabled) */
+.icon-action,
+.like-btn,
+.save-btn,
+.rate-btn,
+.rate-star {
+  background: none;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Add spacing between action buttons */
+.like-btn,
+.rate-btn,
+button.flex.items-center.space-x-1 {
+  margin-right: 0.5rem;
+}
+
+/* Ensure action buttons stay transparent on all states */
+.icon-action:hover,
+.icon-action:focus,
+.icon-action:active,
+.like-btn:hover,
+.like-btn:focus,
+.like-btn:active,
+.save-btn:hover,
+.save-btn:focus,
+.save-btn:active,
+.rate-btn:hover,
+.rate-btn:focus,
+.rate-btn:active {
+  background: none;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+/* Preserve green button styling for Post Recipe button */
+button.bg-green-500,
+button[class*="bg-green-500"] {
+  background-color: #22c55e !important;
+  color: white !important;
+}
+
+button.bg-green-500:hover,
+button[class*="bg-green-500"]:hover {
+  background-color: #16a34a !important;
 }

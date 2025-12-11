@@ -1,5 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.utils import timezone
+from recipes.models import Meal, DailyLog, Recipe, Post
+
 
 @login_required
 def dashboard(request):
@@ -11,4 +14,33 @@ def dashboard(request):
     is not authenticated, they are automatically redirected to the login
     page.
     """
-    return render(request, 'recipes/dashboard.html', {'user': request.user})
+    user = request.user
+    today = timezone.now().date()
+    
+    # Calculate quick stats
+    meals_today = Meal.objects.filter(user=user, date=today).count()
+    
+    # Get water intake for today
+    try:
+        daily_log = DailyLog.objects.get(user=user, date=today)
+        water_today = daily_log.amount_ml
+    except DailyLog.DoesNotExist:
+        water_today = 0
+    
+    # Get user's recipe count
+    recipes_count = Recipe.objects.filter(created_by=user).count()
+    
+    # Get user's posts count
+    posts_count = Post.objects.filter(author=user).count()
+    
+    stats = {
+        'meals_today': meals_today,
+        'water_today': water_today,
+        'recipes_count': recipes_count,
+        'posts_count': posts_count,
+    }
+    
+    return render(request, 'recipes/dashboard.html', {
+        'user': user,
+        'stats': stats,
+    })
