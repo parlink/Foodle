@@ -1,24 +1,24 @@
 {% extends 'base_content.html' %} {% block content %}
-<style>
-  .recipe-card {
-    border: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-    height: 100%;
-  }
-</style>
-
 <div class="container py-4">
   <div class="row mb-4">
     <div class="col-12">
       <h1 class="mb-2">Browse Recipes</h1>
       <p class="text-muted">Discover delicious recipes to try</p>
-    </div>
+      <h2>Filter Recipes</h2>
+      <div class="row mb-4 sorting-buttons">
+        <div class="col-12 text-center">
+            <form method="get" action="{% url 'recipes' %}">
+                <button type="submit" name="sort_by" value="quick-meals" class="btn btn-custom">Quick Meals</button>
+                <button type="submit" name="sort_by" value="rating" class="btn btn-custom {% if request.GET.sort_by == 'rating' %}active{% endif %}">By Rating</button>
+                <button type="submit" name="sort_by" value="difficulty" class="btn btn-custom {% if request.GET.sort_by == 'difficulty' %}active{% endif %}">By Difficulty</button>
+                <button type="submit" name="sort_by" value="time" class="btn btn-custom {% if request.GET.sort_by == 'time' %}active{% endif %}">By Time</button>
+            </form>
+        </div>
   </div>
 
-  {% if recipes %}
+  {% if page_obj %}
   <div class="row g-4">
-    {% for recipe in recipes %}
+    {% for recipe in page_obj %}
     <div class="col-4">
       <div class="card recipe-card">
         {% if recipe.image_url %}
@@ -137,6 +137,44 @@
     </div>
     {% endfor %}
   </div>
+  {% endif %}
+
+  <!-- Pagination Controls -->
+  {% if page_obj.has_other_pages %}
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}"
+          >Previous</a
+        >
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">Previous</span>
+      </li>
+      {% endif %}
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+        <li class="page-item active" aria-current="page">
+          <span class="page-link">{{ num }}</span>
+        </li>
+        {% else %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}"
+          >Next</a>
+      </li>
+      {% else %}
+      <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+    </ul>
+  </nav>
   {% endif %}
 </div>
 {% endblock %}
