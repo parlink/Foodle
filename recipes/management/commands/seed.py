@@ -430,7 +430,7 @@ class Command(BaseCommand):
             user = User.objects.create_user(
                 username=data['username'],
                 email=data['email'],
-                    password=self.DEFAULT_PASSWORD,
+                        password=self.DEFAULT_PASSWORD,
                 first_name=data['first_name'],
                 last_name=data['last_name'],
             )
@@ -599,8 +599,8 @@ class Command(BaseCommand):
         
         if last_end_datetime and start_datetime < last_end_datetime:
             return last_end_datetime
-        
-        actual_duration_hours = target_duration + (random() * 2 - 1)
+            
+        actual_duration_hours = target_duration + (random() * 2 - 1) 
         end_datetime = start_datetime + timedelta(hours=actual_duration_hours)
         
         now = timezone.now()
