@@ -6,6 +6,7 @@ from recipes.models import Recipe
 
 #login_required
 def recipes(request):
+    
     recipe_list = Recipe.objects.all()
     paginator = Paginator(recipe_list, 20)
     page_number = request.GET.get('page')
