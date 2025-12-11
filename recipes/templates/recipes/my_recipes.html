@@ -8,6 +8,10 @@
             <h1 class="display-5 text-center mb-2">My Recipes</h1>
             <p class="text-center mb-3">Total Recipes: {{ page.paginator.count }}</p>
         </div>
+
+        <a href="{% url 'recipe_create' %}" class="btn btn-emerald ms-3">
+            + Add Recipe
+        </a>
     </div>
 
     <!-- Sorting Buttons -->
@@ -20,20 +24,63 @@
                 <button type="submit" name="sort_by" value="time" class="btn btn-custom {% if request.GET.sort_by == 'time' %}active{% endif %}">By Time</button>
             </form>
         </div>
-    </div>
+  </div>
 
-    <!-- Alphabet Filter Banner (Only shown for alphabetical sort) -->
-    {% if request.GET.sort_by == 'name' %}
-    <div class="row mb-4">
-        <div class="col-12 text-center alphabet-filter">
-            <div class="btn-group" role="group">
-                {% for letter in alphabet %}
-                    <a href="?sort_by=name&letter={{ letter }}" class="btn btn-outline-secondary {% if letter == current_letter %}active{% endif %}">{{ letter }}</a>
-                {% endfor %}
-            </div>
-        </div>
+  <!-- Sorting buttons -->
+  <div class="row mb-3 sorting-buttons">
+    <div class="col-12 text-center">
+      <form method="get" action="{% url 'my_recipes' %}">
+        <!-- Preserve current search when changing sort -->
+        {% if search_query %}
+          <input type="hidden" name="q" value="{{ search_query }}">
+        {% endif %}
+        {% if current_letter and sort_by == 'name' %}
+          <input type="hidden" name="letter" value="{{ current_letter }}">
+        {% endif %}
+
+        <button type="submit"
+                name="sort_by"
+                value="name"
+                class="btn btn-custom {% if sort_by == 'name' %}active{% endif %}">
+          Alphabetical Order
+        </button>
+        <button type="submit"
+                name="sort_by"
+                value="rating"
+                class="btn btn-custom {% if sort_by == 'rating' %}active{% endif %}">
+          By Rating
+        </button>
+        <button type="submit"
+                name="sort_by"
+                value="difficulty"
+                class="btn btn-custom {% if sort_by == 'difficulty' %}active{% endif %}">
+          By Difficulty
+        </button>
+        <button type="submit"
+                name="sort_by"
+                value="time"
+                class="btn btn-custom {% if sort_by == 'time' %}active{% endif %}">
+          By Time
+        </button>
+      </form>
     </div>
-    {% endif %}
+  </div>
+
+  <!-- Alphabet filter (only for alphabetical sort) -->
+  {% if sort_by == 'name' %}
+  <div class="row mb-4">
+    <div class="col-12 text-center alphabet-filter">
+      <div class="btn-group flex-wrap" role="group">
+        {% for letter in alphabet %}
+          <a href="?sort_by=name&letter={{ letter }}{% if search_query %}&q={{ search_query }}{% endif %}"
+             class="btn btn-outline-secondary btn-sm {% if letter == current_letter %}active{% endif %}">
+            {{ letter }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
 
     <!-- Check if there are any recipes -->
     {% if page.object_list %}
@@ -65,29 +112,33 @@
         </div>
         {% endfor %}
     </div>
-    {% else %}
+  {% else %}
     <div class="alert alert-info" role="alert">
+      {% if search_query %}
+        No recipes found for "<strong>{{ search_query }}</strong>".
+      {% else %}
         No recipes found.
+      {% endif %}
     </div>
-    {% endif %}
+  {% endif %}
 
-    <!-- Pagination -->
-    <div class="pagination justify-content-center mt-4">
-        <span class="step-links">
-            {% if page.has_previous %}
-                <a href="?page=1" class="btn btn-outline-secondary">&laquo; First</a>
-                <a href="?page={{ page.previous_page_number }}" class="btn btn-outline-secondary">Previous</a>
-            {% endif %}
+  <!-- Pagination -->
+  <div class="pagination justify-content-center mt-4">
+    <span class="step-links">
+      {% if page.has_previous %}
+        <a href="?page=1{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if current_letter %}&letter={{ current_letter }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-secondary">&laquo; First</a>
+        <a href="?page={{ page.previous_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if current_letter %}&letter={{ current_letter }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-secondary">Previous</a>
+      {% endif %}
 
-            <span class="current">
-                Page {{ page.number }} of {{ page.paginator.num_pages }}.
-            </span>
+      <span class="current mx-2">
+        Page {{ page.number }} of {{ page.paginator.num_pages }}.
+      </span>
 
-            {% if page.has_next %}
-                <a href="?page={{ page.next_page_number }}" class="btn btn-outline-secondary">Next</a>
-                <a href="?page={{ page.paginator.num_pages }}" class="btn btn-outline-secondary">Last &raquo;</a>
-            {% endif %}
-        </span>
-    </div>
+      {% if page.has_next %}
+        <a href="?page={{ page.next_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if current_letter %}&letter={{ current_letter }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-secondary">Next</a>
+        <a href="?page={{ page.paginator.num_pages }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if current_letter %}&letter={{ current_letter }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-secondary">Last &raquo;</a>
+      {% endif %}
+    </span>
+  </div>
 </div>
 {% endblock %}
