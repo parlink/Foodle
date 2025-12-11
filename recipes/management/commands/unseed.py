@@ -1,49 +1,41 @@
-from django.core.management.base import BaseCommand, CommandError
+"""
+Management command to remove all seeded data from the database.
+
+This command clears all user-generated content, tracker data, social interactions,
+recipes, and non-staff users - essentially resetting the database to a clean state.
+"""
+
+from django.core.management.base import BaseCommand
 from recipes.models import (
     User, FastingSession, Meal, DailyLog, Profile, 
-    Post, Follow, Save, Like, Comment, Tag, Recipe
+    Post, Follow, Save, Like, Comment, Tag, Recipe, Rating
 )
 
 
 class Command(BaseCommand):
     """
-    Management command to remove (unseed) user data from the database.
-
-    This command deletes all non-staff users and associated data from the database. 
-    It is designed to complement the corresponding "seed" command, allowing developers 
-    to reset the database to a clean state without removing administrative users.
-
-    Attributes:
-        help (str): Short description displayed when running
-            `python manage.py help unseed`.
+    Management command to remove all seeded data from the database.
+    
+    Deletes all non-staff users and associated data, preserving 
+    administrative accounts.
     """
     
-    help = 'Removes seeded data from the database'
+    help = 'Removes all seeded data from the database (users, recipes, posts, tracker data)'
 
     def handle(self, *args, **options):
-        """
-        Execute the unseeding process.
-
-        Deletes all tracker data, social data, and `User` records where `is_staff` 
-        is False, preserving administrative accounts. Prints a confirmation message 
-        upon completion.
-
-        Args:
-            *args: Positional arguments passed by Django (not used here).
-            **options: Keyword arguments passed by Django (not used here).
-
-        Returns:
-            None
-        """
-        
+        """Execute the unseeding process."""
         self.stdout.write("Clearing all seeded data...")
         
-        # Clear social data (order matters due to foreign keys)
-        self.stdout.write("  Clearing social data...")
+        # Clear social interactions (order matters due to foreign keys)
+        self.stdout.write("  Clearing social interactions...")
+        Rating.objects.all().delete()
         Comment.objects.all().delete()
         Like.objects.all().delete()
         Save.objects.all().delete()
         Follow.objects.all().delete()
+        
+        # Clear posts
+        self.stdout.write("  Clearing posts...")
         Post.objects.all().delete()
         
         # Clear tracker data
@@ -60,7 +52,7 @@ class Command(BaseCommand):
         self.stdout.write("  Clearing profiles...")
         Profile.objects.all().delete()
         
-        # Clear tags (optional - you might want to keep these)
+        # Clear tags
         self.stdout.write("  Clearing tags...")
         Tag.objects.all().delete()
 
@@ -69,5 +61,7 @@ class Command(BaseCommand):
         deleted_count, _ = User.objects.filter(is_staff=False).delete()
         
         self.stdout.write(self.style.SUCCESS(
-            f"Successfully unseeded database: removed {deleted_count} users and all associated data."
+            f"\nSuccessfully unseeded database!\n"
+            f"  - Removed {deleted_count} users and all associated data.\n"
+            f"  - Staff/admin accounts preserved."
         ))

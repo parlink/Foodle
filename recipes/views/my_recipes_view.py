@@ -7,9 +7,8 @@ from recipes.models import Recipe, User
 def my_recipes(request):
     user = request.user
     
-    # Get the sorting parameter and check if it's alphabetical
-    sort_by = request.GET.get('sort_by', 'name')  # Default to alphabetical sorting by name
-    letter_filter = request.GET.get('letter', '')  # Get the letter filter from the query params
+    sort_by = request.GET.get('sort_by', 'name')  
+    letter_filter = request.GET.get('letter', '')  
     
     if sort_by == 'rating':
         recipes = Recipe.objects.filter(created_by=user).order_by('-average_rating')
@@ -18,7 +17,7 @@ def my_recipes(request):
     elif sort_by == 'time':
         recipes = Recipe.objects.filter(created_by=user).order_by('total_time')
     else:
-        # If sorting by name, handle the letter filter
+
         if letter_filter:
             recipes = Recipe.objects.filter(created_by=user, name__istartswith=letter_filter).order_by('name')
         else:
@@ -34,11 +33,20 @@ def my_recipes(request):
     return render(request, 'recipes/my_recipes.html', {
         'page': page,
         'alphabet': alphabet,
-        'current_letter': letter_filter,  # To highlight the current letter in the banner
-        'sort_by': sort_by,  # Pass the current sorting method to the template
+        'current_letter': letter_filter,  
+        'sort_by': sort_by, 
     })
 
 
 def recipe_detail(request, id):
     recipe = Recipe.objects.get(id=id)
-    return render(request, 'recipes/recipe_detail.html', {'recipe': recipe})
+    
+    # Split ingredients and method into separate lines for display
+    ingredients = [i.strip() for i in recipe.ingredients.split(',') if i.strip()]
+    method = [s.strip() for s in recipe.method.split('\n') if s.strip()]
+    
+    return render(request, 'recipes/recipe_detail.html', {
+        'recipe': recipe,
+        'ingredients': ingredients,
+        'method': method,
+    })
