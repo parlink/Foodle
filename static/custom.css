@@ -594,6 +594,99 @@ h3.profile-title {
 }
 
 .btn-secondary-soft:hover {
-    background-color: #d1d5db;
-    color: #111827;
+  background-color: var(--secondary-bg-hover);
+  color: var(--text-primary);
+}
+
+/* --- Social Feed Styles --- */
+.recipe-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.recipe-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.icon-action {
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.icon-action:hover {
+  transform: scale(1.05);
+}
+
+.star-rating button {
+  transition: color 0.1s ease;
+}
+
+/* File input button styling */
+input[type="file"]::file-selector-button {
+  margin-right: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  border: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background-color: #f0fdf4;
+  color: #15803d;
+  cursor: pointer;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background-color: #dcfce7;
+}
+
+body.dark-mode input[type="file"]::file-selector-button {
+  background-color: var(--secondary-bg);
+  color: var(--text-primary);
+}
+
+body.dark-mode input[type="file"]::file-selector-button:hover {
+  background-color: var(--secondary-bg-hover);
+}
+
+/* Card title in dark mode */
+body.dark-mode .card-title {
+  color: var(--text-primary) !important;
+}
+
+/* Headings in dark mode */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: var(--text-primary);
+}
+
+/* Paragraphs in dark mode */
+body.dark-mode p {
+  color: var(--text-primary);
+}
+
+/* Fix for fixed position elements with color blindness filters */
+body.cb-protanopia,
+body.cb-deuteranopia,
+body.cb-tritanopia,
+body.cb-achromatopsia {
+  /* Ensure fixed elements stay in place */
+  isolation: isolate;
+}
+
+/* Ensure modals work with filters */
+.modal {
+  filter: none;
+}
+
+body.cb-protanopia .modal,
+body.cb-deuteranopia .modal,
+body.cb-tritanopia .modal,
+body.cb-achromatopsia .modal {
+  filter: inherit;
 }

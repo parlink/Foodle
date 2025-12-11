@@ -25,8 +25,6 @@ class Recipe(models.Model):
 
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)  
 
-    #image = models.ImageField(upload_to='images/')
-
     personal_rating = models.IntegerField(default=0, null=True, blank=True)
 
     image = models.ImageField(upload_to='images/', null=False, default='images/food1.jpg')
