@@ -1,0 +1,354 @@
+/*
+ * Alerts
+ */
+
+.alert {
+  border-radius: 0px;
+}
+
+
+/*
+ * Cover page
+ */
+
+.content {
+  padding-top: 10px;
+}
+
+.h-100 {
+  min-height: 100vh;
+  height: 100vh;
+}
+
+.vcenter-item{
+    display: flex;
+    align-items: center;
+}
+
+/*
+ * Cover page
+ */
+h1.cover-heading {
+  font-size: 4rem;
+}
+
+p.cover-text {
+  font-size: 1.7rem;
+}
+
+.cover-card {
+  background-color: rgba(245, 245, 245, 0.6);
+  max-width: 30rem;
+  padding-top: 30px;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-bottom: 30px;
+  border-radius: 15%;
+}
+.cover-card-block {
+  opacity: 1
+}
+
+
+/*
+ * forms
+ */
+.nolabel label {
+  display: none;
+}
+
+ul.errorlist {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/*
+ * Typefaces
+ */
+
+.low-key {
+  color: #777777;
+  font-weight: 300;
+}
+
+.list-title {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+/*
+ * Profile
+ */
+.profile-image {
+  width: 120px;
+  clear:both;
+  float:left;
+}
+
+.profile-text {
+  overflow:hidden;
+  padding-left:20px
+}
+
+h3.profile-title {
+  margin-bottom: 0px;
+}
+
+.profile-username {
+  color: #777777;
+  font-weight: 300;
+  font-style: italic;
+}
+
+
+/*
+ * Hyperlinks
+ */
+.content a {
+  text-decoration: none;
+  color: #0d6efd;
+}
+.content a:hover {
+  text-decoration: underline;
+  color: #0d6efd;
+}
+
+/* --- Tracker Page Styles --- */
+.bg-green-accent {
+    background-color: #28a745 !important;
+}
+.text-green-accent {
+    color: #28a745 !important;
+}
+.btn-green-accent {
+    background-color: #28a745;
+    color: white;
+    border: none;
+}
+.btn-green-accent:hover {
+    background-color: #218838;
+    color: white;
+}
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+}
+.progress-bar-custom {
+    background-color: #28a745;
+}
+.meal-card {
+    border-left: 4px solid #28a745;
+}
+.section-divider {
+    border-bottom: 2px solid #e9ecef;
+    margin: 20px 0;
+    padding-bottom: 10px;
+    color: #6c757d;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+.progress-bar {
+    width: var(--progress-width, 0%) !important;
+}
+
+/* --- Welcome Page Styles --- */
+body {
+    background-color: #f9fafb;
+}
+
+/* Green Buttons */
+.btn-emerald {
+    background-color: #22c55e;
+    border: none;
+    color: white;
+}
+.btn-emerald:hover {
+    background-color: #16a34a;
+    color: white;
+}
+
+/* Text Highlights */
+.text-emerald {
+    color: #22c55e;
+}
+
+/* Navbar styling */
+.navbar-custom {
+    background-color: white;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.navbar-brand {
+    font-weight: 700;
+    color: #111827;
+    font-size: 1.5rem;
+}
+
+/* Card Styling ###################################################################*/ 
+.card-style {
+    background-color: white;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+/* --- Add Meal Page Styles --- */
+/* Note: .btn-green-accent is already defined in Tracker Page Styles section above */
+
+/* --- Auth Pages Styles --- */
+/* Note: body background-color, .btn-emerald, and .text-emerald are already defined in Welcome Page Styles section above */
+
+/* Secondary Soft Button (used in password reset pages) */
+.btn-secondary-soft {
+    background-color: #e5e7eb;
+    color: #374151;
+    border: none;
+    font-weight: 600;
+}
+.btn-secondary-soft:hover {
+    background-color: #d1d5db;
+    color: #111827;
+}
+
+/* Custom Styles for Sorting Buttons and Layout */
+
+.btn-custom {
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.btn-custom:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Active Button State */
+.active {
+    background-color: #28a745; 
+    color: white;
+}
+
+
+
+/* --- Sorting Buttons --- */
+.sort-buttons .btn {
+    margin: 5px;
+    font-weight: bold;
+    background-color: #22c55e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+.sort-buttons .btn.active {
+    background-color: #16a34a;
+    color: white;
+}
+
+.sort-buttons .btn:hover {
+    background-color: #15803d;
+    color: white;
+}
+
+/* --- Recipe Cards --- */
+.card-style .card-body {
+    padding: 20px;
+}
+
+.card-style img {
+    border-radius: 8px;
+    width: 100%;
+    max-width: 200px;
+}
+
+.card-style .card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #111827;
+}
+
+.card-style .card-text {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.card-style .btn {
+    background-color: #22c55e;
+    color: white;
+    border-radius: 5px;
+}
+
+.card-style .btn:hover {
+    background-color: #16a34a;
+    color: white;
+}
+
+/* --- Recipe Section --- */
+.recipe-section {
+    margin-top: 40px;
+}
+
+.recipe-summary {
+    margin-left: 20px;
+}
+
+/* Alphabet filter banner */
+.alphabet-filter {
+    margin-top: 20px;
+    padding: 10px 0;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+}
+
+.alphabet-filter .btn {
+    margin: 5px;
+    font-weight: bold;
+    background-color: #e5e7eb;
+    color: #111827;
+    border-radius: 4px;
+}
+
+.alphabet-filter .btn.active {
+    background-color: #22c55e;
+    color: white;
+}
+
+/* Pagination Styling */
+.pagination .btn {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+}
+
+.pagination .btn-outline-secondary {
+    border-radius: 4px;
+    color: #0d6efd;
+}
+
+.pagination .btn-outline-secondary:hover {
+    background-color: #e0e0e0;
+}
+
+/* Recipe image spacing */
+.recipe-image {
+    margin-right: 20px; 
+}
+
+/* Recipe cards display = 3 per row */
+.row .col-md-4 {
+    display: flex;
+    justify-content: center; 
+}
+
+.recipe-card {
+    display: flex;
+    flex-direction: row; 
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.recipe-card img {
+    margin-right: 20px; 
+}

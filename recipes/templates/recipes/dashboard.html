@@ -1,10 +1,143 @@
 {% extends 'base_content.html' %}
+{% load static %}
+
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-12">
-      <h1>Welcome to your dashboard {{ user.username }}</h1>
+<div class="container py-3">
+    <!-- Welcome Header -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card-style p-4 text-center">
+                <h1 class="h2 fw-bold mb-1">Welcome to Foodle, <span class="text-emerald">{{ user.username }}</span></h1>
+                <p class="text-muted mb-0">Your personal food companion for cooking, tracking, and sharing delicious meals.</p>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Quick Stats Row -->
+    <div class="row mb-3 g-2">
+        <div class="col-6 col-md-3">
+            <div class="card-style p-3 text-center">
+                <div class="h3 fw-bold text-emerald mb-0">{{ stats.meals_today }}</div>
+                <small class="text-muted">Meals Today</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card-style p-3 text-center">
+                <div class="h3 fw-bold text-emerald mb-0">{{ stats.water_today }}ml</div>
+                <small class="text-muted">Water Today</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card-style p-3 text-center">
+                <div class="h3 fw-bold text-emerald mb-0">{{ stats.recipes_count }}</div>
+                <small class="text-muted">My Recipes</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card-style p-3 text-center">
+                <div class="h3 fw-bold text-emerald mb-0">{{ stats.posts_count }}</div>
+                <small class="text-muted">Posts Shared</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="row mb-2">
+        <div class="col-12">
+            <h5 class="fw-bold mb-0"><i class="bi bi-grid-3x3-gap me-2"></i>Explore Features</h5>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- Browse Recipes -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{% url 'recipes' %}" class="text-decoration-none">
+                <div class="card-style p-3 dashboard-card">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="feature-icon bg-green-accent text-white rounded-circle me-3">
+                            <i class="bi bi-search"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Browse Recipes</h6>
+                    </div>
+                    <p class="text-muted small mb-0">Discover delicious recipes. Search by ingredients, cuisine, or difficulty.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- My Recipes -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{% url 'my_recipes' %}" class="text-decoration-none">
+                <div class="card-style p-3 dashboard-card">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="feature-icon bg-green-accent text-white rounded-circle me-3">
+                            <i class="bi bi-book"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">My Recipes</h6>
+                    </div>
+                    <p class="text-muted small mb-0">Your personal cookbook! View and manage your saved recipes.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Tracker -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{% url 'tracker' %}" class="text-decoration-none">
+                <div class="card-style p-3 dashboard-card">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="feature-icon bg-green-accent text-white rounded-circle me-3">
+                            <i class="bi bi-bar-chart-line"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Tracker</h6>
+                    </div>
+                    <p class="text-muted small mb-0">Track nutrition, water intake, and fasting progress.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Social Feed -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{% url 'feed' %}" class="text-decoration-none">
+                <div class="card-style p-3 dashboard-card">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="feature-icon bg-green-accent text-white rounded-circle me-3">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Social Feed</h6>
+                    </div>
+                    <p class="text-muted small mb-0">Share your creations and discover recipes from the community.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- AI Recipes -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{% url 'ai_recipes' %}" class="text-decoration-none">
+                <div class="card-style p-3 dashboard-card">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="feature-icon bg-green-accent text-white rounded-circle me-3">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">AI Recipes</h6>
+                    </div>
+                    <p class="text-muted small mb-0">Get personalized recipe suggestions based on your ingredients.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Settings -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{% url 'settings' %}" class="text-decoration-none">
+                <div class="card-style p-3 dashboard-card">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="feature-icon bg-green-accent text-white rounded-circle me-3">
+                            <i class="bi bi-gear"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Settings</h6>
+                    </div>
+                    <p class="text-muted small mb-0">Customize themes, accessibility, and account preferences.</p>
+                </div>
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}

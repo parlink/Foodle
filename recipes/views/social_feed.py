@@ -5,48 +5,55 @@ from django.views.decorators.http import require_POST
 from django.db import transaction
 from django.db.models import F
 from django.template.loader import render_to_string
-
 from recipes.models import Post, Like, Comment, Save, Rating, Follow, User 
 from recipes.forms.post_form import PostForm 
 from recipes.helpers import is_liked_util, is_saved_util, is_followed_util, get_rating_util
 
 @login_required
 def feed(request):
-    show_followed_only = request.GET.get('followed', 'false') == 'true'
+    show_followed_only = request.GET.get('followed') == 'true'
 
     if show_followed_only:
         followed_ids = Follow.objects.filter(follower=request.user).values_list('followed_id', flat=True)
-        posts_queryset = Post.objects.filter(author__in=followed_ids).union(
-            Post.objects.filter(author=request.user)
-        ).order_by('-created_at')
-        post_ids = [post.id for post in posts_queryset]
-        posts = Post.objects.filter(id__in=post_ids)
+        
+        posts_following = Post.objects.filter(author__in=followed_ids).select_related('author').prefetch_related('tags', 'comments__user')
+        my_posts = Post.objects.filter(author=request.user).select_related('author').prefetch_related('tags', 'comments__user')
+        
+        posts = posts_following.union(my_posts).order_by('-created_at')
     else:
-        posts = Post.objects.all()
+        posts = Post.objects.all().select_related('author').prefetch_related('tags', 'comments__user').order_by('-created_at')
 
-    posts = posts.select_related('author').prefetch_related('tags', 'comments__user').order_by('-created_at')
+    saved_posts = Post.objects.filter(saves__user=request.user).select_related('author').order_by('-saves__created_at')
 
-    post_ids = [post.id for post in posts]
+    main_posts_list = list(posts)
+    saved_posts_list = list(saved_posts)
+    all_posts_combined = main_posts_list + saved_posts_list
+    
+    post_ids = {p.id for p in all_posts_combined} 
+    
     liked_posts_set = set(Like.objects.filter(user=request.user, post_id__in=post_ids).values_list('post_id', flat=True))
     saved_posts_set = set(Save.objects.filter(user=request.user, post_id__in=post_ids).values_list('post_id', flat=True))
     user_ratings_dict = {r.post_id: r.score for r in Rating.objects.filter(user=request.user, post_id__in=post_ids)}
     
-    author_ids = [post.author_id for post in posts]
+    author_ids = {p.author_id for p in all_posts_combined}
     following_status = Follow.objects.filter(follower=request.user, followed_id__in=author_ids).values_list('followed_id', flat=True)
     is_following_map = {author_id: True for author_id in following_status}
     
-    posts_with_status = []
-    for post in posts:
-        post.is_liked_by_user = is_liked_util(post.id, liked_posts_set)
-        post.is_saved_by_user = is_saved_util(post.id, saved_posts_set)
-        post.user_rating_score = get_rating_util(post.id, user_ratings_dict)
-        post.is_followed_by_user = is_followed_util(post.author_id, is_following_map)
-        posts_with_status.append(post)
+    def attach_attrs(post_list):
+        for post in post_list:
+            post.is_liked_by_user = post.id in liked_posts_set
+            post.is_saved_by_user = post.id in saved_posts_set
+            post.user_rating_score = user_ratings_dict.get(post.id, 0)
+            post.is_followed_by_user = is_following_map.get(post.author_id, False)
+
+    attach_attrs(main_posts_list)
+    attach_attrs(saved_posts_list)
 
     form = PostForm()
 
     context = {
-        'posts': posts_with_status,
+        'posts': main_posts_list,
+        'saved_posts': saved_posts_list,
         'show_followed_only': show_followed_only,
         'form': form,
     }
@@ -71,10 +78,9 @@ def toggle_like(request, post_id):
                 Like.objects.create(user=request.user, post=post)
                 liked = True
             
-            post.likes_count = Post.objects.get(id=post_id).likes.count()
-            post.save(update_fields=['likes_count'])
+            current_count = post.likes.count()
             
-            return JsonResponse({'liked': liked, 'likes_count': post.likes_count})
+            return JsonResponse({'liked': liked, 'likes_count': current_count})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
@@ -92,12 +98,30 @@ def toggle_save(request, post_id):
         if save_query.exists():
             save_query.delete()
             saved = False
+
+            return JsonResponse({'saved': saved})
         else:
             Save.objects.create(user=request.user, post=post)
             saved = True
-        return JsonResponse({'saved': saved})
+            
+            sidebar_html = render_to_string('recipes/partials/saved_card.html', {'post': post}, request=request)
+            
+            return JsonResponse({
+                'saved': saved, 
+                'sidebar_html': sidebar_html
+            })
+
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    
+    if request.user == post.author:
+        post.delete()
+        
+    return redirect('feed')
 
 @login_required
 @require_POST
@@ -193,4 +217,20 @@ def create_post(request):
             post.save()
             form.save_m2m()
             return redirect('feed')
+        else:
+            print("Form Errors:", form.errors)
+            
     return redirect('feed')
+
+@login_required
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    
+    post.is_liked_by_user = Like.objects.filter(user=request.user, post=post).exists()
+    post.is_saved_by_user = Save.objects.filter(user=request.user, post=post).exists()
+    post.is_followed_by_user = Follow.objects.filter(follower=request.user, followed=post.author).exists()
+    
+    user_rating = Rating.objects.filter(user=request.user, post=post).first()
+    post.user_rating_score = user_rating.score if user_rating else 0
+
+    return render(request, 'recipes/post_detail.html', {'post': post})

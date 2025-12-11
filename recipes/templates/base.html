@@ -18,14 +18,37 @@
     <title>foodle</title>
   </head>
   <body
+    data-theme="{{ user_theme }}"
     data-theme-classes="{{ body_classes }}"
     data-theme-styles="{{ body_styles }}"
   >
     <script>
       (function () {
         var b = document.body;
-        if (b.dataset.themeClasses) b.className = b.dataset.themeClasses;
+        var theme = b.dataset.theme;
+        var classes = b.dataset.themeClasses || '';
+        
+        // Handle system theme preference
+        if (theme === 'system') {
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (prefersDark) {
+            classes = classes ? classes + ' dark-mode' : 'dark-mode';
+          }
+        }
+        
+        if (classes) b.className = classes;
         if (b.dataset.themeStyles) b.style.cssText = b.dataset.themeStyles;
+        
+        // Listen for system theme changes (when user changes OS theme)
+        if (theme === 'system') {
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+            if (e.matches) {
+              b.classList.add('dark-mode');
+            } else {
+              b.classList.remove('dark-mode');
+            }
+          });
+        }
       })();
     </script>
     <!-- SVG Filters for Color Blindness Modes (hidden) -->
