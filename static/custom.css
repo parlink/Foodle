@@ -1149,3 +1149,127 @@ button.bg-green-500:hover,
 button[class*="bg-green-500"]:hover {
   background-color: #16a34a !important;
 }
+
+/* =====================================================
+   MY RECIPES PAGE - Recipe Cards
+   ===================================================== */
+
+.recipe-card-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.recipe-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card-style:hover .recipe-card-img {
+  transform: scale(1.05);
+}
+
+.recipe-meta {
+  padding: 0.25rem 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.recipe-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Dark mode adjustments for recipe cards */
+body.dark-mode .recipe-meta {
+  border-color: var(--border-color);
+}
+
+body.dark-mode .card-style .card-title {
+  color: var(--text-primary) !important;
+}
+
+body.dark-mode .card-style .text-muted {
+  color: var(--text-secondary) !important;
+}
+
+/* =====================================================
+   RECIPE DETAIL PAGE
+   ===================================================== */
+
+.recipe-detail-img-wrapper {
+  width: 100%;
+  height: 280px;
+  border-radius: var(--radius-md);
+}
+
+.recipe-detail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recipe-meta-card {
+  background-color: var(--secondary-bg);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem !important;
+}
+
+.recipe-meta-card i {
+  font-size: 1.2rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.recipe-meta-card small {
+  font-size: 0.7rem;
+}
+
+body.dark-mode .recipe-meta-card {
+  background-color: var(--secondary-bg);
+  border-color: var(--border-color);
+}
+
+/* Ingredient list styling */
+.ingredient-list .ingredient-item {
+  border-color: var(--border-color) !important;
+  padding: 0.4rem 0 !important;
+  font-size: 0.9rem;
+}
+
+.ingredient-list .ingredient-item:last-child {
+  border-bottom: none !important;
+}
+
+/* Method steps styling */
+.method-step {
+  align-items: flex-start;
+  margin-bottom: 0.75rem !important;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  background-color: var(--primary-accent);
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.step-text {
+  padding-top: 2px;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+body.dark-mode .ingredient-list .ingredient-item {
+  border-color: var(--border-color) !important;
+}

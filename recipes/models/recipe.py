@@ -16,6 +16,8 @@ class Recipe(models.Model):
 
     servings = models.PositiveIntegerField(default=1)
 
+    calories = models.PositiveIntegerField(default=0, help_text="Calories per serving")
+
     ingredients = models.TextField()
 
     method = models.TextField()

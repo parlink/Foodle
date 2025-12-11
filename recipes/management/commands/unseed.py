@@ -22,49 +22,8 @@ class Command(BaseCommand):
     
     help = 'Removes all seeded data from the database (users, recipes, posts, tracker data)'
 
-    def add_arguments(self, parser):
-        """Add command-line arguments."""
-        parser.add_argument(
-            '--confirm',
-            action='store_true',
-            help='Skip confirmation prompt',
-        )
-
     def handle(self, *args, **options):
         """Execute the unseeding process."""
-        
-        # Count records before deletion
-        counts = {
-            'users': User.objects.filter(is_staff=False).count(),
-            'recipes': Recipe.objects.count(),
-            'posts': Post.objects.count(),
-            'meals': Meal.objects.count(),
-            'profiles': Profile.objects.count(),
-        }
-        
-        total = sum(counts.values())
-        
-        if total == 0:
-            self.stdout.write(self.style.WARNING('Database is already empty. Nothing to unseed.'))
-            return
-        
-        # Confirmation prompt
-        if not options['confirm']:
-            self.stdout.write(self.style.WARNING(
-                f"\nThis will delete:\n"
-                f"  - {counts['users']} non-staff users\n"
-                f"  - {counts['recipes']} recipes\n"
-                f"  - {counts['posts']} posts\n"
-                f"  - {counts['meals']} meals\n"
-                f"  - {counts['profiles']} profiles\n"
-                f"  - All related data (likes, comments, follows, etc.)\n\n"
-                f"Are you sure? (yes/no): "
-            ))
-            confirmation = input().lower()
-            if confirmation not in ['yes', 'y']:
-                self.stdout.write(self.style.ERROR('Operation cancelled.'))
-                return
-        
         self.stdout.write("Clearing all seeded data...")
         
         # Clear social interactions (order matters due to foreign keys)

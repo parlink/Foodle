@@ -2,15 +2,15 @@
 {% load static %}
 
 {% block content %}
-<div class="container my-5">
+<div class="container my-3">
     <div class="row">
         <div class="col-12">
-            <h1 class="display-4 text-center mb-4">My Recipes</h1>
-            <p class="text-center">Total Recipes: {{ page.paginator.count }}</p>
+            <h1 class="display-5 text-center mb-2">My Recipes</h1>
+            <p class="text-center mb-3">Total Recipes: {{ page.paginator.count }}</p>
         </div>
     </div>
 
-    <!-- Sorting Buttons (Instead of dropdown) -->
+    <!-- Sorting Buttons -->
     <div class="row mb-4 sorting-buttons">
         <div class="col-12 text-center">
             <form method="get" action="{% url 'my_recipes' %}">
@@ -37,26 +37,29 @@
 
     <!-- Check if there are any recipes -->
     {% if page.object_list %}
-    <div class="row">
+    <div class="row g-3">
         {% for recipe in page.object_list %}
-        <div class="col-md-4 mb-4">
-            <div class="card card-style">
-                <div class="d-flex align-items-center p-4">
-                    <!-- Recipe Image -->
-                    <div class="mr-4 recipe-image">
-                        <img src="{% static recipe.image %}" alt="{{ recipe.name }}" class="img-fluid rounded">
-                    </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-style overflow-hidden">
+                <!-- Recipe Image -->
+                <div class="recipe-card-img-wrapper">
+                    <img src="{% static recipe.image %}" alt="{{ recipe.name }}" class="card-img-top recipe-card-img">
+                    <span class="badge bg-success position-absolute top-0 end-0 m-2">{{ recipe.difficulty }}</span>
+                </div>
 
-
-                    <!-- Recipe Summary -->
-                    <div class="flex-grow-1 recipe-summary">
-                        <h5 class="font-weight-bold text-dark mb-3">{{ recipe.name }}</h5>
-                        <p class="mb-2"><strong>Personal Rating:</strong> {{ recipe.average_rating }}</p>
-                        <p class="mb-2"><strong>Difficulty:</strong> {{ recipe.difficulty }}</p>
-                        <p class="mb-2"><strong>Servings:</strong> {{ recipe.servings }}</p>
-                        <p class="mb-2"><strong>Duration:</strong> {{ recipe.total_time }}</p>
-                        <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary mt-2">View Recipe</a>
+                <!-- Recipe Content -->
+                <div class="card-body py-2 px-3">
+                    <h6 class="card-title fw-bold mb-1">{{ recipe.name }}</h6>
+                    
+                    <div class="recipe-meta mb-2">
+                        <div class="d-flex flex-wrap gap-2 text-muted small">
+                            <span><i class="bi bi-star-fill text-warning"></i> {{ recipe.average_rating }}/5</span>
+                            <span><i class="bi bi-people"></i> {{ recipe.servings }} servings</span>
+                            <span><i class="bi bi-clock"></i> {{ recipe.total_time }}</span>
+                        </div>
                     </div>
+                    
+                    <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-emerald btn-sm w-100">View Recipe</a>
                 </div>
             </div>
         </div>
