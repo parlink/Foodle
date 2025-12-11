@@ -2,69 +2,73 @@
    CSS Variables for Theme Support
    ============================================ */
 :root {
-    --bg-primary: #f9fafb;
-    --text-primary: #111827;
-    --primary-accent: #22c55e;
-    --primary-accent-hover: #16a34a;
-    --card-bg: #ffffff;
-    --text-secondary: #777777;
-    --text-muted: #6c757d;
-    --link-color: #0d6efd;
-    --border-color: #e9ecef;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.05);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-    --green-accent: #28a745;
-    --green-accent-hover: #218838;
-    --secondary-bg: #e5e7eb;
-    --secondary-bg-hover: #d1d5db;
-    --secondary-text: #374151;
-    --cover-card-bg: rgba(245, 245, 245, 0.6);
-    --navbar-bg: #212529;
-    --navbar-text: #ffffff;
+  --bg-primary: #f9fafb;
+  --text-primary: #111827;
+  --primary-accent: #22c55e;
+  --primary-accent-hover: #16a34a;
+  --card-bg: #ffffff;
+  --text-secondary: #777777;
+  --text-muted: #6c757d;
+  --link-color: #0d6efd;
+  --border-color: #e9ecef;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --green-accent: #28a745;
+  --green-accent-hover: #218838;
+  --secondary-bg: #e5e7eb;
+  --secondary-bg-hover: #d1d5db;
+  --secondary-text: #374151;
+  --cover-card-bg: rgba(245, 245, 245, 0.6);
+  --navbar-bg: #212529;
+  --navbar-text: #ffffff;
 }
 
 /* Dark Mode Overrides */
 body.dark-mode {
-    --bg-primary: #121212;
-    --text-primary: #e0e0e0;
-    --primary-accent: #2ea043;
-    --primary-accent-hover: #238636;
-    --card-bg: #1e1e1e;
-    --text-secondary: #b0b0b0;
-    --text-muted: #a0a0a0;
-    --link-color: #58a6ff;
-    --border-color: #303030;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-    --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
-    --green-accent: #2ea043;
-    --green-accent-hover: #238636;
-    --secondary-bg: #2d2d2d;
-    --secondary-bg-hover: #3d3d3d;
-    --secondary-text: #e0e0e0;
-    --cover-card-bg: rgba(30, 30, 30, 0.8);
-    --navbar-bg: #1a1a1a;
-    --navbar-text: #e0e0e0;
+  --bg-primary: #121212;
+  --text-primary: #e0e0e0;
+  --primary-accent: #2ea043;
+  --primary-accent-hover: #238636;
+  --card-bg: #1e1e1e;
+  --text-secondary: #b0b0b0;
+  --text-muted: #a0a0a0;
+  --link-color: #58a6ff;
+  --border-color: #303030;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4),
+    0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4),
+    0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --green-accent: #2ea043;
+  --green-accent-hover: #238636;
+  --secondary-bg: #2d2d2d;
+  --secondary-bg-hover: #3d3d3d;
+  --secondary-text: #e0e0e0;
+  --cover-card-bg: rgba(30, 30, 30, 0.8);
+  --navbar-bg: #1a1a1a;
+  --navbar-text: #e0e0e0;
 }
 
 /* Color Blind Mode Filters */
 body.cb-protanopia {
-    filter: url('#protanopia-filter');
+  filter: url("#protanopia-filter");
 }
 
 body.cb-deuteranopia {
-    filter: url('#deuteranopia-filter');
+  filter: url("#deuteranopia-filter");
 }
 
 body.cb-tritanopia {
-    filter: url('#tritanopia-filter');
+  filter: url("#tritanopia-filter");
 }
 
 body.cb-achromatopsia {
-    filter: grayscale(100%);
+  filter: grayscale(100%);
 }
 
 /* ============================================
@@ -73,498 +77,506 @@ body.cb-achromatopsia {
 
 /* Base body styling */
 body {
-    background-color: var(--bg-primary) !important;
-    color: var(--text-primary) !important;
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
 }
 
 /* Override Bootstrap utility classes for theme support */
 body.dark-mode .bg-white,
 body.dark-mode .bg-light {
-    background-color: var(--card-bg) !important;
+  background-color: var(--card-bg) !important;
 }
 
 body.dark-mode .text-dark {
-    color: var(--text-primary) !important;
+  color: var(--text-primary) !important;
 }
 
 body.dark-mode .text-muted {
-    color: var(--text-muted) !important;
+  color: var(--text-muted) !important;
 }
 
 body.dark-mode .border-bottom,
 body.dark-mode .border-top,
 body.dark-mode .border,
 body.dark-mode .border-end {
-    border-color: var(--border-color) !important;
+  border-color: var(--border-color) !important;
 }
 
 /* Card and container components */
-.card, .card-style, .list-group-item, .modal-content, .dropdown-menu {
-    background-color: var(--card-bg) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--border-color) !important;
+.card,
+.card-style,
+.list-group-item,
+.modal-content,
+.dropdown-menu {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
 }
 
 /* Card headers */
 .card-header {
-    background-color: var(--card-bg) !important;
-    border-color: var(--border-color) !important;
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
 }
 
 body.dark-mode .card-header {
-    background-color: var(--card-bg) !important;
-    border-color: var(--border-color) !important;
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
 }
 
 /* Card body */
 .card-body {
-    background-color: var(--card-bg);
-    color: var(--text-primary);
+  background-color: var(--card-bg);
+  color: var(--text-primary);
 }
 
 /* Navbar styling - always dark */
-.navbar, .navbar-custom {
-    background-color: var(--navbar-bg) !important;
-    color: var(--navbar-text) !important;
+.navbar,
+.navbar-custom {
+  background-color: var(--navbar-bg) !important;
+  color: var(--navbar-text) !important;
 }
 
 .navbar-dark .navbar-nav .nav-link {
-    color: rgba(255, 255, 255, 0.85) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
 .navbar-dark .navbar-nav .nav-link:hover,
 .navbar-dark .navbar-nav .nav-link:focus {
-    color: #ffffff !important;
+  color: #ffffff !important;
 }
 
 .navbar-dark .navbar-brand {
-    color: #ffffff !important;
+  color: #ffffff !important;
 }
 
 body.dark-mode .navbar {
-    background-color: var(--navbar-bg) !important;
+  background-color: var(--navbar-bg) !important;
 }
 
 /* Progress bars */
 .progress {
-    background-color: var(--secondary-bg) !important;
+  background-color: var(--secondary-bg) !important;
 }
 
 body.dark-mode .progress {
-    background-color: var(--secondary-bg) !important;
+  background-color: var(--secondary-bg) !important;
 }
 
 /* Badges */
 body.dark-mode .badge.bg-light {
-    background-color: var(--secondary-bg) !important;
-    color: var(--text-primary) !important;
+  background-color: var(--secondary-bg) !important;
+  color: var(--text-primary) !important;
 }
 
 body.dark-mode .badge.bg-light.text-dark {
-    background-color: var(--secondary-bg) !important;
-    color: var(--text-primary) !important;
+  background-color: var(--secondary-bg) !important;
+  color: var(--text-primary) !important;
 }
 
 /* Modals */
-.modal-header, .modal-footer {
-    background-color: var(--card-bg);
-    border-color: var(--border-color);
+.modal-header,
+.modal-footer {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
 }
 
 body.dark-mode .modal-header,
 body.dark-mode .modal-footer {
-    background-color: var(--card-bg) !important;
-    border-color: var(--border-color) !important;
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
 }
 
 body.dark-mode .modal-content {
-    background-color: var(--card-bg) !important;
-    color: var(--text-primary) !important;
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
 }
 
 body.dark-mode .modal-title {
-    color: var(--text-primary) !important;
+  color: var(--text-primary) !important;
 }
 
 /* Forms - single consistent definition */
-.form-control, .form-select {
-    background-color: var(--card-bg) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--border-color) !important;
+.form-control,
+.form-select {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
 }
 
-.form-control:focus, .form-select:focus {
-    background-color: var(--card-bg) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--primary-accent) !important;
-    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25) !important;
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--primary-accent) !important;
+  box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25) !important;
 }
 
 .form-control::placeholder {
-    color: var(--text-muted) !important;
+  color: var(--text-muted) !important;
 }
 
 body.dark-mode .form-control,
 body.dark-mode .form-select {
-    background-color: var(--card-bg) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--border-color) !important;
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
 }
 
 body.dark-mode .form-control:focus,
 body.dark-mode .form-select:focus {
-    background-color: var(--card-bg) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--primary-accent) !important;
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--primary-accent) !important;
 }
 
 .form-label {
-    color: var(--text-primary);
+  color: var(--text-primary);
 }
 
 body.dark-mode .form-label {
-    color: var(--text-primary) !important;
+  color: var(--text-primary) !important;
 }
 
 /* Buttons outline variants */
 body.dark-mode .btn-outline-primary {
-    color: var(--link-color) !important;
-    border-color: var(--link-color) !important;
+  color: var(--link-color) !important;
+  border-color: var(--link-color) !important;
 }
 
 body.dark-mode .btn-outline-primary:hover {
-    background-color: var(--link-color) !important;
-    color: #ffffff !important;
+  background-color: var(--link-color) !important;
+  color: #ffffff !important;
 }
 
 body.dark-mode .btn-outline-secondary {
-    color: var(--text-primary) !important;
-    border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
 }
 
 body.dark-mode .btn-outline-secondary:hover {
-    background-color: var(--secondary-bg) !important;
-    color: var(--text-primary) !important;
+  background-color: var(--secondary-bg) !important;
+  color: var(--text-primary) !important;
 }
 
 body.dark-mode .btn-outline-danger {
-    color: #dc3545 !important;
-    border-color: #dc3545 !important;
+  color: #dc3545 !important;
+  border-color: #dc3545 !important;
 }
 
 body.dark-mode .btn-outline-danger:hover {
-    background-color: #dc3545 !important;
-    color: #ffffff !important;
+  background-color: #dc3545 !important;
+  color: #ffffff !important;
 }
 
 /* Secondary button */
 body.dark-mode .btn-secondary {
-    background-color: var(--secondary-bg) !important;
-    border-color: var(--secondary-bg) !important;
-    color: var(--text-primary) !important;
+  background-color: var(--secondary-bg) !important;
+  border-color: var(--secondary-bg) !important;
+  color: var(--text-primary) !important;
 }
 
 body.dark-mode .btn-secondary:hover {
-    background-color: var(--secondary-bg-hover) !important;
-    border-color: var(--secondary-bg-hover) !important;
+  background-color: var(--secondary-bg-hover) !important;
+  border-color: var(--secondary-bg-hover) !important;
 }
 
 /* Dropdown menus */
 body.dark-mode .dropdown-menu {
-    background-color: var(--card-bg) !important;
-    border-color: var(--border-color) !important;
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
 }
 
 body.dark-mode .dropdown-item {
-    color: var(--text-primary) !important;
+  color: var(--text-primary) !important;
 }
 
 body.dark-mode .dropdown-item:hover,
 body.dark-mode .dropdown-item:focus {
-    background-color: var(--secondary-bg) !important;
-    color: var(--text-primary) !important;
+  background-color: var(--secondary-bg) !important;
+  color: var(--text-primary) !important;
 }
 
 body.dark-mode .dropdown-divider {
-    border-color: var(--border-color) !important;
+  border-color: var(--border-color) !important;
 }
 
 /* Tables */
 .table {
-    color: var(--text-primary);
+  color: var(--text-primary);
 }
 
 body.dark-mode .table {
-    color: var(--text-primary) !important;
+  color: var(--text-primary) !important;
 }
 
 body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: var(--secondary-bg) !important;
+  background-color: var(--secondary-bg) !important;
 }
 
 /* Button close */
 .btn-close {
-    filter: var(--btn-close-filter, none);
+  filter: var(--btn-close-filter, none);
 }
 
 body.dark-mode .btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%);
+  filter: invert(1) grayscale(100%) brightness(200%);
 }
 
 /* Text muted override */
 .text-muted {
-    color: var(--text-muted) !important;
+  color: var(--text-muted) !important;
 }
 
 /* Border override */
 .border {
-    border-color: var(--border-color) !important;
+  border-color: var(--border-color) !important;
 }
 
 /* Nav links in dark mode */
 body.dark-mode .nav-link {
-    color: var(--text-primary);
+  color: var(--text-primary);
 }
 
 body.dark-mode .nav-link:hover {
-    color: var(--link-color);
+  color: var(--link-color);
 }
 
 /* List groups */
 body.dark-mode .list-group-item {
-    background-color: var(--card-bg) !important;
-    color: var(--text-primary) !important;
-    border-color: var(--border-color) !important;
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
 }
 
 /* Star rating menu (feed page) */
 body.dark-mode .star-rating {
-    background-color: var(--card-bg) !important;
-    border-color: var(--border-color) !important;
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
 }
 
 /* Comment list container */
 .comment-list {
-    background-color: var(--secondary-bg) !important;
+  background-color: var(--secondary-bg) !important;
 }
 
 body.dark-mode .comment-list {
-    background-color: var(--secondary-bg) !important;
+  background-color: var(--secondary-bg) !important;
 }
 
 /* Empty state containers */
 .rounded-4.shadow-sm {
-    background-color: var(--card-bg);
+  background-color: var(--card-bg);
 }
 
 body.dark-mode .rounded-4.shadow-sm {
-    background-color: var(--card-bg) !important;
+  background-color: var(--card-bg) !important;
 }
 
 /* Feed container empty state */
 #feed-container > .text-center {
-    background-color: var(--card-bg);
-    color: var(--text-primary);
+  background-color: var(--card-bg);
+  color: var(--text-primary);
 }
 
 /*
  * Alerts
  */
 .alert {
-    border-radius: 0px;
+  border-radius: 0px;
 }
 
 /*
  * Cover page
  */
 .content {
-    padding-top: 10px;
+  padding-top: 10px;
 }
 
 .h-100 {
-    min-height: 100vh;
-    height: 100vh;
+  min-height: 100vh;
+  height: 100vh;
 }
 
 .vcenter-item {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 h1.cover-heading {
-    font-size: 4rem;
+  font-size: 4rem;
 }
 
 p.cover-text {
-    font-size: 1.7rem;
+  font-size: 1.7rem;
 }
 
 .cover-card {
-    background-color: var(--cover-card-bg);
-    max-width: 30rem;
-    padding-top: 30px;
-    padding-left: 50px;
-    padding-right: 50px;
-    padding-bottom: 30px;
-    border-radius: 15%;
+  background-color: var(--cover-card-bg);
+  max-width: 30rem;
+  padding-top: 30px;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-bottom: 30px;
+  border-radius: 15%;
 }
 
 .cover-card-block {
-    opacity: 1;
+  opacity: 1;
 }
 
 /*
  * Forms
  */
 .nolabel label {
-    display: none;
+  display: none;
 }
 
 ul.errorlist {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
 }
 
 /*
  * Typefaces
  */
 .low-key {
-    color: var(--text-secondary);
-    font-weight: 300;
+  color: var(--text-secondary);
+  font-weight: 300;
 }
 
 .list-title {
-    margin-top: 10px;
-    margin-bottom: 20px;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 
 /*
  * Profile
  */
 .profile-image {
-    width: 120px;
-    clear: both;
-    float: left;
+  width: 120px;
+  clear: both;
+  float: left;
 }
 
 .profile-text {
-    overflow: hidden;
-    padding-left: 20px;
+  overflow: hidden;
+  padding-left: 20px;
 }
 
 h3.profile-title {
-    margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 .profile-username {
-    color: var(--text-secondary);
-    font-weight: 300;
-    font-style: italic;
+  color: var(--text-secondary);
+  font-weight: 300;
+  font-style: italic;
 }
 
 /*
  * Hyperlinks
  */
 .content a {
-    text-decoration: none;
-    color: var(--link-color);
+  text-decoration: none;
+  color: var(--link-color);
 }
 
 .content a:hover {
-    text-decoration: underline;
-    color: var(--link-color);
+  text-decoration: underline;
+  color: var(--link-color);
 }
 
 /* --- Tracker Page Styles --- */
 .bg-green-accent {
-    background-color: var(--green-accent) !important;
+  background-color: var(--green-accent) !important;
 }
 
 .text-green-accent {
-    color: var(--green-accent) !important;
+  color: var(--green-accent) !important;
 }
 
 .btn-green-accent {
-    background-color: var(--green-accent);
-    color: white;
-    border: none;
+  background-color: var(--green-accent);
+  color: white;
+  border: none;
 }
 
 .btn-green-accent:hover {
-    background-color: var(--green-accent-hover);
-    color: white;
+  background-color: var(--green-accent-hover);
+  color: white;
 }
 
 .card {
-    border: none;
-    box-shadow: var(--shadow-md);
-    margin-bottom: 1.5rem;
+  border: none;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
 }
 
 .progress-bar-custom {
-    background-color: var(--green-accent);
+  background-color: var(--green-accent);
 }
 
 .meal-card {
-    border-left: 4px solid var(--green-accent);
+  border-left: 4px solid var(--green-accent);
 }
 
 /* Meal macro values text color */
 .meal-card .fw-bold {
-    color: var(--text-primary);
+  color: var(--text-primary);
 }
 
 .section-divider {
-    border-bottom: 2px solid var(--border-color);
-    margin: 20px 0;
-    padding-bottom: 10px;
-    color: var(--text-muted);
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.85rem;
+  border-bottom: 2px solid var(--border-color);
+  margin: 20px 0;
+  padding-bottom: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
 }
 
 .progress-bar {
-    width: var(--progress-width, 0%) !important;
+  width: var(--progress-width, 0%) !important;
 }
 
 /* --- Welcome Page Styles --- */
 /* Green Buttons */
 .btn-emerald {
-    background-color: var(--primary-accent);
-    border: none;
-    color: white;
+  background-color: var(--primary-accent);
+  border: none;
+  color: white;
 }
 
 .btn-emerald:hover {
-    background-color: var(--primary-accent-hover);
-    color: white;
+  background-color: var(--primary-accent-hover);
+  color: white;
 }
 
 /* Text Highlights */
 .text-emerald {
-    color: var(--primary-accent);
+  color: var(--primary-accent);
 }
 
 /* Navbar styling */
 .navbar-custom {
-    background-color: var(--navbar-bg);
-    box-shadow: var(--shadow-sm);
+  background-color: var(--navbar-bg);
+  box-shadow: var(--shadow-sm);
 }
 
 .navbar-brand {
-    font-weight: 700;
-    color: var(--navbar-text);
-    font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--navbar-text);
+  font-size: 1.5rem;
 }
 
-/* Card Styling */
+/* Card Styling ###################################################################*/ 
 .card-style {
-    background-color: var(--card-bg);
-    border: none;
-    border-radius: 16px;
-    box-shadow: var(--shadow-card);
+  background-color: var(--card-bg);
+  border: none;
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
 }
 
 /* --- Add Meal Page Styles --- */
@@ -575,106 +587,13 @@ h3.profile-title {
 
 /* Secondary Soft Button (used in password reset pages) */
 .btn-secondary-soft {
-    background-color: var(--secondary-bg);
-    color: var(--secondary-text);
-    border: none;
-    font-weight: 600;
+  background-color: var(--secondary-bg);
+  color: var(--secondary-text);
+  border: none;
+  font-weight: 600;
 }
 
 .btn-secondary-soft:hover {
-    background-color: var(--secondary-bg-hover);
-    color: var(--text-primary);
-}
-
-/* --- Social Feed Styles --- */
-.recipe-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.recipe-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-
-.icon-action {
-    cursor: pointer;
-    transition: color 0.15s ease, transform 0.15s ease;
-}
-
-.icon-action:hover {
-    transform: scale(1.05);
-}
-
-.star-rating button {
-    transition: color 0.1s ease;
-}
-
-/* File input button styling */
-input[type="file"]::file-selector-button {
-    margin-right: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 9999px;
-    border: 0;
-    font-size: 0.875rem;
-    font-weight: 600;
-    background-color: #f0fdf4;
-    color: #15803d;
-    cursor: pointer;
-}
-
-input[type="file"]::file-selector-button:hover {
-    background-color: #dcfce7;
-}
-
-body.dark-mode input[type="file"]::file-selector-button {
-    background-color: var(--secondary-bg);
-    color: var(--text-primary);
-}
-
-body.dark-mode input[type="file"]::file-selector-button:hover {
-    background-color: var(--secondary-bg-hover);
-}
-
-/* Card title in dark mode */
-body.dark-mode .card-title {
-    color: var(--text-primary) !important;
-}
-
-/* Headings in dark mode */
-body.dark-mode h1,
-body.dark-mode h2,
-body.dark-mode h3,
-body.dark-mode h4,
-body.dark-mode h5,
-body.dark-mode h6 {
-    color: var(--text-primary);
-}
-
-/* Paragraphs in dark mode */
-body.dark-mode p {
-    color: var(--text-primary);
-}
-
-/* Fix for fixed position elements with color blindness filters */
-body.cb-protanopia,
-body.cb-deuteranopia,
-body.cb-tritanopia,
-body.cb-achromatopsia {
-    /* Ensure fixed elements stay in place */
-    isolation: isolate;
-}
-
-/* Ensure modals work with filters */
-.modal {
-    filter: none;
-}
-
-body.cb-protanopia .modal,
-body.cb-deuteranopia .modal,
-body.cb-tritanopia .modal,
-body.cb-achromatopsia .modal {
-    filter: inherit;
+    background-color: #d1d5db;
+    color: #111827;
 }

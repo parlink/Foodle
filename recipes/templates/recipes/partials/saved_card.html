@@ -1,0 +1,36 @@
+<div id="sidebar-post-{{ post.id }}" class="border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition bg-white group relative">
+    
+    <a href="{% url 'post_detail' post.id %}" class="block">
+        
+        <div class="h-32 w-full bg-gray-100 relative">
+            <img src="{% if post.image %}{{ post.image.url }}{% else %}https://placehold.co/800x400{% endif %}" 
+                 class="w-full h-full object-cover">
+            {% if post.cuisine %}
+                <span class="absolute top-2 right-2 bg-white bg-opacity-90 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                    {{ post.cuisine }}
+                </span>
+            {% endif %}
+        </div>
+        
+        <div class="p-3">
+            <h3 class="font-bold text-gray-800 text-sm truncate mb-1 group-hover:text-green-600 transition">{{ post.title }}</h3>
+            <p class="text-xs text-gray-500 mb-2">by {{ post.author.full_name }}</p>
+            
+            <div class="flex items-center justify-between text-xs text-gray-400">
+                <span class="flex items-center">
+                    <svg class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    {{ post.prep_time|default:"-- min" }}
+                </span>
+            </div>
+        </div>
+    </a>
+
+    <button 
+        data-post-id="{{ post.id }}" 
+        data-action="unsave-sidebar" 
+        class="absolute bottom-3 right-3 z-10 p-1 text-green-500 hover:text-red-500 transition bg-white rounded-full shadow-sm hover:shadow border border-gray-100"
+        title="Unsave">
+        <svg class="h-4 w-4 fill-current pointer-events-none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+    </button>
+
+</div>

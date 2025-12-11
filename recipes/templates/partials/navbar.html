@@ -1,26 +1,27 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
+<nav
+  class="navbar navbar-expand-lg myCustomBackground navbar-dark mb-3"
+  style="background-color: #029f04 !important"
+>
   <div class="container">
+    {% load static %}
     <a class="navbar-brand" href="{% url 'home' %}">
-      foodle
+      <img
+        src="{% static 'images/foodle-logo.png' %}"
+        alt="Foodle"
+        height="30"
+      />
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
       <span class="navbar-toggler-icon"></span>
     </button>
-    {% if user.is_authenticated %}
-      <div class="collapse navbar-collapse" id="main-nav">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'tracker' %}">Tracker</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'feed' %}">Feed</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'recipes' %}">Recipes</a>
-          </li>
-        </ul>
-        {% include 'partials/menu.html' %}
-      </div>
-    {% endif %}
+    {% if user.is_authenticated %} {% include 'partials/menu.html' %} {% endif%}
   </div>
 </nav>

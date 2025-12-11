@@ -1,30 +1,35 @@
 from django.db import models
+from django.conf import settings  
 
 
 class Recipe(models.Model):
     name = models.CharField(max_length=200)
-    # 1–5 as used in your seeder
     average_rating = models.IntegerField(default=0)
 
     difficulty = models.CharField(
         max_length=20,
-        choices=[
-            ("Easy", "Easy"),
-            ("Moderate", "Moderate"),
-            ("Hard", "Hard"),
-        ],
+        choices=[("Very Easy", "Very Easy"), ("Easy", "Easy"), ("Moderate", "Moderate"), ("Hard", "Hard"), ("Very Hard", "Very Hard")],
+        default = "Easy",
     )
 
-    # Store value such as '3 hours'
     total_time = models.CharField(max_length=50)
 
     servings = models.PositiveIntegerField(default=1)
 
-    # comma separated list: "Ingredient 1, Ingredient 2, ..."
     ingredients = models.TextField()
 
-    # multiline method text
     method = models.TextField()
+
+    # Image URL for the recipe
+    image_url = models.URLField(blank=True, null=True)
+
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)  
+
+    #image = models.ImageField(upload_to='images/')
+
+    personal_rating = models.IntegerField(default=0, null=True, blank=True)
+
+    image = models.ImageField(upload_to='images/', null=False, default='images/food1.jpg')
 
     def __str__(self):
         return self.name
