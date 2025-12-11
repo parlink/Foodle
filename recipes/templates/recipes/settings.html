@@ -151,9 +151,17 @@
         // Apply theme immediately and save
         function applyTheme(theme) {
             body.classList.remove('dark-mode');
+            body.dataset.theme = theme;
+            
             if (theme === 'dark') {
                 body.classList.add('dark-mode');
+            } else if (theme === 'system') {
+                // Check system preference
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    body.classList.add('dark-mode');
+                }
             }
+            // 'light' - no dark-mode class needed
         }
         
         // Apply color blind mode immediately

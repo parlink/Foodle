@@ -19,11 +19,13 @@ def user_theme_context(request):
     Context processor to provide theme-related classes and styles for the body tag.
     
     Returns:
-        dict: Contains 'body_classes' (space-separated CSS classes) and 
-              'body_styles' (inline CSS styles string).
+        dict: Contains 'body_classes' (space-separated CSS classes),
+              'body_styles' (inline CSS styles string), and
+              'user_theme' (the user's theme preference: 'system', 'light', or 'dark').
     """
     body_classes = []
     body_styles = ""
+    user_theme = "system"  # Default for non-authenticated users
     
     if request.user.is_authenticated:
         try:
@@ -32,7 +34,9 @@ def user_theme_context(request):
             # Profile doesn't exist yet, create it with defaults
             profile = Profile.objects.create(user=request.user)
         
-        # Build classes list
+        user_theme = profile.theme
+        
+        # Build classes list - only add dark-mode if explicitly set (not system)
         if profile.theme == 'dark':
             body_classes.append('dark-mode')
         
@@ -46,4 +50,5 @@ def user_theme_context(request):
     return {
         'body_classes': ' '.join(body_classes),
         'body_styles': body_styles,
+        'user_theme': user_theme,
     }

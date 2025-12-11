@@ -25,10 +25,11 @@ class Profile(models.Model):
     
     # User Preferences / Settings
     THEME_CHOICES = [
+        ('system', 'System Default'),
         ('light', 'Light'),
         ('dark', 'Dark'),
     ]
-    theme = models.CharField(max_length=10, choices=THEME_CHOICES, default='light')
+    theme = models.CharField(max_length=10, choices=THEME_CHOICES, default='system')
     
     COLOR_BLIND_CHOICES = [
         ('none', 'None'),
