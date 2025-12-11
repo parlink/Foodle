@@ -19,11 +19,17 @@
 <div class="container py-4">
   <!-- Header + Search -->
   <div class="row mb-3">
-    <div class="col-md-6">
-      <h1 class="mb-1">My Recipes</h1>
-      <p class="text-muted mb-0">
-        Your saved and created recipes · Total: {{ page.paginator.count }}
-      </p>
+    <div class="col-md-6 d-flex align-items-start justify-content-between">
+        <div>
+            <h1 class="mb-1">My Recipes</h1>
+            <p class="text-muted mb-2">
+                Your saved and created recipes · Total: {{ page.paginator.count }}
+            </p>
+        </div>
+
+        <a href="{% url 'recipe_create' %}" class="btn btn-emerald ms-3">
+            + Add Recipe
+        </a>
     </div>
     <div class="col-md-6">
         <form method="get"

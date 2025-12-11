@@ -43,6 +43,7 @@ urlpatterns = [
     path('recipes/', views.recipes, name='recipes'),
     path('my-recipes/', views.my_recipes, name='my_recipes'),
     path('recipe/<int:id>/', views.recipe_detail, name='recipe_detail'),
+    path('add-recipe/', views.recipe_create, name='recipe_create'),
     path('post/<int:post_id>/', views.post_detail, name='post_detail'),
     path('post/<int:post_id>/like/', views.toggle_like, name='toggle_like'),
     path('post/<int:post_id>/save/', views.toggle_save, name='toggle_save'),
