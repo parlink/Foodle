@@ -25,7 +25,7 @@ def user_theme_context(request):
     """
     body_classes = []
     body_styles = ""
-    user_theme = "system"  # Default for non-authenticated users
+    user_theme = "light"  # Default for non-authenticated users
     
     if request.user.is_authenticated:
         try:

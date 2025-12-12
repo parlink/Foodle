@@ -1,6 +1,5 @@
 {% extends 'base_content.html' %}
 {% load static %}
-
 {% block content %}
 <div class="container py-4">
     <div class="row">
@@ -259,239 +258,142 @@
                             <label for="carbs_goal" class="form-label small">Carbs (g)</label>
                             <input type="number" class="form-control form-control-sm" id="carbs_goal" 
                                    name="carbs_goal" value="{{ daily_log.carbs_goal }}" min="0" max="300"
-                                   oninput="handleMacroInput('carbs')" onblur="validateMacro('carbs')">
-                        </div>
+                                   oninput="handleMacroInput('carbs')" onblur="validateMacro('carbs')"></div>
                         <div class="col-4">
                             <label for="fat_goal" class="form-label small">Fat (g)</label>
                             <input type="number" class="form-control form-control-sm" id="fat_goal" 
                                    name="fat_goal" value="{{ daily_log.fat_goal }}" min="0" max="300"
                                    oninput="handleMacroInput('fat')" onblur="validateMacro('fat')">
-                        </div>
-                    </div>
-
-                    <!-- Water Input -->
+                        </div></div>
                     <div class="mb-3">
                         <label for="water_goal" class="form-label">Water (ml)</label>
                         <input type="number" id="water_goal" name="water_goal" class="form-control" 
                                min="2500" max="7000" value="{{ daily_goals.water }}" required>
-                    </div>
-                </div>
+                    </div></div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-green-accent">Save Goals</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
+                </div></form></div></div></div>{% endblock %}
 <script>
     function updateFastingGoal(select) {
         const form = document.getElementById('fasting-form');
         const actionInput = document.getElementById('fasting-action');
-        
-        //Change action to update goal instead of start fast
         actionInput.value = 'update_fasting_goal';
         form.submit();
     }
-
     document.addEventListener('DOMContentLoaded', function() {
-        //Progress bars logic
         var bars = document.querySelectorAll('.progress-bar[data-width]');
         bars.forEach(function(bar) {
             bar.style.width = bar.getAttribute('data-width') + '%';
         });
-
-        //Fasting Timer Logic
         const fastingActive = JSON.parse("{{ fasting_status.is_active|yesno:'true,false' }}");
         const timerElement = document.getElementById('fasting-timer');
         const goalHours = parseInt("{{ fasting_status.target_duration }}", 10);
-        
         if (fastingActive && timerElement && timerElement.dataset.startTime) {
             const startTime = new Date(timerElement.dataset.startTime).getTime();
-
             function updateTimer() {
                 const now = new Date().getTime();
                 const distance = now - startTime;
-
                 if (distance < 0) {
                      timerElement.innerHTML = "0h 00m 00s / " + goalHours + "h 00m";
-                     return;
-                }
-
+                     return;}
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
                 const formattedTime = 
                     hours + "h " + 
                     (minutes < 10 ? "0" + minutes : minutes) + "m " + 
                     (seconds < 10 ? "0" + seconds : seconds) + "s";
-
-                timerElement.innerText = formattedTime + " / " + goalHours + "h 00m";
-            }
-
+                timerElement.innerText = formattedTime + " / " + goalHours + "h 00m";}
             updateTimer();
-            setInterval(updateTimer, 1000);
-        }
-    });
-
-    // Goal adjustment modal JavaScript
+            setInterval(updateTimer, 1000);}});
     let autoCalcEnabled = true;
     const manuallyEditedMacros = {
         protein: false,
         carbs: false,
-        fat: false
-    };
-
-    // Validate and clamp calorie input
+        fat: false};
     function validateCalorieInput() {
         const calorieInput = document.getElementById('calorie_goal');
         if (!calorieInput) return;
-        
         let value = parseInt(calorieInput.value) || 1000;
-        
-        // Clamp to valid range
         if (value < 1000) {
             value = 1000;
         } else if (value > 4000) {
-            value = 4000;
-        }
-        
-        calorieInput.value = value;
-    }
-
-    // Validate and clamp water input
+            value = 4000;}
+        calorieInput.value = value;}
     function validateWaterInput() {
         const waterInput = document.getElementById('water_goal');
         if (!waterInput) return;
-        
         let value = parseInt(waterInput.value) || 2500;
-        
-        // Clamp to valid range
         if (value < 2500) {
             value = 2500;
         } else if (value > 7000) {
-            value = 7000;
-        }
-        
-        waterInput.value = value;
-    }
-
-    // Auto-calculate macros based on calorie goal (40/30/30 split)
+            value = 7000;}
+        waterInput.value = value;}
     function autoCalculateMacros(calories) {
         if (!autoCalcEnabled) return;
-        
         const proteinInput = document.getElementById('protein_goal');
         const carbsInput = document.getElementById('carbs_goal');
         const fatInput = document.getElementById('fat_goal');
-        
-        // Only update macros that haven't been manually edited
         if (!manuallyEditedMacros.protein) {
             const proteinG = Math.round((calories * 0.30) / 4);
-            proteinInput.value = proteinG;
-        }
-        
+            proteinInput.value = proteinG;}
         if (!manuallyEditedMacros.carbs) {
             const carbsG = Math.round((calories * 0.40) / 4);
             carbsInput.value = carbsG;
         }
-        
         if (!manuallyEditedMacros.fat) {
             const fatG = Math.round((calories * 0.30) / 9);
-            fatInput.value = fatG;
-        }
-    }
-
-    // Track manual macro input
+            fatInput.value = fatG;}}
     function handleMacroInput(macroType) {
         manuallyEditedMacros[macroType] = true;
-        autoCalcEnabled = false;
-    }
-
-    // Validate and clamp macro values
+        autoCalcEnabled = false;}
     function validateMacro(macroType) {
         const calorieInput = document.getElementById('calorie_goal');
         const calories = parseInt(calorieInput.value) || 2000;
         const macroInput = document.getElementById(macroType + '_goal');
         let value = parseInt(macroInput.value) || 0;
-        
-        // Ensure minimum value
         if (value < 0) {
-            value = 0;
-        }
-        
-        // Calculate reasonable maximum based on calorie goal
+            value = 0;}
         let maxValue;
         if (macroType === 'protein') {
             maxValue = Math.round((calories * 0.60) / 4);
         } else if (macroType === 'carbs') {
             maxValue = Math.round((calories * 0.80) / 4);
         } else if (macroType === 'fat') {
-            maxValue = Math.round((calories * 0.60) / 9);
-        }
-        
-        // Enforce absolute maximum of 300g regardless of calorie-based calculations
+            maxValue = Math.round((calories * 0.60) / 9);}
         const ABSOLUTE_MAX = 300;
         const effectiveMax = Math.min(maxValue, ABSOLUTE_MAX);
-        
-        // Clamp to effective maximum (the smaller of calorie-based max or 300)
         if (value > effectiveMax) {
-            value = effectiveMax;
-        }
-        
-        macroInput.value = value;
-    }
-
-    // Validate all inputs before form submission
+            value = effectiveMax;}
+        macroInput.value = value;}
     function validateAllMacros() {
         validateCalorieInput();
         validateWaterInput();
         validateMacro('protein');
         validateMacro('carbs');
-        validateMacro('fat');
-    }
-
-    // Initialize on page load
+        validateMacro('fat');}
     document.addEventListener('DOMContentLoaded', function() {
-        // Set up calorie input event listener for auto-calculation
         const calorieInput = document.getElementById('calorie_goal');
         if (calorieInput) {
-            // Auto-calculate macros when calorie value changes
             calorieInput.addEventListener('input', function() {
                 const value = parseInt(this.value) || 0;
                 if (value >= 1000 && value <= 4000) {
                     autoCalculateMacros(value);
                 }
             });
-            
-            // Validate on blur
             calorieInput.addEventListener('blur', function() {
                 validateCalorieInput();
-                // Re-trigger auto-calculation with validated value
                 const value = parseInt(this.value) || 1000;
-                autoCalculateMacros(value);
-            });
-        }
-        
-        // Set up water input event listener for validation
+                autoCalculateMacros(value);});}
         const waterInput = document.getElementById('water_goal');
         if (waterInput) {
-            // Validate on blur
-            waterInput.addEventListener('blur', validateWaterInput);
-        }
-        
-        // Set up modal event listener for resetting flags
+            waterInput.addEventListener('blur', validateWaterInput);}
         const modal = document.getElementById('editGoalsModal');
         if (modal) {
             modal.addEventListener('show.bs.modal', function() {
-                // Reset auto-calc state
                 autoCalcEnabled = true;
                 manuallyEditedMacros.protein = false;
                 manuallyEditedMacros.carbs = false;
                 manuallyEditedMacros.fat = false;
-            });
-        }
-    });
-</script>
+            });}}); </script>

@@ -29,7 +29,7 @@ class Profile(models.Model):
         ('light', 'Light'),
         ('dark', 'Dark'),
     ]
-    theme = models.CharField(max_length=10, choices=THEME_CHOICES, default='system')
+    theme = models.CharField(max_length=10, choices=THEME_CHOICES, default='light')
     
     COLOR_BLIND_CHOICES = [
         ('none', 'None'),

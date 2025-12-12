@@ -19,11 +19,11 @@ The deployed version of the application can be found at [*enter url here*](*ente
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  The project source code has been developed using Python 3.12, so you are recommended to use the same version.  From the root of the project:
 
 ```
-$ python3.12 -m venv venv
+$ python3 -m venv venv
 $ source venv/bin/activate
 ```
 
-If your system does not have `python3.12` installed and you are unable to install Python 3.12 as a version you can explicitly refer to from the CLI, then replace `python3.12` by `python3` or `python`, provide this employs a relatively recent version of Python.
+If your system does not have `python3` installed and you are unable to install Python 3.12 as a version you can explicitly refer to from the CLI, then replace `python3` by `python3` or `python`, provide this employs a relatively recent version of Python.
 
 Install all required packages:
 
