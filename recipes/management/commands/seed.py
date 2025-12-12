@@ -271,7 +271,7 @@ class Command(BaseCommand):
     RECIPES_PER_USER_MAX = 12  # Maximum additional recipes per user
     
     def create_recipes(self):
-        """Create recipes from RECIPES_DATA and ensure each user has recipes."""
+        """Create random recipes for each user."""
         self.stdout.write("Creating recipes...")
         
         users = list(User.objects.all())
@@ -279,24 +279,10 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING("  No users found. Skipping recipes."))
             return
         
-        # First, create base recipes from RECIPES_DATA (shared pool)
-        base_recipes_created = 0
-        for recipe_data in RECIPES_DATA:
-            try:
-                if not Recipe.objects.filter(name=recipe_data['name']).exists():
-                    recipe_data_copy = recipe_data.copy()
-                    recipe_data_copy['created_by'] = choice(users)
-                    recipe_data_copy['image'] = choice(self.RECIPE_IMAGES)
-                    recipe_data_copy['method'] = self.convert_method_to_newlines(recipe_data['method'])
-                    Recipe.objects.create(**recipe_data_copy)
-                    base_recipes_created += 1
-            except Exception as e:
-                pass
-        
-        # Then, give each user additional random recipes for "My Recipes" page
+        # Create random recipes for each user (no base recipes)
         user_recipes_created = 0
         for user in users:
-            # Each user gets a random number of ADDITIONAL recipes (on top of any base recipes)
+            # Each user gets a random number of recipes
             recipes_to_create = randint(self.RECIPES_PER_USER_MIN, self.RECIPES_PER_USER_MAX)
             
             for _ in range(recipes_to_create):
@@ -304,7 +290,6 @@ class Command(BaseCommand):
                 if recipe:
                     user_recipes_created += 1
         
-        self.stdout.write(f"  Base Recipes: {base_recipes_created}")
         self.stdout.write(f"  User Recipes: {user_recipes_created}")
         self.stdout.write(f"  Total Recipes: {Recipe.objects.count()}")
     

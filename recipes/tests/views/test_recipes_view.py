@@ -213,7 +213,7 @@ class RecipesSearchTestCase(TestCase):
         self.url = reverse('recipes')
 
         self.recipe1 = Recipe.objects.create(
-            name="Chicken Curry",
+            name="Spicy Chicken Tikka",
             average_rating=4,
             difficulty="Moderate",
             total_time="45 minutes",
@@ -245,17 +245,17 @@ class RecipesSearchTestCase(TestCase):
 
     def test_search_by_recipe_name(self):
         """Test search filters recipes by name."""
-        response = self.client.get(self.url, {'q': 'chicken'})
+        response = self.client.get(self.url, {'q': 'tikka'})
         page_obj = response.context['page_obj']
         names = [r.name for r in page_obj]
-        self.assertEqual(names, ['Chicken Curry'])
+        self.assertEqual(names, ['Spicy Chicken Tikka'])
 
     def test_search_by_recipe_name_case_insensitive(self):
         """Test search is case insensitive for name."""
-        response = self.client.get(self.url, {'q': 'CHICKEN'})
+        response = self.client.get(self.url, {'q': 'TIKKA'})
         page_obj = response.context['page_obj']
         names = [r.name for r in page_obj]
-        self.assertEqual(names, ['Chicken Curry'])
+        self.assertEqual(names, ['Spicy Chicken Tikka'])
 
     def test_search_by_ingredients(self):
         """Test search filters recipes by ingredients."""
@@ -390,6 +390,16 @@ class RecipesSortingTestCase(TestCase):
         self.assertNotIn(self.slow_recipe.id, recipe_ids)
         self.assertNotIn(self.very_slow_recipe.id, recipe_ids)
 
+    def test_sort_by_quick_meals_sorted_fastest_first(self):
+        """Test that quick-meals sorts from fastest to slowest."""
+        response = self.client.get(self.url, {'sort_by': 'quick-meals'})
+        page_obj = response.context['page_obj']
+        names = [r.name for r in page_obj]
+        # Should be sorted by time: 10 min, 25 min, 30 min
+        self.assertEqual(names[0], 'Quick Snack')  # 10 minutes
+        self.assertEqual(names[1], 'Quick Salad')  # 25 minutes
+        self.assertEqual(names[2], '30 Min Pasta')  # 30 minutes
+
     def test_sort_by_servings_descending(self):
         """Test sorting by servings is in descending order."""
         response = self.client.get(self.url, {'sort_by': 'servings'})
@@ -449,7 +459,7 @@ class RecipesPaginationTestCase(TestCase):
         self.user = User.objects.get(username='@johndoe')
         self.url = reverse('recipes')
 
-        # Create 25 recipes to test pagination (page size is 20)
+        # Create 25 recipes to test pagination (page size is 21)
         for i in range(25):
             Recipe.objects.create(
                 name=f"Recipe {i+1:02d}",
@@ -462,17 +472,17 @@ class RecipesPaginationTestCase(TestCase):
                 created_by=self.user,
             )
 
-    def test_first_page_has_20_recipes(self):
-        """Test that first page contains 20 recipes."""
+    def test_first_page_has_21_recipes(self):
+        """Test that first page contains 21 recipes."""
         response = self.client.get(self.url)
         page_obj = response.context['page_obj']
-        self.assertEqual(len(list(page_obj)), 20)
+        self.assertEqual(len(list(page_obj)), 21)
 
     def test_second_page_has_remaining_recipes(self):
         """Test that second page contains remaining recipes."""
         response = self.client.get(self.url, {'page': 2})
         page_obj = response.context['page_obj']
-        self.assertEqual(len(list(page_obj)), 5)
+        self.assertEqual(len(list(page_obj)), 4)
 
     def test_page_obj_has_correct_page_number(self):
         """Test that page_obj has correct page number."""
