@@ -1,62 +1,113 @@
-{% extends 'base_content.html' %} {% block content %}
-<div class="container py-4">
-  <div class="row mb-4">
-    <div class="col-12">
-      <h1 class="mb-2">Browse Recipes</h1>
-      <p class="text-muted">Discover delicious recipes to try</p>
-      <h2>Filter Recipes</h2>
-      <div class="row mb-4 sorting-buttons">
-        <div class="col-12 text-center">
-            <form method="get" action="{% url 'recipes' %}">
-                <button type="submit" name="sort_by" value="quick-meals" class="btn btn-custom">Quick Meals</button>
-                <button type="submit" name="sort_by" value="servings" class="btn btn-custom">By Servings</button>
-                <button type="submit" name="sort_by" value="difficulty" class="btn btn-custom">By Difficulty</button>
-            </form>
-        </div>
+{% extends 'base_content.html' %}
+{% load static %}
+{% block content %}
+<div class="container my-3">
+  <!-- Header with Title and Search -->
+  <div class="row align-items-center mb-4">
+    <div class="col-md-4">
+      <h1 class="display-5 mb-1">Browse Recipes</h1>
+      <p class="text-muted mb-0">Discover delicious recipes to try · Total: {{ page_obj.paginator.count }}</p>
+    </div>
+    <div class="col-md-6">
+      <form method="get" action="{% url 'recipes' %}" class="d-flex">
+        {% if active_sort %}
+          <input type="hidden" name="sort_by" value="{{ active_sort }}">
+        {% endif %}
+        <input type="text" 
+               class="form-control me-2" 
+               name="q" 
+               value="{{ search_query }}" 
+               placeholder="Search recipes...">
+        <button type="submit" class="btn btn-outline-secondary">Search</button>
+      </form>
+    </div>
   </div>
 
-  {% if page_obj %}
-  <div class="row g-4">
-    {% for recipe in page_obj %}
-    <div class="col-4">
-      <div class="card recipe-card">
-        {% if recipe.image_url %}
-        <img
-          src="{{ recipe.image_url }}"
-          class="card-img-top"
-          alt="{{ recipe.name }}"
-          style="height: 200px; object-fit: cover"
-        />
+  <!-- Sorting buttons -->
+  <div class="row mb-3 sorting-buttons">
+    <div class="col-12 text-center">
+      <form method="get" action="{% url 'recipes' %}" class="d-inline">
+        {% if search_query %}
+          <input type="hidden" name="q" value="{{ search_query }}">
         {% endif %}
-        <div class="card-body d-flex flex-column">
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <h5 class="card-title mb-0">{{ recipe.name }}</h5>
-          </div>
+        <button type="submit" name="sort_by" value="quick-meals" class="btn btn-custom {% if active_sort == 'quick-meals' %}active{% endif %}">Quick Meals</button>
+        <button type="submit" name="sort_by" value="servings" class="btn btn-custom {% if active_sort == 'servings' %}active{% endif %}">By Servings</button>
+        <button type="submit" name="sort_by" value="difficulty" class="btn btn-custom {% if active_sort == 'difficulty' %}active{% endif %}">By Difficulty</button>
+        <button type="submit" name="sort_by" value="rating" class="btn btn-custom {% if active_sort == 'rating' %}active{% endif %}">By Rating</button>
+      </form>
+    </div>
+  </div>
 
-          <div class="mb-3">
-            <div><i class="bi bi-clock"></i> {{ recipe.total_time }}</div>
-            <div>
-              <i class="bi bi-people"></i> {{ recipe.servings }} servings
+  <!-- Search Results Info -->
+  {% if search_query %}
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="search-results-bar card-style d-flex align-items-center justify-content-between py-2 px-3 rounded">
+        <span>
+          <i class="bi bi-search me-2 text-success"></i>
+          Showing results for "<strong class="text-success">{{ search_query }}</strong>" 
+          <span class="text-muted">({{ page_obj.paginator.count }} found)</span>
+        </span>
+        <a href="{% url 'recipes' %}{% if active_sort %}?sort_by={{ active_sort }}{% endif %}" class="btn btn-sm btn-outline-danger">
+          <i class="bi bi-x-lg"></i> Clear Search
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if page_obj %}
+  <div class="row g-3">
+    {% for recipe in page_obj %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card card-style overflow-hidden">
+        <!-- Recipe Image -->
+        <div class="recipe-card-img-wrapper">
+          {% if recipe.image_url %}
+          <img src="{{ recipe.image_url }}" alt="{{ recipe.name }}" class="card-img-top recipe-card-img">
+          {% elif recipe.image %}
+          <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" class="card-img-top recipe-card-img">
+          {% else %}
+          <img src="{% static 'images/food1.jpg' %}" alt="{{ recipe.name }}" class="card-img-top recipe-card-img">
+          {% endif %}
+          <span class="badge position-absolute top-0 end-0 m-2 difficulty-badge
+            {% if recipe.difficulty == 'Very Easy' %}bg-success
+            {% elif recipe.difficulty == 'Easy' %}bg-success
+            {% elif recipe.difficulty == 'Moderate' %}bg-success
+            {% elif recipe.difficulty == 'Hard' %}bg-danger
+            {% else %}bg-danger{% endif %}">
+            {{ recipe.difficulty }}
+          </span>
+        </div>
+
+        <!-- Recipe Content -->
+        <div class="card-body py-2 px-3 d-flex flex-column">
+          <h6 class="card-title fw-bold mb-1">{{ recipe.name }}</h6>
+          
+          <div class="recipe-meta mb-2">
+            <div class="d-flex flex-wrap gap-2 text-muted small">
+              <span><i class="bi bi-star-fill text-warning"></i> {{ recipe.average_rating }}/5</span>
+              <span><i class="bi bi-people"></i> {{ recipe.servings }} servings</span>
+              <span><i class="bi bi-clock"></i> {{ recipe.total_time }}</span>
             </div>
           </div>
 
-          <div class="mb-3">
-            <h6 class="text-muted small mb-2">Ingredients:</h6>
-            <div class="ingredients-preview">
-              {{ recipe.ingredients|truncatewords:20 }}
+          <!-- Ingredients Preview (only on browse recipes page) -->
+          <div class="mb-2 flex-grow-1">
+            <h6 class="text-muted small mb-1 fw-semibold">Ingredients:</h6>
+            <div class="ingredients-preview small">
+              {{ recipe.ingredients|truncatewords:15 }}
             </div>
           </div>
-
-          <div class="mt-auto">
-            <button
-              class="btn btn-emerald w-100"
-              type="button"
-              data-bs-toggle="modal"
-              data-bs-target="#recipeModal{{ recipe.id }}"
-            >
-              View Recipe
-            </button>
-          </div>
+          
+          <button
+            class="btn btn-emerald btn-sm w-100"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#recipeModal{{ recipe.id }}"
+          >
+            View Recipe
+          </button>
         </div>
       </div>
     </div>
@@ -138,42 +189,23 @@
   </div>
   {% endif %}
 
-  <!-- Pagination Controls -->
-  {% if page_obj.has_other_pages %}
-  <nav aria-label="Page navigation" class="mt-4">
-    <ul class="pagination justify-content-center">
+  <!-- Pagination -->
+  <div class="pagination justify-content-center mt-4">
+    <span class="step-links">
       {% if page_obj.has_previous %}
-      <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}"
-          >Previous</a
-        >
-      </li>
-      {% else %}
-      <li class="page-item disabled">
-        <span class="page-link">Previous</span>
-      </li>
+        <a href="?page=1{% if active_sort %}&sort_by={{ active_sort }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-secondary">&laquo; First</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if active_sort %}&sort_by={{ active_sort }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-secondary">Previous</a>
       {% endif %}
-      {% for num in page_obj.paginator.page_range %}
-        {% if num == page_obj.number %}
-        <li class="page-item active" aria-current="page">
-          <span class="page-link">{{ num }}</span>
-        </li>
-        {% else %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-        </li>
-        {% endif %}
-      {% endfor %}
+
+      <span class="current mx-2">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+      </span>
+
       {% if page_obj.has_next %}
-      <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}"
-          >Next</a>
-      </li>
-      {% else %}
-      <li class="page-item disabled"><span class="page-link">Next</span></li>
+        <a href="?page={{ page_obj.next_page_number }}{% if active_sort %}&sort_by={{ active_sort }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-secondary">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if active_sort %}&sort_by={{ active_sort }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-secondary">Last &raquo;</a>
       {% endif %}
-    </ul>
-  </nav>
-  {% endif %}
+    </span>
+  </div>
 </div>
 {% endblock %}

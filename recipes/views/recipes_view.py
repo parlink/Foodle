@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from recipes.models import Recipe
+from django.db.models import Q
 
 
 def parse_time_to_minutes(time_string):
@@ -33,6 +34,14 @@ def parse_time_to_minutes(time_string):
 def recipes(request):
     sort_by = request.GET.get('sort_by', '')
     recipe_list = Recipe.objects.all()
+    search_query = request.GET.get('q', '')
+
+    if search_query:
+        recipe_list = recipe_list.filter(
+            Q(name__icontains=search_query) |
+            Q(ingredients__icontains=search_query) |
+            Q(method__icontains=search_query)
+        ).distinct()
 
     if sort_by == 'quick-meals':
         quick_recipes = []
@@ -43,11 +52,12 @@ def recipes(request):
         recipe_list = Recipe.objects.filter(id__in=quick_recipes)
     
     elif sort_by == 'servings':
-        recipe_list = Recipe.objects.all().order_by('-servings')
+        recipe_list = recipe_list.order_by('-servings')
     elif sort_by == 'rating':
-        recipe_list = Recipe.objects.all().order_by('-average_rating')
-    else:
-        recipe_list = Recipe.objects.all()
+        recipe_list = recipe_list.order_by('-average_rating')
+    elif sort_by == 'difficulty':
+        recipe_list = recipe_list.order_by('difficulty')
+
 
     paginator = Paginator(recipe_list, 20)
     page_number = request.GET.get('page')
@@ -55,7 +65,8 @@ def recipes(request):
 
     context = {
         'page_obj': page_obj,
-        'active_sort': sort_by
+        'active_sort': sort_by,
+        'search_query': search_query
     }
     return render(request, 'recipes.html', context)
 
