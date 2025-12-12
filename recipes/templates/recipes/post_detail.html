@@ -3,13 +3,10 @@
 
 {% block content %}
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-    tailwind.config = {
-        corePlugins: {
-            preflight: false,
-        }
-    }
-</script>
+
+<div style="display: none;">
+    {% csrf_token %}
+</div>
 
 <div class="bg-gray-50 font-sans min-h-screen relative z-0 py-8 px-4">
     
@@ -178,7 +175,11 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const getCSRFToken = () => document.querySelector('[name=csrfmiddlewaretoken]').value;
+        // Safe check for CSRF token to prevent crashes if missing
+        const getCSRFToken = () => {
+            const tokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+            return tokenInput ? tokenInput.value : '';
+        };
 
         function fetchDjango(url, method, data = {}) {
             const headers = { 'X-CSRFToken': getCSRFToken(), 'X-Requested-With': 'XMLHttpRequest' };
@@ -192,6 +193,7 @@
             });
         }
 
+        // --- GLOBAL CLICK HANDLER (Like, Save, Follow, Rating) ---
         document.getElementById('feed-container').addEventListener('click', (event) => {
             const target = event.target.closest('[data-action]');
             if (!target) return;
@@ -247,6 +249,7 @@
             }
         });
 
+        // --- COMMENT SUBMIT HANDLER ---
         document.getElementById('feed-container').addEventListener('submit', (event) => {
             const form = event.target.closest('.comment-form');
             if (form) {
@@ -256,15 +259,27 @@
                 const text = input.value.trim();
                 if (!text) return;
                 const url = `{% url 'submit_comment' 0 %}`.replace('0', postId);
+                
                 fetchDjango(url, 'POST', { text: text }).then(data => {
                     if (data.success) {
-                        const commentList = form.closest('.p-4').querySelector('.comment-list');
-                        const commentCountSpan = document.getElementById(`post-${postId}`).querySelector('.comment-count');
-                        commentList.insertAdjacentHTML('beforeend', data.comment_html);
-                        commentCountSpan.textContent = data.comments_count;
-                        const noCommentMsg = commentList.querySelector('.no-comments-msg');
+                        // FIX: Use specific ID to find the list safely
+                        const postCard = document.getElementById(`post-${postId}`);
+                        const commentList = postCard.querySelector('.comment-list');
+                        const commentCountSpan = postCard.querySelector('.comment-count');
+                        
+                        if (commentList) {
+                            commentList.insertAdjacentHTML('beforeend', data.comment_html);
+                            commentList.scrollTop = commentList.scrollHeight;
+                        }
+                        if (commentCountSpan) {
+                            commentCountSpan.textContent = data.comments_count;
+                        }
+                        
+                        const noCommentMsg = commentList ? commentList.querySelector('.no-comments-msg') : null;
                         if (noCommentMsg) noCommentMsg.remove();
-                        input.value = ''; input.focus();
+                        
+                        input.value = ''; 
+                        input.focus();
                     }
                 });
             }
