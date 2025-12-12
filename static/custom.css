@@ -1285,3 +1285,166 @@ body.dark-mode .search-results-bar {
   background: linear-gradient(135deg, rgba(2, 159, 4, 0.15) 0%, rgba(2, 159, 4, 0.05) 100%);
   border-color: rgba(2, 159, 4, 0.3);
 }
+
+/* ============================================
+   Pagination Styles
+   ============================================ */
+   .pagination {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .pagination .page-link {
+    color: var(--text-primary);
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    padding: 0.5rem 0.75rem;
+    transition: all 0.2s ease;
+  }
+  
+  .pagination .page-link:hover {
+    color: var(--primary-accent);
+    background-color: var(--secondary-bg);
+    border-color: var(--primary-accent);
+    transform: translateY(-1px);
+  }
+  
+  .pagination .page-item.active .page-link {
+    background-color: var(--primary-accent);
+    border-color: var(--primary-accent);
+    color: white;
+    font-weight: 600;
+  }
+  
+  .pagination .page-item.disabled .page-link {
+    color: var(--text-muted);
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  
+  .pagination .page-item.disabled .page-link:hover {
+    transform: none;
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+  }
+  
+  /* Dark mode pagination */
+  body.dark-mode .pagination .page-link {
+    color: var(--text-primary);
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+  }
+  
+  body.dark-mode .pagination .page-link:hover {
+    background-color: var(--secondary-bg);
+    border-color: var(--primary-accent);
+  }
+  
+  body.dark-mode .pagination .page-item.active .page-link {
+    background-color: var(--primary-accent);
+    border-color: var(--primary-accent);
+    color: white;
+  }
+
+/* ============================================
+   Browse Recipes Page - Recipe Cards
+   ============================================ */
+.recipe-card-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background-color: var(--secondary-bg);
+}
+
+.recipe-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card-style:hover .recipe-card-img {
+  transform: scale(1.05);
+}
+
+.recipe-meta {
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.75rem;
+}
+
+.recipe-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.ingredients-preview {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-height: 4.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Recipe card badge styling */
+.recipe-card-img-wrapper .badge,
+.difficulty-badge {
+  font-size: 0.75rem;
+  padding: 0.4rem 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border: none;
+}
+
+.difficulty-badge.bg-success {
+  background-color: #198754 !important;
+}
+
+.difficulty-badge.bg-danger {
+  background-color: #8b0000 !important;
+}
+
+/* Card body styling for recipes */
+.card-style .card-body {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-style .card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+/* Dark mode adjustments for recipe cards */
+body.dark-mode .recipe-meta {
+  border-color: var(--border-color);
+}
+
+body.dark-mode .card-style .card-title {
+  color: var(--text-primary) !important;
+}
+
+body.dark-mode .card-style .text-muted {
+  color: var(--text-secondary) !important;
+}
+
+body.dark-mode .ingredients-preview {
+  color: var(--text-secondary);
+}
+
+body.dark-mode .recipe-meta span {
+  color: var(--text-secondary);
+}
