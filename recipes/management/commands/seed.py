@@ -442,8 +442,8 @@ class Command(BaseCommand):
 
     # ==================== RECIPES ====================
     
-    RECIPES_PER_USER_MIN = 3  # Each user gets at least this many recipes
-    RECIPES_PER_USER_MAX = 8  # Each user gets at most this many recipes
+    RECIPES_PER_USER_MIN = 2   # Minimum additional recipes per user
+    RECIPES_PER_USER_MAX = 12  # Maximum additional recipes per user
     
     def create_recipes(self):
         """Create recipes from RECIPES_DATA and ensure each user has recipes."""
@@ -468,15 +468,13 @@ class Command(BaseCommand):
             except Exception as e:
                 pass
         
-        # Then, ensure each user has their own recipes for "My Recipes" page
+        # Then, give each user additional random recipes for "My Recipes" page
         user_recipes_created = 0
         for user in users:
-            # Check how many recipes this user already has
-            existing_count = Recipe.objects.filter(created_by=user).count()
-            # Create additional recipes if needed
-            recipes_to_create = randint(self.RECIPES_PER_USER_MIN, self.RECIPES_PER_USER_MAX) - existing_count
+            # Each user gets a random number of ADDITIONAL recipes (on top of any base recipes)
+            recipes_to_create = randint(self.RECIPES_PER_USER_MIN, self.RECIPES_PER_USER_MAX)
             
-            for _ in range(max(0, recipes_to_create)):
+            for _ in range(recipes_to_create):
                 recipe = self.create_random_recipe_for_user(user)
                 if recipe:
                     user_recipes_created += 1
