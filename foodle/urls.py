@@ -52,6 +52,7 @@ urlpatterns = [
     path('post/<int:post_id>/rate/', views.submit_rating, name='submit_rating'),
     path('post/<int:post_id>/comment/', views.submit_comment, name='submit_comment'),
     path('post/<int:post_id>/delete/', views.delete_post, name='delete_post'),
+    path('post/<int:post_id>/edit/', views.edit_post, name='edit_post'),
     path('user/<int:author_id>/follow/', views.toggle_follow, name='toggle_follow'),
     path('ai-recipes/', views.chatbot, name='ai_recipes'),
 

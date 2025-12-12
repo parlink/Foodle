@@ -3,26 +3,36 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
 from django.db import transaction
-from django.db.models import F
+from django.db.models import F, Q, Avg
 from django.template.loader import render_to_string
-from recipes.models import Post, Like, Comment, Save, Rating, Follow, User 
+from recipes.models import Post, Like, Comment, Save, Rating, Follow, User, Tag
 from recipes.forms.post_form import PostForm 
 from recipes.helpers import is_liked_util, is_saved_util, is_followed_util, get_rating_util
 
 @login_required
 def feed(request):
     show_followed_only = request.GET.get('followed') == 'true'
+    sort_by = request.GET.get('sort', 'newest')  # NEW
+    cuisine_filter = request.GET.get('cuisine', '')  # NEW
+    tag_filter = request.GET.get('tag', '')  # NEW
 
     if show_followed_only:
         followed_ids = Follow.objects.filter(follower=request.user).values_list('followed_id', flat=True)
-        
-        posts_following = Post.objects.filter(author__in=followed_ids).select_related('author').prefetch_related('tags', 'comments__user')
-        my_posts = Post.objects.filter(author=request.user).select_related('author').prefetch_related('tags', 'comments__user')
-        
-        posts = posts_following.union(my_posts).order_by('-created_at')
+        posts_following = Post.objects.filter(author__in=followed_ids)
+        my_posts = Post.objects.filter(author=request.user)
+        posts = posts_following.union(my_posts)
     else:
-        posts = Post.objects.all().select_related('author').prefetch_related('tags', 'comments__user').order_by('-created_at')
+        posts = Post.objects.all()
+    if cuisine_filter:
+        posts = posts.filter(cuisine=cuisine_filter)
+    if tag_filter:
+        posts = posts.filter(tags__name=tag_filter)
+    if sort_by == 'top_rated':
+        posts = posts.annotate(calculated_average=Avg('ratings__score')).order_by('-calculated_average')
+    else:
+        posts = posts.order_by('-created_at')
 
+    posts = posts.select_related('author').prefetch_related('tags', 'comments__user')
     saved_posts = Post.objects.filter(saves__user=request.user).select_related('author').order_by('-saves__created_at')
 
     main_posts_list = list(posts)
@@ -51,11 +61,19 @@ def feed(request):
 
     form = PostForm()
 
+    all_cuisines = [c[0] for c in Post.CUISINE_CHOICES]
+    popular_tags = Tag.objects.all()[:10]
+
     context = {
         'posts': main_posts_list,
         'saved_posts': saved_posts_list,
         'show_followed_only': show_followed_only,
         'form': form,
+        'all_cuisines': all_cuisines,
+        'popular_tags': popular_tags,
+        'current_sort': sort_by,
+        'current_cuisine': cuisine_filter,
+        'current_tag': tag_filter,
     }
     return render(request, 'recipes/feed.html', context)
 
@@ -234,3 +252,22 @@ def post_detail(request, post_id):
     post.user_rating_score = user_rating.score if user_rating else 0
 
     return render(request, 'recipes/post_detail.html', {'post': post})
+
+def edit_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    
+    #Security check: Ensure only the author can edit
+    if request.user != post.author:
+        return redirect('feed')
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            #If request is AJAX, return JSON
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            return redirect('feed')
+    
+    #If using a separate page (fallback)
+    return redirect('feed')
