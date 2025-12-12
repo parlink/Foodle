@@ -10,7 +10,7 @@
             <form method="get" action="{% url 'recipes' %}">
                 <button type="submit" name="sort_by" value="quick-meals" class="btn btn-custom">Quick Meals</button>
                 <button type="submit" name="sort_by" value="servings" class="btn btn-custom">By Servings</button>
-                <button type="submit" name="sort_by" value="difficulty" class="btn btn-custom {% if request.GET.sort_by == 'difficulty' %}active{% endif %}">By Difficulty</button>
+                <button type="submit" name="sort_by" value="difficulty" class="btn btn-custom">By Difficulty</button>
             </form>
         </div>
   </div>
