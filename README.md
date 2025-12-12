@@ -20,7 +20,7 @@ To install the software and use it in your local development environment, you mu
 
 ```
 $ python3 -m venv venv
-$ source venv/bin/activate
+$ source .venv/bin/activate
 ```
 
 If your system does not have `python3` installed and you are unable to install Python 3.12 as a version you can explicitly refer to from the CLI, then replace `python3` by `python3` or `python`, provide this employs a relatively recent version of Python.
