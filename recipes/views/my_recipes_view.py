@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from recipes.models import Recipe, User
-from django.db.models import Q, F
+from django.db.models import Q
 from django.contrib import messages
 
 
@@ -64,7 +64,6 @@ def my_recipes(request):
     elif sort_by == 'difficulty':
         recipes = recipes_qs.order_by('difficulty')
     else:
-
         if letter_filter:
             recipes_qs = recipes_qs.filter(name__istartswith=letter_filter)
         recipes = recipes_qs.order_by('name')
