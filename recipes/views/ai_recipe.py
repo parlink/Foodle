@@ -93,4 +93,4 @@ def chatbot(request):
        # request.session = {"recipes" : chatbot_response}
        
         
-   return render(request,"AI_recipe.html",{"recipes": recipes})
+   return render(request,"AI_Recipe.html",{"recipes": recipes})
