@@ -40,3 +40,14 @@ class PostForm(forms.ModelForm):
                 'class': 'form-control rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500'
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        #Check if the post already exists by checking for a primary key
+        if self.instance.pk:
+            #If editing, image is optional and this keeps the old one
+            self.fields['image'].required = False
+        else:
+            #If creating new, image is mandatory
+            self.fields['image'].required = True
