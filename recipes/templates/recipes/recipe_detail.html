@@ -3,114 +3,134 @@
 
 {% block content %}
 <div class="container py-3">
-    <!-- Back Button -->
-    <div class="mb-2">
-        <a href="{% url 'my_recipes' %}" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left me-1"></i>Back to My Recipes
-        </a>
+
+  <!-- Top bar: Back + Edit/Delete -->
+  <div class="mb-2 d-flex justify-content-between align-items-center">
+    <a href="{% url 'my_recipes' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>Back to My Recipes
+    </a>
+
+    <div class="d-flex gap-2">
+      <a href="{% url 'recipe_edit' recipe.id %}" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-pencil-square me-1"></i>Edit Recipe
+      </a>
+
+      <form method="post"
+            action="{% url 'recipe_delete' recipe.id %}"
+            class="d-inline"
+            onsubmit="return confirm('Delete this recipe?');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger btn-sm">
+          <i class="bi bi-trash me-1"></i>Delete
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Recipe Header -->
+  <div class="row g-3 mb-3">
+    <!-- Recipe Image -->
+    <div class="col-lg-5">
+      <div class="recipe-detail-img-wrapper card-style overflow-hidden">
+        {# Keep your current image approach; adjust later if you want media images here #}
+        <img src="{% static recipe.image %}" alt="{{ recipe.name }}" class="recipe-detail-img">
+      </div>
     </div>
 
-    <!-- Recipe Header -->
-    <div class="row g-3 mb-3">
-        <!-- Recipe Image -->
-        <div class="col-lg-5">
-            <div class="recipe-detail-img-wrapper card-style overflow-hidden">
-                <img src="{% static recipe.image %}" alt="{{ recipe.name }}" class="recipe-detail-img">
-            </div>
+    <!-- Recipe Info -->
+    <div class="col-lg-7">
+      <div class="card-style p-3">
+        <h4 class="fw-bold mb-1">{{ recipe.name }}</h4>
+
+        <!-- Rating Stars -->
+        <div class="mb-2">
+          <span class="text-warning">
+            {% for i in "12345" %}
+              {% if forloop.counter <= recipe.average_rating %}
+                <i class="bi bi-star-fill"></i>
+              {% else %}
+                <i class="bi bi-star"></i>
+              {% endif %}
+            {% endfor %}
+          </span>
+          <span class="text-muted ms-2 small">{{ recipe.average_rating }}/5</span>
         </div>
 
-        <!-- Recipe Info -->
-        <div class="col-lg-7">
-            <div class="card-style p-3">
-                <h4 class="fw-bold mb-1">{{ recipe.name }}</h4>
-                
-                <!-- Rating Stars -->
-                <div class="mb-2">
-                    <span class="text-warning">
-                        {% for i in "12345" %}
-                            {% if forloop.counter <= recipe.average_rating %}
-                                <i class="bi bi-star-fill"></i>
-                            {% else %}
-                                <i class="bi bi-star"></i>
-                            {% endif %}
-                        {% endfor %}
-                    </span>
-                    <span class="text-muted ms-2 small">{{ recipe.average_rating }}/5</span>
-                </div>
-
-                <!-- Recipe Meta Cards -->
-                <div class="row g-2">
-                    <div class="col-3">
-                        <div class="recipe-meta-card text-center py-2 px-1 rounded-3">
-                            <i class="bi bi-speedometer2 text-emerald d-block"></i>
-                            <small class="text-muted d-block" style="font-size: 0.65rem;">Difficulty</small>
-                            <strong class="small">{{ recipe.difficulty }}</strong>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="recipe-meta-card text-center py-2 px-1 rounded-3">
-                            <i class="bi bi-clock text-emerald d-block"></i>
-                            <small class="text-muted d-block" style="font-size: 0.65rem;">Duration</small>
-                            <strong class="small">{{ recipe.total_time }}</strong>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="recipe-meta-card text-center py-2 px-1 rounded-3">
-                            <i class="bi bi-people text-emerald d-block"></i>
-                            <small class="text-muted d-block" style="font-size: 0.65rem;">Servings</small>
-                            <strong class="small">{{ recipe.servings }}</strong>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="recipe-meta-card text-center py-2 px-1 rounded-3">
-                            <i class="bi bi-lightning-charge-fill text-emerald d-block"></i>
-                            <small class="text-muted d-block" style="font-size: 0.65rem;">Calories</small>
-                            <strong class="small">{{ recipe.calories }}</strong>
-                        </div>
-                    </div>
-                </div>
+        <!-- Recipe Metadata -->
+        <div class="row g-2">
+          <div class="col-3">
+            <div class="recipe-meta-card text-center py-2 px-1 rounded-3">
+              <i class="bi bi-speedometer2 text-emerald d-block"></i>
+              <small class="text-muted d-block" style="font-size: 0.65rem;">Difficulty</small>
+              <strong class="small">{{ recipe.difficulty }}</strong>
             </div>
+          </div>
+          <div class="col-3">
+            <div class="recipe-meta-card text-center py-2 px-1 rounded-3">
+              <i class="bi bi-clock text-emerald d-block"></i>
+              <small class="text-muted d-block" style="font-size: 0.65rem;">Duration</small>
+              <strong class="small">{{ recipe.total_time }}</strong>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="recipe-meta-card text-center py-2 px-1 rounded-3">
+              <i class="bi bi-people text-emerald d-block"></i>
+              <small class="text-muted d-block" style="font-size: 0.65rem;">Servings</small>
+              <strong class="small">{{ recipe.servings }}</strong>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="recipe-meta-card text-center py-2 px-1 rounded-3">
+              <i class="bi bi-lightning-charge-fill text-emerald d-block"></i>
+              <small class="text-muted d-block" style="font-size: 0.65rem;">Calories</small>
+              <strong class="small">{{ recipe.calories }}</strong>
+            </div>
+          </div>
         </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Ingredients & Method -->
+  <div class="row g-3">
+    <!-- Ingredients -->
+    <div class="col-lg-4">
+      <div class="card-style p-3">
+        <h6 class="fw-bold mb-2">
+          <i class="bi bi-basket text-emerald me-2"></i>Ingredients
+        </h6>
+        <ul class="ingredient-list list-unstyled mb-0">
+          {% for ingredient in ingredients %}
+            <li class="ingredient-item py-1 border-bottom">
+              <i class="bi bi-check-circle text-success me-2"></i>{{ ingredient }}
+            </li>
+          {% empty %}
+            <li class="text-muted">No ingredients listed</li>
+          {% endfor %}
+        </ul>
+      </div>
     </div>
 
-    <!-- Ingredients & Method -->
-    <div class="row g-3">
-        <!-- Ingredients -->
-        <div class="col-lg-4">
-            <div class="card-style p-3">
-                <h6 class="fw-bold mb-2">
-                    <i class="bi bi-basket text-emerald me-2"></i>Ingredients
-                </h6>
-                <ul class="ingredient-list list-unstyled mb-0">
-                    {% for ingredient in ingredients %}
-                    <li class="ingredient-item py-1 border-bottom">
-                        <i class="bi bi-check-circle text-success me-2"></i>{{ ingredient }}
-                    </li>
-                    {% empty %}
-                    <li class="text-muted">No ingredients listed</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-
-        <!-- Method -->
-        <div class="col-lg-8">
-            <div class="card-style p-3">
-                <h6 class="fw-bold mb-2">
-                    <i class="bi bi-list-ol text-emerald me-2"></i>Instructions
-                </h6>
-                <ol class="method-list list-unstyled mb-0">
-                    {% for step in method %}
-                    <li class="method-step d-flex mb-2">
-                        <span class="step-number me-2">{{ forloop.counter }}</span>
-                        <span class="step-text">{{ step }}</span>
-                    </li>
-                    {% empty %}
-                    <li class="text-muted">No instructions listed</li>
-                    {% endfor %}
-                </ol>
-            </div>
-        </div>
+    <!-- Method -->
+    <div class="col-lg-8">
+      <div class="card-style p-3">
+        <h6 class="fw-bold mb-2">
+          <i class="bi bi-list-ol text-emerald me-2"></i>Instructions
+        </h6>
+        <ol class="method-list list-unstyled mb-0">
+          {% for step in method %}
+            <li class="method-step d-flex mb-2">
+              <span class="step-number me-2">{{ forloop.counter }}</span>
+              <span class="step-text">{{ step }}</span>
+            </li>
+          {% empty %}
+            <li class="text-muted">No instructions listed</li>
+          {% endfor %}
+        </ol>
+      </div>
     </div>
+  </div>
+
 </div>
 {% endblock %}
