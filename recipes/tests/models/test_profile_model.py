@@ -18,7 +18,7 @@ class ProfileModelTestCase(TestCase):
         """Test creating a profile with default values."""
         profile = Profile.objects.create(user=self.user)
         self.assertEqual(profile.user, self.user)
-        self.assertEqual(profile.theme, 'system')
+        self.assertEqual(profile.theme, 'light')
         self.assertEqual(profile.color_blind_mode, 'none')
         self.assertEqual(profile.font_scale, 1.0)
 

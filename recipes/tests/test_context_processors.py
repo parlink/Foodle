@@ -57,7 +57,7 @@ class UserThemeContextProcessorTestCase(TestCase):
         context = user_theme_context(request)
         self.assertEqual(context['body_classes'], '')
         self.assertEqual(context['body_styles'], '')
-        self.assertEqual(context['user_theme'], 'system')
+        self.assertEqual(context['user_theme'], 'light')
 
     def test_returns_dark_mode_class_for_dark_theme(self):
         """Test that dark-mode class is returned for dark theme."""
@@ -146,7 +146,7 @@ class UserThemeContextProcessorTestCase(TestCase):
         request.user = self.user
         context = user_theme_context(request)
         self.assertTrue(Profile.objects.filter(user=self.user).exists())
-        self.assertEqual(context['user_theme'], 'system')  # Default
+        self.assertEqual(context['user_theme'], 'light')  # Default
 
     def test_multiple_classes_combined(self):
         """Test that multiple classes are combined properly."""

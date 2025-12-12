@@ -18,9 +18,7 @@ def feed(request):
 
     if show_followed_only:
         followed_ids = Follow.objects.filter(follower=request.user).values_list('followed_id', flat=True)
-        posts_following = Post.objects.filter(author__in=followed_ids).select_related('author').prefetch_related('tags', 'comments__user')
-        my_posts = Post.objects.filter(author=request.user).select_related('author').prefetch_related('tags', 'comments__user')
-        posts = posts_following.union(my_posts)
+        posts = Post.objects.filter(Q(author__in=followed_ids) | Q(author=request.user)).select_related('author').prefetch_related('tags', 'comments__user')
     else:
         posts = Post.objects.all().select_related('author').prefetch_related('tags', 'comments__user')
     if cuisine_filter:
@@ -28,9 +26,9 @@ def feed(request):
     if tag_filter:
         posts = posts.filter(tags__name=tag_filter)
     if sort_by == 'top_rated':
-        posts = posts.annotate(calculated_average=Avg('ratings__score')).order_by('-calculated_average')
+        posts = posts.annotate(calculated_average=Avg('ratings__score')).order_by('-calculated_average', '-created_at', '-id')
     else:
-        posts = posts.order_by('-created_at')
+        posts = posts.order_by('-created_at', '-id')
 
     saved_posts = Post.objects.filter(saves__user=request.user).select_related('author').prefetch_related('tags', 'comments__user').order_by('-saves__created_at')
 
