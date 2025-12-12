@@ -18,3 +18,4 @@ from .ai_recipe import chatbot
 from .my_recipes_view import *
 from .add_recipe_view import *
 from .recipe_detail_view import *
+from .edit_recipe_view import *
