@@ -9,9 +9,8 @@
         <div class="col-12 text-center">
             <form method="get" action="{% url 'recipes' %}">
                 <button type="submit" name="sort_by" value="quick-meals" class="btn btn-custom">Quick Meals</button>
-                <button type="submit" name="sort_by" value="rating" class="btn btn-custom {% if request.GET.sort_by == 'rating' %}active{% endif %}">By Rating</button>
+                <button type="submit" name="sort_by" value="servings" class="btn btn-custom">By Servings</button>
                 <button type="submit" name="sort_by" value="difficulty" class="btn btn-custom {% if request.GET.sort_by == 'difficulty' %}active{% endif %}">By Difficulty</button>
-                <button type="submit" name="sort_by" value="time" class="btn btn-custom {% if request.GET.sort_by == 'time' %}active{% endif %}">By Time</button>
             </form>
         </div>
   </div>
