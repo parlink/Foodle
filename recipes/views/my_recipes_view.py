@@ -1,9 +1,11 @@
 import re
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from recipes.models import Recipe, User
 from django.db.models import Q, F
+from django.contrib import messages
+
 
 def parse_total_time_to_minutes(total_time_str: str) -> int:
     if not total_time_str:
@@ -77,8 +79,8 @@ def my_recipes(request):
     return render(request, 'recipes/my_recipes.html', {
         'page': page,
         'alphabet': alphabet,
-        'current_letter': letter_filter,  # To highlight the current letter in the banner
-        'sort_by': sort_by,  # Pass the current sorting method to the template
+        'current_letter': letter_filter,  
+        'sort_by': sort_by,  
         'search_query': search_query,
     },)
 
@@ -86,7 +88,6 @@ def my_recipes(request):
 def recipe_detail(request, id):
     recipe = Recipe.objects.get(id=id)
     
-    # Split ingredients and method into separate lines for display
     ingredients = [i.strip() for i in recipe.ingredients.split(',') if i.strip()]
     method = [s.strip() for s in recipe.method.split('\n') if s.strip()]
     
@@ -95,3 +96,15 @@ def recipe_detail(request, id):
         'ingredients': ingredients,
         'method': method,
     })
+
+@login_required
+def recipe_delete(request, id):
+    recipe = get_object_or_404(Recipe, id=id, created_by=request.user)
+
+    if request.method == "POST":
+        recipe_name = recipe.name
+        recipe.delete()
+        messages.success(request, f'Recipe "{recipe_name}" deleted.')
+
+    return redirect("my_recipes")
+
