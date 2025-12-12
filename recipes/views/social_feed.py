@@ -18,11 +18,11 @@ def feed(request):
 
     if show_followed_only:
         followed_ids = Follow.objects.filter(follower=request.user).values_list('followed_id', flat=True)
-        posts_following = Post.objects.filter(author__in=followed_ids)
-        my_posts = Post.objects.filter(author=request.user)
+        posts_following = Post.objects.filter(author__in=followed_ids).select_related('author').prefetch_related('tags', 'comments__user')
+        my_posts = Post.objects.filter(author=request.user).select_related('author').prefetch_related('tags', 'comments__user')
         posts = posts_following.union(my_posts)
     else:
-        posts = Post.objects.all()
+        posts = Post.objects.all().select_related('author').prefetch_related('tags', 'comments__user')
     if cuisine_filter:
         posts = posts.filter(cuisine=cuisine_filter)
     if tag_filter:
@@ -32,8 +32,7 @@ def feed(request):
     else:
         posts = posts.order_by('-created_at')
 
-    posts = posts.select_related('author').prefetch_related('tags', 'comments__user')
-    saved_posts = Post.objects.filter(saves__user=request.user).select_related('author').order_by('-saves__created_at')
+    saved_posts = Post.objects.filter(saves__user=request.user).select_related('author').prefetch_related('tags', 'comments__user').order_by('-saves__created_at')
 
     main_posts_list = list(posts)
     saved_posts_list = list(saved_posts)
@@ -236,7 +235,8 @@ def create_post(request):
             form.save_m2m()
             return redirect('feed')
         else:
-            print("Form Errors:", form.errors)
+            # Form is invalid, redirect to feed
+            pass
             
     return redirect('feed')
 

@@ -76,3 +76,40 @@ class EditRecipeViewTestCase(TestCase):
         url = reverse('recipe_edit', kwargs={'id': 999999})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+    def test_edit_recipe_with_invalid_form(self):
+        self.client.login(username=self.user.username, password='Password123')
+        invalid_form_input = {'name': ''}  # Missing required fields
+        response = self.client.post(self.url, invalid_form_input)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'recipes/edit_recipe.html')
+
+    def test_edit_recipe_preserves_created_by(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self.client.post(self.url, self.form_input, follow=True)
+        self.recipe.refresh_from_db()
+        self.assertEqual(self.recipe.created_by, self.user)
+
+    def test_edit_recipe_updates_average_rating(self):
+        self.client.login(username=self.user.username, password='Password123')
+        self.client.post(self.url, self.form_input)
+        self.recipe.refresh_from_db()
+        self.assertEqual(self.recipe.average_rating, self.recipe.personal_rating)
+
+    def test_edit_recipe_context_contains_form(self):
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.get(self.url)
+        self.assertIn('form', response.context)
+
+    def test_edit_recipe_context_contains_recipe(self):
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.get(self.url)
+        self.assertIn('recipe', response.context)
+        self.assertEqual(response.context['recipe'].id, self.recipe.id)
+
+    def test_edit_recipe_success_message(self):
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.post(self.url, self.form_input, follow=True)
+        messages = list(response.context['messages'])
+        self.assertEqual(len(messages), 1)
+        self.assertIn('updated', str(messages[0]).lower())

@@ -12,23 +12,26 @@ def parse_time_to_minutes(time_string):
     if not time_string:
         return None
     
-    total_minutes = 0
-    time_string = time_string.lower().strip()
-    words = time_string.split()
+    try:
+        total_minutes = 0
+        time_string = time_string.lower().strip()
+        words = time_string.split()
 
-    # either x minutes or x hours form
-    if len(words) == 2:
-        if words[1] == 'minutes':
-            return int(words[0])
-        elif words[1] == 'hours':
-            return int(words[0]) * 60
-    
-    # x hours y minutes form
-    if len(words) == 4: 
-        if words[1] == 'hours' and words[3] == 'minutes':
-            return int(words[0]) * 60 + int(words[2])
+        # either x minutes or x hours form
+        if len(words) == 2:
+            if words[1] == 'minutes':
+                return int(words[0])
+            elif words[1] == 'hours':
+                return int(words[0]) * 60
+        
+        # x hours y minutes form
+        if len(words) == 4: 
+            if words[1] == 'hours' and words[3] == 'minutes':
+                return int(words[0]) * 60 + int(words[2])
 
-    return None
+        return None
+    except (ValueError, IndexError):
+        return None
 
 #login_required
 def recipes(request):
