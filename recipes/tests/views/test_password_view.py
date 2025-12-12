@@ -1,11 +1,11 @@
 """Tests for the password view."""
-from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.test import TestCase
 from django.urls import reverse
 from recipes.forms import PasswordForm
 from recipes.models import User
 from recipes.tests.helpers import reverse_with_next
+
 
 class PasswordViewTest(TestCase):
     """Test suite for the password view."""
@@ -19,14 +19,16 @@ class PasswordViewTest(TestCase):
         self.url = reverse('password')
         self.form_input = {
             'password': 'Password123',
-            'new_password': 'NewPassword123',
-            'password_confirmation': 'NewPassword123',
+            'new_password': 'NewPassword123!',
+            'password_confirmation': 'NewPassword123!',
         }
 
     def test_password_url(self):
+        """Test that password URL resolves correctly."""
         self.assertEqual(self.url, '/password/')
 
     def test_get_password(self):
+        """Test GET request to password page."""
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -35,21 +37,24 @@ class PasswordViewTest(TestCase):
         self.assertTrue(isinstance(form, PasswordForm))
 
     def test_get_password_redirects_when_not_logged_in(self):
+        """Test that unauthenticated users are redirected to login."""
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
-    def test_succesful_password_change(self):
+    def test_successful_password_change(self):
+        """Test successful password change."""
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.post(self.url, self.form_input, follow=True)
         response_url = reverse('dashboard')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'dashboard.html')
+        self.assertTemplateUsed(response, 'recipes/dashboard.html')
         self.user.refresh_from_db()
-        is_password_correct = check_password('NewPassword123', self.user.password)
+        is_password_correct = check_password('NewPassword123!', self.user.password)
         self.assertTrue(is_password_correct)
 
-    def test_password_change_unsuccesful_without_correct_old_password(self):
+    def test_password_change_unsuccessful_without_correct_old_password(self):
+        """Test that password change fails with incorrect current password."""
         self.client.login(username=self.user.username, password='Password123')
         self.form_input['password'] = 'WrongPassword123'
         response = self.client.post(self.url, self.form_input, follow=True)
@@ -61,9 +66,10 @@ class PasswordViewTest(TestCase):
         is_password_correct = check_password('Password123', self.user.password)
         self.assertTrue(is_password_correct)
 
-    def test_password_change_unsuccesful_without_password_confirmation(self):
+    def test_password_change_unsuccessful_without_password_confirmation(self):
+        """Test that password change fails when confirmation doesn't match."""
         self.client.login(username=self.user.username, password='Password123')
-        self.form_input['password_confirmation'] = 'WrongPassword123'
+        self.form_input['password_confirmation'] = 'WrongPassword123!'
         response = self.client.post(self.url, self.form_input, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'password.html')
@@ -73,9 +79,16 @@ class PasswordViewTest(TestCase):
         is_password_correct = check_password('Password123', self.user.password)
         self.assertTrue(is_password_correct)
 
-    def test_post_profile_redirects_when_not_logged_in(self):
+    def test_post_password_redirects_when_not_logged_in(self):
+        """Test that POST to password page redirects when not logged in."""
         redirect_url = reverse_with_next('log_in', self.url)
         response = self.client.post(self.url, self.form_input)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         is_password_correct = check_password('Password123', self.user.password)
         self.assertTrue(is_password_correct)
+
+    def test_password_form_has_csrf_token(self):
+        """Test that password form includes CSRF protection."""
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.get(self.url)
+        self.assertContains(response, 'csrfmiddlewaretoken')

@@ -5,6 +5,7 @@ from django.test import TestCase
 from recipes.forms import SignUpForm
 from recipes.models import User
 
+
 class SignUpFormTestCase(TestCase):
     """Unit tests of the sign up form."""
 
@@ -14,15 +15,17 @@ class SignUpFormTestCase(TestCase):
             'last_name': 'Doe',
             'username': '@janedoe',
             'email': 'janedoe@example.org',
-            'new_password': 'Password123',
-            'password_confirmation': 'Password123'
+            'new_password': 'Password123!',
+            'password_confirmation': 'Password123!'
         }
 
     def test_valid_sign_up_form(self):
+        """Test that form is valid with correct input."""
         form = SignUpForm(data=self.form_input)
         self.assertTrue(form.is_valid())
 
     def test_form_has_necessary_fields(self):
+        """Test that form has all required fields."""
         form = SignUpForm()
         self.assertIn('first_name', form.fields)
         self.assertIn('last_name', form.fields)
@@ -38,42 +41,55 @@ class SignUpFormTestCase(TestCase):
         self.assertTrue(isinstance(password_confirmation_widget, forms.PasswordInput))
 
     def test_form_uses_model_validation(self):
+        """Test that form validates username format."""
         self.form_input['username'] = 'badusername'
         form = SignUpForm(data=self.form_input)
         self.assertFalse(form.is_valid())
 
     def test_password_must_contain_uppercase_character(self):
-        self.form_input['new_password'] = 'password123'
-        self.form_input['password_confirmation'] = 'password123'
+        """Test that password must contain uppercase letter."""
+        self.form_input['new_password'] = 'password123!'
+        self.form_input['password_confirmation'] = 'password123!'
         form = SignUpForm(data=self.form_input)
         self.assertFalse(form.is_valid())
 
     def test_password_must_contain_lowercase_character(self):
-        self.form_input['new_password'] = 'PASSWORD123'
-        self.form_input['password_confirmation'] = 'PASSWORD123'
+        """Test that password must contain lowercase letter."""
+        self.form_input['new_password'] = 'PASSWORD123!'
+        self.form_input['password_confirmation'] = 'PASSWORD123!'
         form = SignUpForm(data=self.form_input)
         self.assertFalse(form.is_valid())
 
     def test_password_must_contain_number(self):
-        self.form_input['new_password'] = 'PasswordABC'
-        self.form_input['password_confirmation'] = 'PasswordABC'
+        """Test that password must contain a number."""
+        self.form_input['new_password'] = 'PasswordABC!'
+        self.form_input['password_confirmation'] = 'PasswordABC!'
+        form = SignUpForm(data=self.form_input)
+        self.assertFalse(form.is_valid())
+
+    def test_password_must_contain_special_character(self):
+        """Test that password must contain a special character."""
+        self.form_input['new_password'] = 'Password123'
+        self.form_input['password_confirmation'] = 'Password123'
         form = SignUpForm(data=self.form_input)
         self.assertFalse(form.is_valid())
 
     def test_new_password_and_password_confirmation_are_identical(self):
-        self.form_input['password_confirmation'] = 'WrongPassword123'
+        """Test that password and confirmation must match."""
+        self.form_input['password_confirmation'] = 'WrongPassword123!'
         form = SignUpForm(data=self.form_input)
         self.assertFalse(form.is_valid())
 
     def test_form_must_save_correctly(self):
+        """Test that form creates a new user correctly."""
         form = SignUpForm(data=self.form_input)
         before_count = User.objects.count()
         form.save()
         after_count = User.objects.count()
-        self.assertEqual(after_count, before_count+1)
+        self.assertEqual(after_count, before_count + 1)
         user = User.objects.get(username='@janedoe')
         self.assertEqual(user.first_name, 'Jane')
         self.assertEqual(user.last_name, 'Doe')
         self.assertEqual(user.email, 'janedoe@example.org')
-        is_password_correct = check_password('Password123', user.password)
+        is_password_correct = check_password('Password123!', user.password)
         self.assertTrue(is_password_correct)

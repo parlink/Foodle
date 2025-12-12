@@ -1,0 +1,167 @@
+{% extends "base_content.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card card-style">
+        <div class="card-header border-0 bg-transparent">
+          <h4 class="mb-0 fw-bold">
+            <i class="bi bi-plus-circle me-2"></i>Add New Recipe
+          </h4>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data" id="addRecipeForm">
+            {% csrf_token %}
+            
+            <!-- Recipe Name -->
+            <div class="mb-3">
+              <label for="id_name" class="form-label fw-semibold">Recipe Name</label>
+              {{ form.name }}
+              {% if form.name.errors %}
+                <div class="text-danger small">{{ form.name.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Photo Upload -->
+            <div class="mb-3">
+              <label for="id_image" class="form-label fw-semibold">Photo</label>
+              {{ form.image }}
+              <div class="form-text">Upload a photo of your recipe (optional)</div>
+              {% if form.image.errors %}
+                <div class="text-danger small">{{ form.image.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Your Rating -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Your Rating</label>
+              <div class="star-rating-input d-flex gap-1" id="ratingInput">
+                {% for i in "12345" %}
+                <i class="bi bi-star fs-4 star-select" data-rating="{{ i }}" style="cursor: pointer;"></i>
+                {% endfor %}
+                {{ form.personal_rating }}
+              </div>
+            </div>
+            
+            <div class="row">
+              <!-- Difficulty -->
+              <div class="col-md-6 mb-3">
+                <label for="id_difficulty" class="form-label fw-semibold">Difficulty</label>
+                {{ form.difficulty }}
+                {% if form.difficulty.errors %}
+                  <div class="text-danger small">{{ form.difficulty.errors }}</div>
+                {% endif %}
+              </div>
+              
+              <!-- Duration -->
+              <div class="col-md-6 mb-3">
+                <label for="id_total_time" class="form-label fw-semibold">Duration</label>
+                {{ form.total_time }}
+                {% if form.total_time.errors %}
+                  <div class="text-danger small">{{ form.total_time.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="row">
+              <!-- Servings -->
+              <div class="col-md-6 mb-3">
+                <label for="id_servings" class="form-label fw-semibold">Servings</label>
+                {{ form.servings }}
+                {% if form.servings.errors %}
+                  <div class="text-danger small">{{ form.servings.errors }}</div>
+                {% endif %}
+              </div>
+              
+              <!-- Calories -->
+              <div class="col-md-6 mb-3">
+                <label for="id_calories" class="form-label fw-semibold">Calories (per serving)</label>
+                {{ form.calories }}
+                {% if form.calories.errors %}
+                  <div class="text-danger small">{{ form.calories.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <!-- Ingredients -->
+            <div class="mb-3">
+              <label for="id_ingredients" class="form-label fw-semibold">Ingredients</label>
+              {{ form.ingredients }}
+              <div class="form-text">Separate each ingredient with a comma</div>
+              {% if form.ingredients.errors %}
+                <div class="text-danger small">{{ form.ingredients.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Instructions -->
+            <div class="mb-3">
+              <label for="id_method" class="form-label fw-semibold">Instructions</label>
+              {{ form.method }}
+              <div class="form-text">Enter each step on a new line</div>
+              {% if form.method.errors %}
+                <div class="text-danger small">{{ form.method.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-emerald">
+                <i class="bi bi-check-lg me-1"></i>Save Recipe
+              </button>
+              <a href="{% url 'my_recipes' %}" class="btn btn-secondary">
+                Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Star rating functionality
+  const stars = document.querySelectorAll('.star-select');
+  const ratingInput = document.getElementById('id_personal_rating');
+  
+  stars.forEach(star => {
+    star.addEventListener('click', function() {
+      const rating = parseInt(this.dataset.rating);
+      ratingInput.value = rating;
+      
+      // Update star display
+      stars.forEach((s, index) => {
+        if (index < rating) {
+          s.classList.remove('bi-star');
+          s.classList.add('bi-star-fill', 'text-warning');
+        } else {
+          s.classList.remove('bi-star-fill', 'text-warning');
+          s.classList.add('bi-star');
+        }
+      });
+    });
+    
+    // Hover effect
+    star.addEventListener('mouseenter', function() {
+      const rating = parseInt(this.dataset.rating);
+      stars.forEach((s, index) => {
+        if (index < rating) {
+          s.classList.add('text-warning');
+        }
+      });
+    });
+    
+    star.addEventListener('mouseleave', function() {
+      const currentRating = parseInt(ratingInput.value) || 0;
+      stars.forEach((s, index) => {
+        if (index >= currentRating) {
+          s.classList.remove('text-warning');
+        }
+      });
+    });
+  });
+});
+</script>
+{% endblock %}

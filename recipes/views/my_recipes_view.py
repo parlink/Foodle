@@ -1,27 +1,71 @@
+import re
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from recipes.models import Recipe, User
+from django.db.models import Q, F
+
+def parse_total_time_to_minutes(total_time_str: str) -> int:
+    if not total_time_str:
+        return 0
+
+    s = total_time_str.lower()
+
+    hours = 0
+    minutes = 0
+
+    # Look for hours
+    match_hours = re.search(r'(\d+)\s*hour', s)
+    if match_hours:
+        hours = int(match_hours.group(1))
+
+    # Look for minutes
+    match_minutes = re.search(r'(\d+)\s*min', s)
+    if match_minutes:
+        minutes = int(match_minutes.group(1))
+
+    # If we didn't find explicit 'hour' or 'min', just grab the first number as minutes
+    if hours == 0 and minutes == 0:
+        match_any = re.search(r'(\d+)', s)
+        if match_any:
+            minutes = int(match_any.group(1))
+
+    return hours * 60 + minutes
+
 
 @login_required
 def my_recipes(request):
     user = request.user
     
-    sort_by = request.GET.get('sort_by', 'name')  
-    letter_filter = request.GET.get('letter', '')  
-    
-    if sort_by == 'rating':
-        recipes = Recipe.objects.filter(created_by=user).order_by('-average_rating')
+    # Get the sorting parameter and check if it's alphabetical
+    sort_by = request.GET.get('sort_by', 'name')  # Default to alphabetical sorting by name
+    letter_filter = request.GET.get('letter', '')  # Get the letter filter from the query params
+    search_query = request.GET.get('q', '').strip()
+
+    recipes_qs = Recipe.objects.filter(created_by=user)
+
+    if search_query:
+        recipes_qs = recipes_qs.filter(
+            Q(name__icontains=search_query) |
+            Q(ingredients__icontains=search_query) |
+            Q(method__icontains=search_query)
+        ).distinct()
+
+    if sort_by == 'time':
+        # Apply the complex sorting using your custom function
+        recipes = sorted(
+            recipes_qs, # Apply sorted() to the filtered queryset!
+            key=lambda r: parse_total_time_to_minutes(r.total_time)
+        )
+    elif sort_by == 'rating':
+        recipes = recipes_qs.order_by('-average_rating')
     elif sort_by == 'difficulty':
-        recipes = Recipe.objects.filter(created_by=user).order_by('difficulty')
-    elif sort_by == 'time':
-        recipes = Recipe.objects.filter(created_by=user).order_by('total_time')
+        recipes = recipes_qs.order_by('difficulty')
     else:
 
         if letter_filter:
-            recipes = Recipe.objects.filter(created_by=user, name__istartswith=letter_filter).order_by('name')
-        else:
-            recipes = Recipe.objects.filter(created_by=user).order_by('name')
+            recipes_qs = recipes_qs.filter(name__istartswith=letter_filter)
+        recipes = recipes_qs.order_by('name')
     
     paginator = Paginator(recipes, 12)  # Show 12 recipes per page
     page_number = request.GET.get('page', 1)
@@ -33,9 +77,10 @@ def my_recipes(request):
     return render(request, 'recipes/my_recipes.html', {
         'page': page,
         'alphabet': alphabet,
-        'current_letter': letter_filter,  
-        'sort_by': sort_by, 
-    })
+        'current_letter': letter_filter,  # To highlight the current letter in the banner
+        'sort_by': sort_by,  # Pass the current sorting method to the template
+        'search_query': search_query,
+    },)
 
 
 def recipe_detail(request, id):

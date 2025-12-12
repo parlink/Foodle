@@ -6,6 +6,7 @@ from recipes.forms import SignUpForm
 from recipes.models import User
 from recipes.tests.helpers import LogInTester
 
+
 class SignUpViewTestCase(TestCase, LogInTester):
     """Tests of the sign up view."""
 
@@ -18,59 +19,67 @@ class SignUpViewTestCase(TestCase, LogInTester):
             'last_name': 'Doe',
             'username': '@janedoe',
             'email': 'janedoe@example.org',
-            'new_password': 'Password123',
-            'password_confirmation': 'Password123'
+            'new_password': 'Password123!',
+            'password_confirmation': 'Password123!'
         }
         self.user = User.objects.get(username='@johndoe')
 
     def test_sign_up_url(self):
-        self.assertEqual(self.url,'/sign_up/')
+        """Test that sign up URL resolves correctly."""
+        self.assertEqual(self.url, '/signup/')
 
     def test_get_sign_up(self):
+        """Test GET request to sign up page."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'sign_up.html')
+        self.assertTemplateUsed(response, 'recipes/auth/signup.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, SignUpForm))
         self.assertFalse(form.is_bound)
 
     def test_get_sign_up_redirects_when_logged_in(self):
+        """Test that logged in users are redirected from sign up page."""
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url, follow=True)
         redirect_url = reverse('dashboard')
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'dashboard.html')
+        self.assertTemplateUsed(response, 'recipes/dashboard.html')
 
-    def test_unsuccesful_sign_up(self):
+    def test_unsuccessful_sign_up(self):
+        """Test sign up with invalid username."""
         self.form_input['username'] = 'BAD_USERNAME'
         before_count = User.objects.count()
         response = self.client.post(self.url, self.form_input)
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'sign_up.html')
+        self.assertTemplateUsed(response, 'recipes/auth/signup.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, SignUpForm))
         self.assertTrue(form.is_bound)
         self.assertFalse(self._is_logged_in())
 
-    def test_succesful_sign_up(self):
+    def test_successful_sign_up(self):
+        """Test successful sign up creates user and redirects to login."""
         before_count = User.objects.count()
         response = self.client.post(self.url, self.form_input, follow=True)
         after_count = User.objects.count()
-        self.assertEqual(after_count, before_count+1)
-        response_url = reverse('dashboard')
+        self.assertEqual(after_count, before_count + 1)
+        # SignUpView redirects to log_in page after successful signup
+        response_url = reverse('log_in')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'dashboard.html')
+        self.assertTemplateUsed(response, 'recipes/auth/login.html')
         user = User.objects.get(username='@janedoe')
         self.assertEqual(user.first_name, 'Jane')
         self.assertEqual(user.last_name, 'Doe')
         self.assertEqual(user.email, 'janedoe@example.org')
-        is_password_correct = check_password('Password123', user.password)
+        is_password_correct = check_password('Password123!', user.password)
         self.assertTrue(is_password_correct)
-        self.assertTrue(self._is_logged_in())
+        # User is not logged in after signup (they need to log in)
+        self.assertFalse(self._is_logged_in())
 
     def test_post_sign_up_redirects_when_logged_in(self):
+        """Test that logged in users posting to sign up are redirected."""
         self.client.login(username=self.user.username, password="Password123")
         before_count = User.objects.count()
         response = self.client.post(self.url, self.form_input, follow=True)
@@ -78,4 +87,14 @@ class SignUpViewTestCase(TestCase, LogInTester):
         self.assertEqual(after_count, before_count)
         redirect_url = reverse('dashboard')
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'dashboard.html')
+        self.assertTemplateUsed(response, 'recipes/dashboard.html')
+
+    def test_sign_up_form_has_csrf_token(self):
+        """Test that sign up form includes CSRF protection."""
+        response = self.client.get(self.url)
+        self.assertContains(response, 'csrfmiddlewaretoken')
+
+    def test_sign_up_page_has_login_link(self):
+        """Test that sign up page has a link to login."""
+        response = self.client.get(self.url)
+        self.assertContains(response, reverse('log_in'))

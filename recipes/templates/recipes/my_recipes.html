@@ -1,35 +1,91 @@
 {% extends 'base_content.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block content %}
 <div class="container my-3">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="display-5 text-center mb-2">My Recipes</h1>
-            <p class="text-center mb-3">Total Recipes: {{ page.paginator.count }}</p>
+    <!-- Header with Title, Search, and Add Button -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-4">
+            <h1 class="display-5 mb-1">My Recipes</h1>
+            <p class="text-muted mb-0">Your saved and created recipes · Total: {{ page.paginator.count }}</p>
+        </div>
+        <div class="col-md-6">
+            <form method="get" action="{% url 'my_recipes' %}" class="d-flex">
+                {% if sort_by %}
+                    <input type="hidden" name="sort_by" value="{{ sort_by }}">
+                {% endif %}
+                <input type="text" 
+                       class="form-control me-2" 
+                       name="q" 
+                       value="{{ search_query }}" 
+                       placeholder="Search my recipes...">
+                <button type="submit" class="btn btn-outline-secondary">Search</button>
+            </form>
+        </div>
+        <div class="col-md-2 text-end">
+            <button type="button" class="btn btn-emerald" data-bs-toggle="modal" data-bs-target="#addRecipeModal">
+                <i class="bi bi-plus-lg"></i> Add Recipe
+            </button>
         </div>
     </div>
 
-    <!-- Sorting Buttons -->
-    <div class="row mb-4 sorting-buttons">
+    <!-- Sorting buttons -->
+    <div class="row mb-3 sorting-buttons">
         <div class="col-12 text-center">
-            <form method="get" action="{% url 'my_recipes' %}">
-                <button type="submit" name="sort_by" value="name" class="btn btn-custom {% if request.GET.sort_by == 'name' %}active{% endif %}">Alphabetical Order</button>
-                <button type="submit" name="sort_by" value="rating" class="btn btn-custom {% if request.GET.sort_by == 'rating' %}active{% endif %}">By Rating</button>
-                <button type="submit" name="sort_by" value="difficulty" class="btn btn-custom {% if request.GET.sort_by == 'difficulty' %}active{% endif %}">By Difficulty</button>
-                <button type="submit" name="sort_by" value="time" class="btn btn-custom {% if request.GET.sort_by == 'time' %}active{% endif %}">By Time</button>
+            <form method="get" action="{% url 'my_recipes' %}" class="d-inline">
+                {% if search_query %}
+                    <input type="hidden" name="q" value="{{ search_query }}">
+                {% endif %}
+                {% if current_letter and sort_by == 'name' %}
+                    <input type="hidden" name="letter" value="{{ current_letter }}">
+                {% endif %}
+
+                <button type="submit" name="sort_by" value="name" class="btn btn-custom {% if sort_by == 'name' %}active{% endif %}">
+                    Alphabetical Order
+                </button>
+                <button type="submit" name="sort_by" value="rating" class="btn btn-custom {% if sort_by == 'rating' %}active{% endif %}">
+                    By Rating
+                </button>
+                <button type="submit" name="sort_by" value="difficulty" class="btn btn-custom {% if sort_by == 'difficulty' %}active{% endif %}">
+                    By Difficulty
+                </button>
+                <button type="submit" name="sort_by" value="time" class="btn btn-custom {% if sort_by == 'time' %}active{% endif %}">
+                    By Time
+                </button>
             </form>
         </div>
     </div>
 
-    <!-- Alphabet Filter Banner (Only shown for alphabetical sort) -->
-    {% if request.GET.sort_by == 'name' %}
-    <div class="row mb-4">
-        <div class="col-12 text-center alphabet-filter">
-            <div class="btn-group" role="group">
-                {% for letter in alphabet %}
-                    <a href="?sort_by=name&letter={{ letter }}" class="btn btn-outline-secondary {% if letter == current_letter %}active{% endif %}">{{ letter }}</a>
-                {% endfor %}
+  <!-- Alphabet filter (only for alphabetical sort) -->
+  {% if sort_by == 'name' %}
+  <div class="row mb-4">
+    <div class="col-12 text-center alphabet-filter">
+      <div class="btn-group flex-wrap" role="group">
+        {% for letter in alphabet %}
+          <a href="?sort_by=name&letter={{ letter }}{% if search_query %}&q={{ search_query }}{% endif %}"
+             class="btn btn-outline-secondary btn-sm {% if letter == current_letter %}active{% endif %}">
+            {{ letter }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+    <!-- Search Results Info -->
+    {% if search_query %}
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="search-results-bar card-style d-flex align-items-center justify-content-between py-2 px-3 rounded">
+                <span>
+                    <i class="bi bi-search me-2 text-success"></i>
+                    Showing results for "<strong class="text-success">{{ search_query }}</strong>" 
+                    <span class="text-muted">({{ page.paginator.count }} found)</span>
+                </span>
+                <a href="{% url 'my_recipes' %}{% if sort_by %}?sort_by={{ sort_by }}{% endif %}" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-x-lg"></i> Clear Search
+                </a>
             </div>
         </div>
     </div>
@@ -65,29 +121,179 @@
         </div>
         {% endfor %}
     </div>
-    {% else %}
-    <div class="alert alert-info" role="alert">
-        No recipes found.
+  {% else %}
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+      <i class="bi bi-info-circle me-2 fs-5"></i>
+      <div>
+        {% if search_query %}
+          No recipes found matching "<strong>{{ search_query }}</strong>". 
+          <a href="{% url 'my_recipes' %}{% if sort_by %}?sort_by={{ sort_by }}{% endif %}">Clear search</a> or try a different term.
+        {% else %}
+          You don't have any recipes yet. Click <strong>+ Add Recipe</strong> to create your first one!
+        {% endif %}
+      </div>
     </div>
-    {% endif %}
+  {% endif %}
 
-    <!-- Pagination -->
-    <div class="pagination justify-content-center mt-4">
-        <span class="step-links">
-            {% if page.has_previous %}
-                <a href="?page=1" class="btn btn-outline-secondary">&laquo; First</a>
-                <a href="?page={{ page.previous_page_number }}" class="btn btn-outline-secondary">Previous</a>
-            {% endif %}
+  <!-- Pagination -->
+  <div class="pagination justify-content-center mt-4">
+    <span class="step-links">
+      {% if page.has_previous %}
+        <a href="?page=1{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if current_letter %}&letter={{ current_letter }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-secondary">&laquo; First</a>
+        <a href="?page={{ page.previous_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if current_letter %}&letter={{ current_letter }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-secondary">Previous</a>
+      {% endif %}
 
-            <span class="current">
-                Page {{ page.number }} of {{ page.paginator.num_pages }}.
-            </span>
+      <span class="current mx-2">
+        Page {{ page.number }} of {{ page.paginator.num_pages }}.
+      </span>
 
-            {% if page.has_next %}
-                <a href="?page={{ page.next_page_number }}" class="btn btn-outline-secondary">Next</a>
-                <a href="?page={{ page.paginator.num_pages }}" class="btn btn-outline-secondary">Last &raquo;</a>
-            {% endif %}
-        </span>
-    </div>
+      {% if page.has_next %}
+        <a href="?page={{ page.next_page_number }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if current_letter %}&letter={{ current_letter }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-secondary">Next</a>
+        <a href="?page={{ page.paginator.num_pages }}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}{% if current_letter %}&letter={{ current_letter }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-secondary">Last &raquo;</a>
+      {% endif %}
+    </span>
+  </div>
 </div>
+
+<!-- Add Recipe Modal -->
+<div class="modal fade" id="addRecipeModal" tabindex="-1" aria-labelledby="addRecipeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content card-style">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold" id="addRecipeModalLabel">
+          <i class="bi bi-plus-circle me-2"></i>Add New Recipe
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'recipe_create' %}" enctype="multipart/form-data" id="addRecipeForm">
+          {% csrf_token %}
+          
+          <!-- Recipe Name -->
+          <div class="mb-3">
+            <label for="id_name" class="form-label fw-semibold">Recipe Name</label>
+            <input type="text" class="form-control" id="id_name" name="name" required placeholder="Enter recipe name">
+          </div>
+          
+          <!-- Photo Upload -->
+          <div class="mb-3">
+            <label for="id_image" class="form-label fw-semibold">Photo</label>
+            <input type="file" class="form-control" id="id_image" name="image" accept="image/*">
+            <div class="form-text">Upload a photo of your recipe (optional)</div>
+          </div>
+          
+          <!-- Your Rating -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Your Rating</label>
+            <div class="star-rating-input d-flex gap-1" id="ratingInput">
+              {% for i in "12345" %}
+              <i class="bi bi-star fs-4 star-select" data-rating="{{ i }}" style="cursor: pointer;"></i>
+              {% endfor %}
+              <input type="hidden" name="personal_rating" id="id_personal_rating" value="0">
+            </div>
+          </div>
+          
+          <div class="row">
+            <!-- Difficulty -->
+            <div class="col-md-6 mb-3">
+              <label for="id_difficulty" class="form-label fw-semibold">Difficulty</label>
+              <select class="form-select" id="id_difficulty" name="difficulty" required>
+                <option value="Very Easy">Very Easy</option>
+                <option value="Easy" selected>Easy</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Hard">Hard</option>
+                <option value="Very Hard">Very Hard</option>
+              </select>
+            </div>
+            
+            <!-- Duration -->
+            <div class="col-md-6 mb-3">
+              <label for="id_total_time" class="form-label fw-semibold">Duration</label>
+              <input type="text" class="form-control" id="id_total_time" name="total_time" required placeholder="e.g., 30 min or 1 hour 15 min">
+            </div>
+          </div>
+          
+          <div class="row">
+            <!-- Servings -->
+            <div class="col-md-6 mb-3">
+              <label for="id_servings" class="form-label fw-semibold">Servings</label>
+              <input type="number" class="form-control" id="id_servings" name="servings" min="1" value="1" required>
+            </div>
+            
+            <!-- Calories -->
+            <div class="col-md-6 mb-3">
+              <label for="id_calories" class="form-label fw-semibold">Calories (per serving)</label>
+              <input type="number" class="form-control" id="id_calories" name="calories" min="0" value="0" placeholder="e.g., 350">
+            </div>
+          </div>
+          
+          <!-- Ingredients -->
+          <div class="mb-3">
+            <label for="id_ingredients" class="form-label fw-semibold">Ingredients</label>
+            <textarea class="form-control" id="id_ingredients" name="ingredients" rows="4" required placeholder="Enter ingredients, separated by commas&#10;e.g., 2 cups flour, 1 cup sugar, 3 eggs"></textarea>
+            <div class="form-text">Separate each ingredient with a comma</div>
+          </div>
+          
+          <!-- Instructions -->
+          <div class="mb-3">
+            <label for="id_method" class="form-label fw-semibold">Instructions</label>
+            <textarea class="form-control" id="id_method" name="method" rows="6" required placeholder="Enter cooking instructions&#10;Each line will be a separate step"></textarea>
+            <div class="form-text">Enter each step on a new line</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" form="addRecipeForm" class="btn btn-emerald">
+          <i class="bi bi-check-lg me-1"></i>Save Recipe
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Star rating functionality
+  const stars = document.querySelectorAll('.star-select');
+  const ratingInput = document.getElementById('id_personal_rating');
+  
+  stars.forEach(star => {
+    star.addEventListener('click', function() {
+      const rating = parseInt(this.dataset.rating);
+      ratingInput.value = rating;
+      
+      // Update star display
+      stars.forEach((s, index) => {
+        if (index < rating) {
+          s.classList.remove('bi-star');
+          s.classList.add('bi-star-fill', 'text-warning');
+        } else {
+          s.classList.remove('bi-star-fill', 'text-warning');
+          s.classList.add('bi-star');
+        }
+      });
+    });
+    
+    // Hover effect
+    star.addEventListener('mouseenter', function() {
+      const rating = parseInt(this.dataset.rating);
+      stars.forEach((s, index) => {
+        if (index < rating) {
+          s.classList.add('text-warning');
+        }
+      });
+    });
+    
+    star.addEventListener('mouseleave', function() {
+      const currentRating = parseInt(ratingInput.value);
+      stars.forEach((s, index) => {
+        if (index >= currentRating) {
+          s.classList.remove('text-warning');
+        }
+      });
+    });
+  });
+});
+</script>
 {% endblock %}
