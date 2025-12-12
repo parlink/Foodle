@@ -52,7 +52,7 @@ def recipes(request):
             minutes = parse_time_to_minutes(recipe.total_time)
             if minutes and minutes <= 30:
                 quick_recipes.append(recipe.id)
-        recipe_list = Recipe.objects.filter(id__in=quick_recipes)
+        recipe_list = Recipe.objects.filter(id__in=quick_recipes).order_by('id')
     
     elif sort_by == 'servings':
         recipe_list = recipe_list.order_by('-servings')
@@ -60,6 +60,9 @@ def recipes(request):
         recipe_list = recipe_list.order_by('-average_rating')
     elif sort_by == 'difficulty':
         recipe_list = recipe_list.order_by('difficulty')
+    else:
+        # Default ordering to ensure consistent pagination
+        recipe_list = recipe_list.order_by('-id')
 
 
     paginator = Paginator(recipe_list, 20)
