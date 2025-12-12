@@ -363,7 +363,7 @@ class Command(BaseCommand):
     Creates users, recipes, tracker data, social posts, and interactions.
     """
 
-    USER_COUNT = 5
+    USER_COUNT = 50
     DEFAULT_PASSWORD = 'Password123'
     help = 'Seeds the database with sample data (users, recipes, tracker data, posts)'
     
@@ -442,32 +442,145 @@ class Command(BaseCommand):
 
     # ==================== RECIPES ====================
     
+    RECIPES_PER_USER_MIN = 2   # Minimum additional recipes per user
+    RECIPES_PER_USER_MAX = 12  # Maximum additional recipes per user
+    
     def create_recipes(self):
-        """Create recipes from RECIPES_DATA and assign to random users."""
+        """Create recipes from RECIPES_DATA and ensure each user has recipes."""
         self.stdout.write("Creating recipes...")
-        created = 0
         
         users = list(User.objects.all())
         if not users:
             self.stdout.write(self.style.WARNING("  No users found. Skipping recipes."))
             return
         
+        # First, create base recipes from RECIPES_DATA (shared pool)
+        base_recipes_created = 0
         for recipe_data in RECIPES_DATA:
             try:
                 if not Recipe.objects.filter(name=recipe_data['name']).exists():
-                    # Assign recipe to a random user for "My Recipes" feature
                     recipe_data_copy = recipe_data.copy()
                     recipe_data_copy['created_by'] = choice(users)
-                    # Assign a random local image for the template
                     recipe_data_copy['image'] = choice(self.RECIPE_IMAGES)
-                    # Convert method steps to newline-separated format for the template
                     recipe_data_copy['method'] = self.convert_method_to_newlines(recipe_data['method'])
                     Recipe.objects.create(**recipe_data_copy)
-                    created += 1
+                    base_recipes_created += 1
             except Exception as e:
                 pass
         
-        self.stdout.write(f"  Recipes: {Recipe.objects.count()}")
+        # Then, give each user additional random recipes for "My Recipes" page
+        user_recipes_created = 0
+        for user in users:
+            # Each user gets a random number of ADDITIONAL recipes (on top of any base recipes)
+            recipes_to_create = randint(self.RECIPES_PER_USER_MIN, self.RECIPES_PER_USER_MAX)
+            
+            for _ in range(recipes_to_create):
+                recipe = self.create_random_recipe_for_user(user)
+                if recipe:
+                    user_recipes_created += 1
+        
+        self.stdout.write(f"  Base Recipes: {base_recipes_created}")
+        self.stdout.write(f"  User Recipes: {user_recipes_created}")
+        self.stdout.write(f"  Total Recipes: {Recipe.objects.count()}")
+    
+    def create_random_recipe_for_user(self, user):
+        """Create a random recipe assigned to a specific user."""
+        # Recipe name variations
+        dishes = [
+            "Pasta", "Salad", "Soup", "Stir Fry", "Curry", "Casserole", "Bowl",
+            "Sandwich", "Wrap", "Tacos", "Pizza", "Risotto", "Noodles", "Rice",
+            "Stew", "Pie", "Roast", "Bake", "Grill", "Skillet"
+        ]
+        proteins = [
+            "Chicken", "Beef", "Pork", "Salmon", "Shrimp", "Tofu", "Turkey",
+            "Lamb", "Tuna", "Cod", "Eggs", "Tempeh", "Chickpea", "Lentil"
+        ]
+        styles = [
+            "Mediterranean", "Asian", "Mexican", "Italian", "Thai", "Indian",
+            "Greek", "Japanese", "Korean", "American", "French", "Spanish",
+            "Moroccan", "Vietnamese", "Hawaiian", "Cajun", "BBQ", "Teriyaki"
+        ]
+        adjectives = [
+            "Creamy", "Spicy", "Crispy", "Savory", "Zesty", "Hearty", "Fresh",
+            "Grilled", "Roasted", "Sautéed", "Baked", "Pan-Fried", "Slow-Cooked"
+        ]
+        
+        # Generate unique recipe name
+        name_style = randint(1, 4)
+        if name_style == 1:
+            name = f"{choice(adjectives)} {choice(proteins)} {choice(dishes)}"
+        elif name_style == 2:
+            name = f"{choice(styles)} {choice(proteins)} {choice(dishes)}"
+        elif name_style == 3:
+            name = f"{choice(proteins)} {choice(dishes)} {choice(styles)} Style"
+        else:
+            name = f"{choice(adjectives)} {choice(styles)} {choice(proteins)}"
+        
+        # Check if recipe with this name exists, add user suffix if needed
+        base_name = name
+        counter = 1
+        while Recipe.objects.filter(name=name).exists():
+            name = f"{base_name} #{counter}"
+            counter += 1
+            if counter > 10:
+                return None  # Give up after 10 attempts
+        
+        # Generate random ingredients
+        all_ingredients = [
+            "olive oil", "garlic", "onion", "salt", "pepper", "butter",
+            "chicken breast", "ground beef", "salmon fillet", "tofu",
+            "rice", "pasta", "noodles", "bread", "tortillas",
+            "tomatoes", "bell peppers", "broccoli", "spinach", "mushrooms",
+            "carrots", "zucchini", "corn", "beans", "potatoes",
+            "cheese", "cream", "milk", "eggs", "yogurt",
+            "lemon", "lime", "ginger", "soy sauce", "honey",
+            "paprika", "cumin", "oregano", "basil", "cilantro",
+            "chicken broth", "coconut milk", "tomato sauce", "vinegar"
+        ]
+        num_ingredients = randint(5, 12)
+        ingredients = ", ".join(sample(all_ingredients, min(num_ingredients, len(all_ingredients))))
+        
+        # Generate random method steps
+        cooking_steps = [
+            "Preheat the oven to 375°F (190°C)",
+            "Heat oil in a large skillet over medium heat",
+            "Season the protein with salt, pepper, and spices",
+            "Cook until golden brown on both sides",
+            "Add the vegetables and sauté for 5 minutes",
+            "Pour in the sauce and bring to a simmer",
+            "Reduce heat and let it cook for 15-20 minutes",
+            "Stir occasionally to prevent sticking",
+            "Add fresh herbs in the last few minutes",
+            "Taste and adjust seasoning as needed",
+            "Let rest for 5 minutes before serving",
+            "Garnish with fresh herbs and serve hot",
+            "Serve over rice or with crusty bread",
+            "Top with cheese and let it melt",
+            "Drizzle with olive oil before serving"
+        ]
+        num_steps = randint(4, 8)
+        method = "\n".join(sample(cooking_steps, min(num_steps, len(cooking_steps))))
+        
+        difficulties = ["Very Easy", "Easy", "Moderate", "Hard", "Very Hard"]
+        times = ["15 min", "20 min", "25 min", "30 min", "45 min", "1 hour", "1 hour 30 min"]
+        
+        try:
+            recipe = Recipe.objects.create(
+                name=name,
+                created_by=user,
+                ingredients=ingredients,
+                method=method,
+                difficulty=choice(difficulties),
+                total_time=choice(times),
+                servings=randint(2, 6),
+                calories=randint(200, 800),
+                average_rating=randint(1, 5),
+                personal_rating=randint(1, 5),
+                image=choice(self.RECIPE_IMAGES)
+            )
+            return recipe
+        except Exception as e:
+            return None
     
     def convert_method_to_newlines(self, method_string):
         """Convert '1) Step. 2) Step.' format to newline-separated steps."""
