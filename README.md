@@ -1,4 +1,4 @@
-# Team Foodle Small Group project
+# Team Pink-6 Small Group project
 
 ## Team members
 The members of the team are:
