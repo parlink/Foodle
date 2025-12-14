@@ -157,14 +157,19 @@ MESSAGE_TAGS = {
 # Check if SendGrid API key is set for production email sending
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 
+# Disable sandbox mode - MUST be at module level for django-sendgrid-v5
+# By default, sandbox mode is enabled when DEBUG=True, preventing real emails
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+# Echo emails to console in addition to sending (useful for debugging)
+SENDGRID_ECHO_TO_STDOUT = True
+
 if SENDGRID_API_KEY:
     # Production: Use SendGrid API (works on PythonAnywhere - uses HTTPS instead of SMTP)
-    # This avoids ConnectionRefusedError because it uses HTTPS API calls, not SMTP ports
-    # django-sendgrid-v5 automatically reads SENDGRID_API_KEY from environment
     EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
     
-    # Set default from email (update this to your verified sender email in SendGrid)
-    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@foodle.com')
+    # Set default from email (MUST match your verified sender email in SendGrid)
+    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'hikmetozankaya@gmail.com')
     SERVER_EMAIL = DEFAULT_FROM_EMAIL
 else:
     # Development: Print emails to console
