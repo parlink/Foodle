@@ -13,7 +13,7 @@ The members of the team are:
 The project is called `Foodle`.
 
 ## Deployed version of the application
-The deployed version of the application can be found at [*enter url here*](*enter_url_here*).
+The deployed version of the application can be found at https://ozankaya4.pythonanywhere.com/.
 
 ## Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  The project source code has been developed using Python 3.12, so you are recommended to use the same version.  From the root of the project:
@@ -30,19 +30,6 @@ Install all required packages:
 ```
 $ pip3 install -r requirements.txt
 ```
-
-### Environment Variables Setup
-
-Create a `.env` file in the project root directory (copy from `.env.example`):
-
-On Windows:
-copy .env.example .env
-
-
-On Linux/Mac:
-cp .env.example .env
-
-**Important:** After setting environment variables, make sure to reload your web app from the Web tab for the changes to take effect.
 
 Migrate the database:
 
@@ -61,30 +48,15 @@ Run all tests with:
 $ python3 manage.py test
 ```
 
-*The above instructions should work in your version of the application.  If there are deviations, declare those here in bold.  Otherwise, remove this line.*
+## Generative AI Usage
 
-When deployed:
-Edit the `.env` file and fill in the required values:
+This project utilized generative AI tools to assist in development:
 
-- OPENAI_API_KEY: Required for AI recipe generation. Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
-  - For team members: Ask your team lead or check the shared password manager/documentation for the shared API key
-  - For deployment: Set this as an environment variable in your hosting platform.
+- **Template Creation and Styling**: AI was used to some extent in creating templates and styling the pages throughout the application.
 
-Note: The `.env` file is in `.gitignore` and should never be committed to version control. The `.env.example` file shows what variables are needed without exposing sensitive values.
+- **Debugging**: AI assistance was extensively used for debugging code issues, identifying errors, and resolving technical problems during development.
 
-PythonAnywhere Deployment
-
-For PythonAnywhere, you can set environment variables using one of these methods:
-
-Create a `.env` file on PythonAnywhere
-1. Go to the Files tab in your PythonAnywhere dashboard
-2. Navigate to your project directory
-3. Create a new file named `.env`
-4. Add your environment variables:
-   
-   OPENAI_API_KEY=sk-your-api-key-here
-
-5. Save the file. The application will automatically load these variables when it starts.
+- **Test Case Development**: AI was utilized for finding missing test cases and ensuring comprehensive test coverage for the application's functionality.
 
 ## Sources
 The packages used by this application are specified in `requirements.txt`
