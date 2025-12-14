@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-n*%ityrpt9+wxz#e%i(&7_1e=w-dv1h33&$n(mg=$0&8m0k5f-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['ozankaya4.pythonanywhere.com', 'localhost']
+ALLOWED_HOSTS = ['ozankaya4.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -153,8 +153,22 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-# Email Backend - Development (Prints to Console)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email Configuration
+# Check if SendGrid API key is set for production email sending
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+
+if SENDGRID_API_KEY:
+    # Production: Use SendGrid API (works on PythonAnywhere - uses HTTPS instead of SMTP)
+    # This avoids ConnectionRefusedError because it uses HTTPS API calls, not SMTP ports
+    # django-sendgrid-v5 automatically reads SENDGRID_API_KEY from environment
+    EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+    
+    # Set default from email (update this to your verified sender email in SendGrid)
+    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@foodle.com')
+    SERVER_EMAIL = DEFAULT_FROM_EMAIL
+else:
+    # Development: Print emails to console
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 #OpenAI API Configuration
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
